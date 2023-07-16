@@ -1,0 +1,48 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteStocker = exports.updateStocker = exports.renderStocker = exports.createStocker = exports.getStocker = void 0;
+const stocker_1 = require("../models/stocker");
+const getStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const stocker = yield stocker_1.StockerModel.find({});
+    res.send(stocker);
+});
+exports.getStocker = getStocker;
+const createStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, quantity } = req.body;
+    const stocker = new stocker_1.StockerModel({ name: name, quantity: quantity });
+    yield stocker.save();
+    res.status(201).json({ message: '新規作成', createStocker: stocker });
+});
+exports.createStocker = createStocker;
+const renderStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const stocker = yield stocker_1.StockerModel.findById(id);
+    if (!stocker) {
+        return res.send('Stocker not found!');
+    }
+    res.send(stocker);
+});
+exports.renderStocker = renderStocker;
+const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const stocker = yield stocker_1.StockerModel.findById(id, Object.assign({}, req.body));
+    yield (stocker === null || stocker === void 0 ? void 0 : stocker.save());
+    res.send(stocker);
+});
+exports.updateStocker = updateStocker;
+const deleteStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield stocker_1.StockerModel.findByIdAndDelete(id);
+    res.send();
+});
+exports.deleteStocker = deleteStocker;
+//# sourceMappingURL=stocker.js.map

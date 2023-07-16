@@ -1,0 +1,53 @@
+.button {
+  cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	width: 120px;
+	margin-top: 1rem;
+	padding: 0.5rem;
+	font-weight: bold;
+	border: 2px solid #27acd9;
+	background: #27acd9;
+	color: #fff;
+	border-radius: 2px;
+	transition: 0.5s;
+}
+
+.button:hover {
+  color: #27acd9;
+	background: #fff;
+}
+
+.title {
+	text-align: center;
+}
+
+.form {
+  width: 90%;
+  max-width: 40rem;
+  margin: 2rem auto;
+}
+
+.form-control {
+  margin-bottom: 1rem;
+}
+
+.label, .input {
+  display: block;
+  width: 100%;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.input {
+  border: 1px solid #ccc;
+	border-radius: 2px;
+  padding: 0.5rem;
+	margin-bottom: 0.25rem;
+}
+
+.input:focus {
+  outline: none;
+}

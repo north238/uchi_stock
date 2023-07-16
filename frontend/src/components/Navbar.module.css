@@ -1,0 +1,44 @@
+.navLink {
+  border-bottom: solid 2px #aaa;
+}
+
+ul {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  width: 90%;
+  height: auto;
+  margin: 0 auto;
+  list-style: none;
+}
+
+a {
+  display: block;
+  color: #aaa;
+  font-weight: 500;
+  font-size: large;
+  text-decoration: none;
+  padding: 10px 20px 10px 0px;
+}
+
+a:hover {
+  color: #000;
+
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+@media screen and (max-width: 768px) {
+  ul {
+    justify-content: flex-end;
+    text-align: center;
+    width: 90%;
+    height: auto;
+    list-style: none;
+  }
+}
