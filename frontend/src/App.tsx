@@ -1,51 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-// import axios from 'axios';
 import { Navbar } from './components/index';
-// import { Todo } from './models/todo.model';
+import { ProductProps } from './models/product-props';
 import Home from './pages/Home';
 import Products from './pages/Products';
-import SomeRoute from './pages/SomeRoute';
 import NotFound from './pages/NotFound';
-// import { baseURL } from './utils/constant';
+import EditProduct from './pages/EditProduct';
 
 const App: React.FC = () => {
-  // const [todos, setTodos] = useState<Todo[]>([]);
+  const [product, setProduct] = useState<ProductProps[]>([]);
+  const [editingProduct, setEditingProduct] = useState<ProductProps>({
+    name: '',
+    quantity: null,
+    date: new Date(),
+  });
 
-  // useEffect(() => {
-  //   axios.get(`${baseURL}/get`).then((res) => {
-  //     console.log(res.data);
-  //   });
-  // }, []);
+  const productAddHandler = (
+    name: string,
+    quantity: number | null,
+    date: Date
+  ) => {
+    setProduct((prevProduct) => [...prevProduct, { name, quantity, date }]);
+  };
 
-  // const todoAddHandler = (text: string) => {
-  //   setTodos((prevTodos) => [
-  //     ...prevTodos,
-  //     { id: Math.random().toString(), text: text },
-  //   ]);
-  // };
+  const productUpdateHandler = (name: string) => {
+    const targetProduct = product.find((product) => product.name === name);
+    if (targetProduct) {
+      setEditingProduct(targetProduct);
+    }
+  };
 
-  // const todoDeleteHandler = (todoId: string) => {
-  //   setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId));
-  // };
+  const saveProductHandler = (updatedProduct: ProductProps) => {
+    setProduct((prevProducts) =>
+      prevProducts.map((product) =>
+        product.name === updatedProduct.name ? updatedProduct : product
+      )
+    );
+    setEditingProduct({ name: '', quantity: null, date: new Date() });
+  };
+
+  const productDeleteHandler = (productName: string) => {
+    setProduct((prevProduct) =>
+      prevProduct.filter((product) => product.name !== productName)
+    );
+  };
 
   return (
-    <>
-      <div className="App">
+    <div className="App">
       <Navbar />
-        <div>
-          <Routes>
-            <Route path={'/'} element={<Home />} />
-            <Route path={'/addProducts/'} element={<Products input=''/>} />
-            <Route path={'/someRoute/'} element={<SomeRoute />} />
-            <Route path={'*'} element={<NotFound />} />
-          </Routes>
-        </div>
-        {/* <NewTodo onAddTodo={todoAddHandler} />
-        <TodoList items={todos} onDeleteTodo={todoDeleteHandler} /> */}
-        {/* <Counter /> */}
+      <div>
+        <Routes>
+          <Route
+            path={'/'}
+            element={
+              <Home
+                items={product}
+                updateProduct={productUpdateHandler}
+                onDeleteProduct={productDeleteHandler}
+              />
+            }
+          />
+          <Route
+            path={'/addProducts/'}
+            element={<Products onAddProduct={productAddHandler} />}
+          />
+          <Route
+            path={'/edit/'}
+            element={
+              <EditProduct
+                product={editingProduct}
+                onSaveProduct={saveProductHandler}
+              />
+            }
+          />
+          <Route path={'*'} element={<NotFound />} />
+        </Routes>
       </div>
-    </>
+    </div>
   );
 };
 

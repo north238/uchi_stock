@@ -2,7 +2,7 @@
   border-bottom: solid 2px #aaa;
 }
 
-ul {
+.ul {
   display: flex;
   justify-content: flex-end;
   text-align: right;
@@ -12,7 +12,7 @@ ul {
   list-style: none;
 }
 
-a {
+.a {
   display: block;
   color: #aaa;
   font-weight: 500;
@@ -21,7 +21,7 @@ a {
   padding: 10px 20px 10px 0px;
 }
 
-a:hover {
+.a:hover {
   color: #000;
 
 }
@@ -34,7 +34,7 @@ a:hover {
 }
 
 @media screen and (max-width: 768px) {
-  ul {
+  .ul {
     justify-content: flex-end;
     text-align: center;
     width: 90%;

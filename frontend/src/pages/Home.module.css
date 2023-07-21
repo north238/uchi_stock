@@ -51,3 +51,36 @@
 .input:focus {
   outline: none;
 }
+
+.iconHolder {
+  display: flex;
+}
+
+.icon {
+  font-size: 24px;
+  padding: 0.5rem;
+	cursor: pointer;
+}
+
+.icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 100%;
+}
+
+.ul {
+  list-style: none;
+  margin: 2rem auto;
+  padding: 0;
+  width: 90%;
+  max-width: 40rem;
+}
+
+.li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  border-radius: 6px;
+}

@@ -6,19 +6,16 @@ import styles from './Navbar.module.css';
 const Navbar: React.FC = () => {
   return (
     <nav className={styles.navLink}>
-      <ul>
+      <ul className={styles.ul}>
         <li>
-          <Link to={`/`}>
+          <Link to={`/`} className={styles.a}>
             <BiHome className={styles.icon} />
           </Link>
         </li>
         <li>
-          <Link to={`/addProducts/`}>
+          <Link to={`/addProducts/`} className={styles.a}>
             <BiAddToQueue className={styles.icon} />
           </Link>
-        </li>
-        <li>
-          <Link to={`/someRoute/`}>some Route</Link>
         </li>
       </ul>
     </nav>

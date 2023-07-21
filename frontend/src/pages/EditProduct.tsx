@@ -1,26 +1,36 @@
 import React, { useState } from 'react';
-// import axios from 'axios';
-// import { baseURL } from '../utils/constant';
 import styles from './Home.module.css';
+import { ProductProps } from '../models/product-props';
 
-type NewProductProps = {
-  onAddProduct: (name: string, quantity: number | null, date: Date) => void;
+interface EditProductProps {
+  product: ProductProps;
+  onSaveProduct: (updateProduct: ProductProps) => void;
 }
 
-const Products: React.FC<NewProductProps> = (props) => {
-  const [name, setName] = useState<string>('');
-  const [quantity, setQuantity] = useState<number | null>(null);
-  const [date, setDate] = useState<Date>(new Date());
+const EditProduct: React.FC<EditProductProps> = ({
+  product,
+  onSaveProduct,
+}) => {
+  const [name, setName] = useState(product.name);
+  const [quantity, setQuantity] = useState(product.quantity);
+  const [date, setDate] = useState(product.date);
 
-  const addProduct = (event: React.FormEvent) => {
+  const saveHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddProduct(name, quantity, date);
+    const updateProduct: ProductProps = {
+      ...product,
+      name,
+      quantity,
+      date,
+    };
+
+    onSaveProduct(updateProduct);
   };
 
   return (
-    <section className="productInput">
-      <h1 className={styles.title}>商品登録</h1>
-      <form onSubmit={addProduct} className={styles.form}>
+    <section className="editProduct">
+      <h1 className={styles.title}>商品編集</h1>
+      <form onSubmit={saveHandler} className={styles.form}>
         <div>
           <label className={styles.label} htmlFor="stocker-name">
             商品名:
@@ -57,11 +67,11 @@ const Products: React.FC<NewProductProps> = (props) => {
           />
         </div>
         <button className={styles.button} type="submit">
-          商品を追加
+          商品を編集
         </button>
       </form>
     </section>
   );
 };
 
-export default Products;
+export default EditProduct;
