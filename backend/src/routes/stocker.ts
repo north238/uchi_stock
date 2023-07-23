@@ -9,7 +9,7 @@ router.get('/', catchAsync(getStocker));
 
 router.post('/addProducts', catchAsync(createStocker));
 
-router.patch('/update/:id', updateStocker);
+router.put('/update/:id', updateStocker);
 
 router.delete('/delete/:id', deleteStocker);
 

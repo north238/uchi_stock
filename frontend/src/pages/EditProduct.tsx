@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
-import { ProductProps, ProductWithIdProps } from '../models/product-props';
+import { ProductWithIdProps } from '../models/product-props';
+import axios from 'axios';
+import { baseURL } from '../utils/constant';
 
 interface EditProductProps {
   product: ProductWithIdProps;
@@ -17,17 +19,20 @@ const EditProduct: React.FC<EditProductProps> = ({
   const [date, setDate] = useState(product.date);
   const navigate = useNavigate();
 
-  const saveHandler = (event: React.FormEvent) => {
+  const saveHandler = async (event: React.FormEvent) => {
     event.preventDefault();
-    const updateProduct: ProductProps = {
-      ...product,
-      name,
-      quantity,
-      date,
-    };
-
-    onSaveProduct(updateProduct as ProductWithIdProps);
-    navigate('/')
+    try {
+      await axios.put(`${baseURL}/update/${product._id}`, {
+        name,
+        quantity,
+        date,
+      });
+      onSaveProduct({ _id: product._id, name, quantity, date });
+      console.log('商品の更新に成功しました', {name, quantity, date});
+      navigate('/');
+    } catch (err) {
+      console.error('商品の更新に失敗しました', err);
+    }
   };
 
   return (
@@ -55,7 +60,9 @@ const EditProduct: React.FC<EditProductProps> = ({
             type="number"
             id="stocker-quantity"
             value={quantity !== null ? quantity.toString() : ''}
-            onChange={(e) => setQuantity(e.target.value ? parseInt(e.target.value) : null)}
+            onChange={(e) =>
+              setQuantity(e.target.value ? parseInt(e.target.value) : null)
+            }
             placeholder="数量を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-date">

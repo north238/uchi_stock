@@ -24,7 +24,12 @@ export const renderStocker: RequestHandler = async (req, res, next) => {
 
 export const updateStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
-  const stocker = await StockerModel.findById(id, { ...req.body });
+  const { name, quantity, date } = req.body;
+  const stocker = await StockerModel.findByIdAndUpdate(id, {
+    name,
+    quantity,
+    date,
+  });
   await stocker?.save();
   res.send('Updated successfully!');
 };

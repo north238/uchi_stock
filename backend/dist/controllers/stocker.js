@@ -34,7 +34,12 @@ const renderStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.renderStocker = renderStocker;
 const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const stocker = yield stocker_1.StockerModel.findById(id, Object.assign({}, req.body));
+    const { name, quantity, date } = req.body;
+    const stocker = yield stocker_1.StockerModel.findByIdAndUpdate(id, {
+        name,
+        quantity,
+        date,
+    });
     yield (stocker === null || stocker === void 0 ? void 0 : stocker.save());
     res.send('Updated successfully!');
 });
