@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { ProductProps } from '../models/product-props';
 
@@ -14,6 +15,7 @@ const EditProduct: React.FC<EditProductProps> = ({
   const [name, setName] = useState(product.name);
   const [quantity, setQuantity] = useState(product.quantity);
   const [date, setDate] = useState(product.date);
+  const navigate = useNavigate();
 
   const saveHandler = (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,6 +27,7 @@ const EditProduct: React.FC<EditProductProps> = ({
     };
 
     onSaveProduct(updateProduct);
+    navigate('/')
   };
 
   return (

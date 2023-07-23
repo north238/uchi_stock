@@ -1,20 +1,34 @@
 import React, { useState } from 'react';
-// import axios from 'axios';
-// import { baseURL } from '../utils/constant';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { baseURL } from '../utils/constant';
 import styles from './Home.module.css';
 
 type NewProductProps = {
   onAddProduct: (name: string, quantity: number | null, date: Date) => void;
-}
+};
 
 const Products: React.FC<NewProductProps> = (props) => {
   const [name, setName] = useState<string>('');
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date>(new Date());
+  const navigate = useNavigate();
 
   const addProduct = (event: React.FormEvent) => {
     event.preventDefault();
     props.onAddProduct(name, quantity, date);
+
+    const postData = async () => {
+      try {
+        await axios.post(`${baseURL}/addProducts`, { name, quantity, date });
+        console.log('データをPOSTしました');
+        navigate('/');
+      } catch (err) {
+        console.error('データのPOSTに失敗しました', err);
+      }
+    };
+
+    postData();
   };
 
   return (
@@ -42,7 +56,9 @@ const Products: React.FC<NewProductProps> = (props) => {
             type="number"
             id="stocker-quantity"
             value={quantity !== null ? quantity.toString() : ''}
-            onChange={(e) => setQuantity(e.target.value ? parseInt(e.target.value) : null)}
+            onChange={(e) =>
+              setQuantity(e.target.value ? parseInt(e.target.value) : null)
+            }
             placeholder="数量を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-date">

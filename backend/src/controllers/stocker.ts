@@ -7,10 +7,10 @@ export const getStocker: RequestHandler = async (req, res, next) => {
 };
 
 export const createStocker: RequestHandler = async (req, res, next) => {
-  const { name, quantity } = req.body;
-  const stocker = new StockerModel({ name: name, quantity: quantity });
+  const { name, quantity, date } = req.body;
+  const stocker = new StockerModel({ name, quantity, date });
   await stocker.save();
-  res.status(201).json({ message: '新規作成', createStocker: stocker });
+  res.status(201).send(stocker);
 };
 
 export const renderStocker: RequestHandler = async (req, res, next) => {
@@ -26,11 +26,11 @@ export const updateStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   const stocker = await StockerModel.findById(id, { ...req.body });
   await stocker?.save();
-  res.send(stocker);
+  res.send('Updated successfully!');
 };
 
 export const deleteStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   await StockerModel.findByIdAndDelete(id);
-  res.send();
+  res.send('Delete successfully!');
 };

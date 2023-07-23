@@ -3,14 +3,14 @@ const { Schema } = mongoose;
 
 interface Stocker extends Document {
   name: string;
-  date: Date;
   quantity: number;
+  date: Date;
 }
 
 const stockerSchema = new Schema<Stocker>({
   name: { type: String, required: true },
-  date: { type: Date, default: Date.now },
   quantity: { type: Number, required: true },
+  date: { type: Date, default: Date.now },
 });
 
 export const StockerModel = mongoose.model<Stocker>('Stocker', stockerSchema);

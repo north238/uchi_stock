@@ -8,8 +8,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const { Schema } = mongoose_1.default;
 const stockerSchema = new Schema({
     name: { type: String, required: true },
-    date: { type: Date, default: Date.now },
     quantity: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
 });
 exports.StockerModel = mongoose_1.default.model('Stocker', stockerSchema);
 //# sourceMappingURL=stocker.js.map

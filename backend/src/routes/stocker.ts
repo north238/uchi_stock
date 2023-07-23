@@ -5,11 +5,9 @@ import { catchAsync } from "../utils/catchAsync";
 
 const router = Router();
 
-router.get('/get', catchAsync(getStocker));
+router.get('/', catchAsync(getStocker));
 
-router.post('/save', catchAsync(createStocker));
-
-router.get('/render', renderStocker);
+router.post('/addProducts', catchAsync(createStocker));
 
 router.patch('/update/:id', updateStocker);
 

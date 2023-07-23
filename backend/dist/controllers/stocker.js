@@ -17,10 +17,10 @@ const getStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getStocker = getStocker;
 const createStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, quantity } = req.body;
-    const stocker = new stocker_1.StockerModel({ name: name, quantity: quantity });
+    const { name, quantity, date } = req.body;
+    const stocker = new stocker_1.StockerModel({ name, quantity, date });
     yield stocker.save();
-    res.status(201).json({ message: '新規作成', createStocker: stocker });
+    res.status(201).send(stocker);
 });
 exports.createStocker = createStocker;
 const renderStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -36,13 +36,13 @@ const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     const { id } = req.params;
     const stocker = yield stocker_1.StockerModel.findById(id, Object.assign({}, req.body));
     yield (stocker === null || stocker === void 0 ? void 0 : stocker.save());
-    res.send(stocker);
+    res.send('Updated successfully!');
 });
 exports.updateStocker = updateStocker;
 const deleteStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     yield stocker_1.StockerModel.findByIdAndDelete(id);
-    res.send();
+    res.send('Delete successfully!');
 });
 exports.deleteStocker = deleteStocker;
 //# sourceMappingURL=stocker.js.map
