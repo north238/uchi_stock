@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from './components/index';
-import { ProductProps } from './models/product-props';
+import { ProductProps, ProductWithIdProps } from './models/product-props';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import NotFound from './pages/NotFound';
@@ -11,7 +11,8 @@ import { baseURL } from './utils/constant';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
-  const [editingProduct, setEditingProduct] = useState<ProductProps>({
+  const [editingProduct, setEditingProduct] = useState<ProductWithIdProps>({
+    _id: '',
     name: '',
     quantity: null,
     date: new Date(),
@@ -22,39 +23,40 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`${baseURL}/`);
-        const fetchProducts: ProductProps[] = res.data.map((item: any) => ({
-          id: item._id,
+        const fetchProducts: ProductWithIdProps[] = res.data.map((item: any) => ({
+          _id: item._id,
           name: item.name,
           quantity: item.quantity,
           date: new Date(item.date),
         }));
-        setProduct(fetchProducts);
-        console.log(res.data);
+        setProduct(fetchProducts as ProductWithIdProps[]);
       } catch (err) {
         console.error('データが見つかりません', err);
       }
     };
     fetchData();
   }, [updateUI]);
-
+  
   const productAddHandler = (
     name: string,
     quantity: number | null,
     date: Date
   ) => {
+    console.log(product);
     setProduct((prevProduct) => [...prevProduct, { name, quantity, date }]);
   };
 
   const productUpdateHandler = (productId: string) => {
-    const targetProduct = product.find((product) => product._id === productId);
+    const targetProduct = (product as ProductWithIdProps[]).find((item) => item._id === productId);
     if (targetProduct) {
-      setEditingProduct(targetProduct);
+      setEditingProduct(targetProduct as ProductWithIdProps);
+      setUpdateUI(prevUpdateUI => !prevUpdateUI);
     }
   };
 
-  const saveProductHandler = (updatedProduct: ProductProps) => {
+  const saveProductHandler = (updatedProduct: ProductWithIdProps) => {
     setProduct((prevProduct) =>
-      prevProduct.map((product) =>
+      (prevProduct as ProductWithIdProps[]).map((product) =>
         product._id === updatedProduct._id ? updatedProduct : product
       )
     );
@@ -65,7 +67,7 @@ const App: React.FC = () => {
     try {
       await axios.delete(`${baseURL}/delete/${productId}`);
       setProduct((prevProduct) =>
-        prevProduct.filter((product) => product._id !== productId)
+        (prevProduct as ProductWithIdProps[]).filter((product) => product._id !== productId)
       );
     } catch (err) {
       console.error('商品の削除に失敗しました', err);
@@ -81,7 +83,7 @@ const App: React.FC = () => {
             path={'/'}
             element={
               <Home
-                items={product}
+                items={product as ProductWithIdProps[]}
                 updateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
               />

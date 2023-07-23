@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
-import { ProductProps } from '../models/product-props';
+import { ProductProps, ProductWithIdProps } from '../models/product-props';
 
 interface EditProductProps {
-  product: ProductProps;
-  onSaveProduct: (updateProduct: ProductProps) => void;
+  product: ProductWithIdProps;
+  onSaveProduct: (updateProduct: ProductWithIdProps) => void;
 }
 
 const EditProduct: React.FC<EditProductProps> = ({
@@ -26,7 +26,7 @@ const EditProduct: React.FC<EditProductProps> = ({
       date,
     };
 
-    onSaveProduct(updateProduct);
+    onSaveProduct(updateProduct as ProductWithIdProps);
     navigate('/')
   };
 
