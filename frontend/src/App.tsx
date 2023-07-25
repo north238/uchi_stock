@@ -23,12 +23,14 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`${baseURL}/`);
-        const fetchProducts: ProductWithIdProps[] = res.data.map((item: any) => ({
-          _id: item._id,
-          name: item.name,
-          quantity: item.quantity,
-          date: new Date(item.date),
-        }));
+        const fetchProducts: ProductWithIdProps[] = res.data.map(
+          (item: any) => ({
+            _id: item._id,
+            name: item.name,
+            quantity: item.quantity,
+            date: new Date(item.date),
+          })
+        );
         setProduct(fetchProducts as ProductWithIdProps[]);
       } catch (err) {
         console.error('データが見つかりません', err);
@@ -36,7 +38,7 @@ const App: React.FC = () => {
     };
     fetchData();
   }, [updateUI]);
-  
+
   const productAddHandler = (
     name: string,
     quantity: number | null,
@@ -47,10 +49,12 @@ const App: React.FC = () => {
   };
 
   const productUpdateHandler = (productId: string) => {
-    const targetProduct = (product as ProductWithIdProps[]).find((item) => item._id === productId);
+    const targetProduct = (product as ProductWithIdProps[]).find(
+      (item) => item._id === productId
+    );
     if (targetProduct) {
       setEditingProduct(targetProduct as ProductWithIdProps);
-      setUpdateUI(prevUpdateUI => !prevUpdateUI);
+      setUpdateUI((prevUpdateUI) => !prevUpdateUI);
     }
   };
 
@@ -67,7 +71,9 @@ const App: React.FC = () => {
     try {
       await axios.delete(`${baseURL}/delete/${productId}`);
       setProduct((prevProduct) =>
-        (prevProduct as ProductWithIdProps[]).filter((product) => product._id !== productId)
+        (prevProduct as ProductWithIdProps[]).filter(
+          (product) => product._id !== productId
+        )
       );
     } catch (err) {
       console.error('商品の削除に失敗しました', err);

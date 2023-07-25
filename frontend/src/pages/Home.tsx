@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
+import { RiPencilLine } from 'react-icons/ri';
 import styles from './Home.module.css';
+import ProductDeleteButton from '../components/ProductDeleteButton';
 
 interface ProductListProps {
-  items: { _id: string, name: string; quantity: number | null; date: Date }[];
+  items: { _id: string; name: string; quantity: number | null; date: Date }[];
   onDeleteProduct: (_id: string) => void;
   updateProduct: (_id: string) => void;
 }
@@ -22,13 +23,13 @@ const Home: React.FC<ProductListProps> = (props) => {
             <div className={styles.iconHolder}>
               <Link to={`/editProduct/`} className={styles.a}>
                 <RiPencilLine
-                  onClick={props.updateProduct.bind(null, product._id)}
+                  onClick={() => props.updateProduct(product._id)}
                   className={styles.icon}
                 />
               </Link>
-              <RiDeleteBinLine
-                onClick={props.onDeleteProduct.bind(null, product._id)}
-                className={styles.icon}
+              <ProductDeleteButton
+                productId={product._id}
+                onDelete={() => props.onDeleteProduct(product._id)}
               />
             </div>
           </li>
