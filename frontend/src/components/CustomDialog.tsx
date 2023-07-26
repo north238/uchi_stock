@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import styles from './CustomDialog.module.css';
 
 interface CustomDialogProps {
@@ -12,6 +13,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({ onCancel, onDelete }) => {
     <div className={styles.overlay}>
       <div className={styles.dialog}>
         <div className={styles.header}>
+          <RiDeleteBinLine className={styles.icon} />
           <h2>この商品を削除しますか？</h2>
         </div>
         <div className={styles.buttons}>

@@ -1,21 +1,22 @@
 .button {
   cursor: pointer;
-	text-align: center;
-	text-decoration: none;
-	width: 120px;
-	margin-top: 1rem;
-	padding: 0.5rem;
-	font-weight: bold;
-	border: 2px solid #27acd9;
-	background: #27acd9;
-	color: #fff;
-	border-radius: 2px;
-	transition: 0.5s;
+  text-align: center;
+  text-decoration: none;
+  width: 120px;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: inherit;
+  font-weight: inherit;
+  border: 2px solid #27acd9;
+  background: #27acd9;
+  color: #fff;
+  border-radius: 6px;
+  transition: 0.5s;
 }
 
 .button:hover {
   color: #27acd9;
-	background: #fff;
+  background: #fff;
 }
 .a {
   text-decoration: none;
@@ -23,7 +24,7 @@
 }
 
 .title {
-	text-align: center;
+  text-align: center;
 }
 
 .form {
@@ -36,24 +37,33 @@
   margin-bottom: 1rem;
 }
 
-.label, .input {
+.label,
+.input {
   display: block;
   width: 100%;
+  color: #333;
 }
 
 .label {
-  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.9em;
 }
 
 .input {
-  border: 1px solid #ccc;
-	border-radius: 2px;
+  border: 1px solid #d2d2d2;
+  border-radius: 6px;
   padding: 0.5rem;
-	margin-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+  font: inherit;
+  background-color: #f7f7f7;
 }
 
 .input:focus {
   outline: none;
+}
+
+.input::placeholder {
+  color: #999;
 }
 
 .iconHolder {
@@ -63,7 +73,7 @@
 .icon {
   font-size: 24px;
   padding: 0.5rem;
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .icon:hover {
