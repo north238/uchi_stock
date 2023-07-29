@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<ProductWithIdProps>({
     _id: '',
     name: '',
+    place: '',
     quantity: null,
     date: new Date(),
   });
@@ -24,14 +25,17 @@ const App: React.FC = () => {
       try {
         const res = await axios.get(`${baseURL}/`);
         const fetchProducts: ProductWithIdProps[] = res.data.map(
-          (item: any) => ({
+          (item: ProductWithIdProps) => ({
             _id: item._id,
             name: item.name,
+            place: item.place,
             quantity: item.quantity,
             date: new Date(item.date),
           })
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
+        console.log(fetchProducts);
+        
       } catch (err) {
         console.error('データが見つかりません', err);
       }
@@ -41,19 +45,23 @@ const App: React.FC = () => {
 
   const productAddHandler = (
     name: string,
+    place: string,
     quantity: number | null,
     date: Date
   ) => {
-    console.log(product);
-    setProduct((prevProduct) => [...prevProduct, { name, quantity, date }]);
+    setProduct((prevProduct) => [
+      ...prevProduct,
+      { name, place, quantity, date },
+    ]);
+    setUpdateUI((prevUpdateUI) => !prevUpdateUI);
   };
 
   const productUpdateHandler = (productId: string) => {
     const targetProduct = (product as ProductWithIdProps[]).find(
-      (item) => item._id === productId
+      (product) => product._id === productId
     );
     if (targetProduct) {
-      setEditingProduct(targetProduct as ProductWithIdProps);
+      setEditingProduct(targetProduct);
       setUpdateUI((prevUpdateUI) => !prevUpdateUI);
     }
   };
@@ -64,7 +72,13 @@ const App: React.FC = () => {
         product._id === updatedProduct._id ? updatedProduct : product
       )
     );
-    setEditingProduct({ _id: '', name: '', quantity: null, date: new Date() });
+    setEditingProduct({
+      _id: '',
+      name: '',
+      place: '',
+      quantity: null,
+      date: new Date(),
+    });
   };
 
   const productDeleteHandler = async (productId: string) => {
@@ -92,6 +106,7 @@ const App: React.FC = () => {
                 items={product as ProductWithIdProps[]}
                 updateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
+                onAddProduct={productAddHandler}
               />
             }
           />

@@ -5,22 +5,33 @@ import { baseURL } from '../utils/constant';
 import styles from './Home.module.css';
 
 type NewProductProps = {
-  onAddProduct: (name: string, quantity: number | null, date: Date) => void;
+  onAddProduct: (
+    name: string,
+    place: string,
+    quantity: number | null,
+    date: Date
+  ) => void;
 };
 
 const Products: React.FC<NewProductProps> = (props) => {
   const [name, setName] = useState<string>('');
+  const [place, setPlace] = useState<string>('');
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date>(new Date());
   const navigate = useNavigate();
 
   const addProduct = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddProduct(name, quantity, date);
+    props.onAddProduct(name, place, quantity, date);
 
     const postData = async () => {
       try {
-        await axios.post(`${baseURL}/addProducts`, { name, quantity, date });
+        await axios.post(`${baseURL}/addProducts`, {
+          name,
+          place,
+          quantity,
+          date,
+        });
         console.log('データをPOSTしました');
         navigate('/');
       } catch (err) {
@@ -35,7 +46,7 @@ const Products: React.FC<NewProductProps> = (props) => {
     <section className="productInput">
       <h1 className={styles.title}>商品登録</h1>
       <form onSubmit={addProduct} className={styles.form}>
-        <div>
+        <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="stocker-name">
             商品名:
           </label>
@@ -47,6 +58,17 @@ const Products: React.FC<NewProductProps> = (props) => {
             autoFocus
             onChange={(e) => setName(e.target.value)}
             placeholder="商品名を入力してください"
+          />
+          <label className={styles.label} htmlFor="stocker-place">
+            場所:
+          </label>
+          <input
+            className={styles.input}
+            type="text"
+            id="stocker-place"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="保存場所を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-quantity">
             数量:
@@ -71,10 +93,10 @@ const Products: React.FC<NewProductProps> = (props) => {
             value={date.toISOString().slice(0, 10)}
             onChange={(e) => setDate(new Date(e.target.value))}
           />
-        </div>
         <button className={styles.button} type="submit">
           商品を追加
         </button>
+        </div>
       </form>
     </section>
   );

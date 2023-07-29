@@ -1,0 +1,53 @@
+.counter {
+  margin-bottom: 10px;
+}
+
+.upButton, .downButton {
+  display: inline-block;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  border-radius: 100%;
+  text-align: center;
+  color: #fff;
+  height: 3rem;
+  width: 3rem;
+  transition: .15s ease;
+}
+
+.upButton {
+  background-color: #25d05e;
+  box-shadow: 0 5px 0 #00a02e;
+}
+.downButton {
+  background-color: #ED0800;
+  box-shadow: 0 5px 0 #a50702;
+}
+
+.upButton:hover
+{
+  -webkit-transform: translate(0, 3px);
+  transform: translate(0, 3px);
+  -webkit-box-shadow: 0 2px 0 #00a02e;
+  box-shadow: 0 2px 0 #00a02e;
+}
+
+.downButton:hover
+{
+  -webkit-transform: translate(0, 3px);
+  transform: translate(0, 3px);
+  -webkit-box-shadow: 0 2px 0 #a50702;
+  box-shadow: 0 2px 0 #a50702;
+}
+
+.span {
+  border: 1px solid #d2d2d2;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  color: #333;
+  font: inherit;
+  font-size: 1.25rem;
+  background-color: #f7f7f7;
+}

@@ -8,6 +8,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const { Schema } = mongoose_1.default;
 const stockerSchema = new Schema({
     name: { type: String, required: true },
+    place: { type: String, required: true },
     quantity: { type: Number, required: true },
     date: { type: Date, default: Date.now },
 });

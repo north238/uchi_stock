@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
+import styles from './Counter.module.css';
 
-const Counter: React.FC = () => {
-  const [count, setCount] = useState(0);
-  const countUp = () => {
-    setCount((prevState) => prevState + 1);
+type CounterProps = {
+  count: number;
+  onCountChange: (newCount: number) => void;
+};
+
+const Counter: React.FC<CounterProps> = (props) => {
+  const { count, onCountChange } = props;
+
+  const handleIncrement = () => {
+    onCountChange(count + 1);
   };
-  const countDown = () => {
-    setCount((prevState) => prevState - 1);
+  const handleDecrement = () => {
+    onCountChange(count > 0 ? count - 1 : 0);
   };
   return (
-    <div>
-      <p>現在のカウント数: {count}</p>
-      <button onClick={countUp}>
-        +
-      </button>
-      <button onClick={countDown}>
-        -
-      </button>
+    <div className={styles.counter}>
+      <button className={styles.upButton} onClick={handleIncrement}>+</button>
+      <span className={styles.span}>{count}</span>
+      <button className={styles.downButton} onClick={handleDecrement}>-</button>
     </div>
   );
 };

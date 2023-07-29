@@ -17,8 +17,8 @@ const getStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getStocker = getStocker;
 const createStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, quantity, date } = req.body;
-    const stocker = new stocker_1.StockerModel({ name, quantity, date });
+    const { name, place, quantity, date } = req.body;
+    const stocker = new stocker_1.StockerModel({ name, place, quantity, date });
     yield stocker.save();
     res.status(201).send(stocker);
 });
@@ -34,9 +34,10 @@ const renderStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.renderStocker = renderStocker;
 const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const { name, quantity, date } = req.body;
+    const { name, place, quantity, date } = req.body;
     const stocker = yield stocker_1.StockerModel.findByIdAndUpdate(id, {
         name,
+        place,
         quantity,
         date,
     });

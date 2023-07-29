@@ -15,6 +15,7 @@ const EditProduct: React.FC<EditProductProps> = ({
   onSaveProduct,
 }) => {
   const [name, setName] = useState(product.name);
+  const [place, setPlace] = useState(product.place);
   const [quantity, setQuantity] = useState(product.quantity);
   const [date, setDate] = useState(product.date);
   const navigate = useNavigate();
@@ -24,11 +25,12 @@ const EditProduct: React.FC<EditProductProps> = ({
     try {
       await axios.put(`${baseURL}/update/${product._id}`, {
         name,
+        place,
         quantity,
         date,
       });
-      onSaveProduct({ _id: product._id, name, quantity, date });
-      console.log('商品の更新に成功しました', {name, quantity, date});
+      onSaveProduct({ _id: product._id, name, place, quantity, date });
+      console.log('商品の更新に成功しました', { name, place, quantity, date });
       navigate('/');
     } catch (err) {
       console.error('商品の更新に失敗しました', err);
@@ -39,7 +41,7 @@ const EditProduct: React.FC<EditProductProps> = ({
     <section className="editProduct">
       <h1 className={styles.title}>商品編集</h1>
       <form onSubmit={saveHandler} className={styles.form}>
-        <div>
+        <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="stocker-name">
             商品名:
           </label>
@@ -51,6 +53,17 @@ const EditProduct: React.FC<EditProductProps> = ({
             autoFocus
             onChange={(e) => setName(e.target.value)}
             placeholder="商品名を入力してください"
+          />
+          <label className={styles.label} htmlFor="stocker-place">
+            場所:
+          </label>
+          <input
+            className={styles.input}
+            type="text"
+            id="stocker-place"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="保存場所を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-quantity">
             数量:
@@ -75,10 +88,10 @@ const EditProduct: React.FC<EditProductProps> = ({
             value={date.toISOString().slice(0, 10)}
             onChange={(e) => setDate(new Date(e.target.value))}
           />
+          <button className={styles.button} type="submit">
+            商品を編集
+          </button>
         </div>
-        <button className={styles.button} type="submit">
-          商品を編集
-        </button>
       </form>
     </section>
   );

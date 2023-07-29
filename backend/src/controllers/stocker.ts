@@ -7,8 +7,8 @@ export const getStocker: RequestHandler = async (req, res, next) => {
 };
 
 export const createStocker: RequestHandler = async (req, res, next) => {
-  const { name, quantity, date } = req.body;
-  const stocker = new StockerModel({ name, quantity, date });
+  const { name, place, quantity, date } = req.body;
+  const stocker = new StockerModel({ name, place, quantity, date });
   await stocker.save();
   res.status(201).send(stocker);
 };
@@ -24,9 +24,10 @@ export const renderStocker: RequestHandler = async (req, res, next) => {
 
 export const updateStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
-  const { name, quantity, date } = req.body;
+  const { name, place, quantity, date } = req.body;
   const stocker = await StockerModel.findByIdAndUpdate(id, {
     name,
+    place,
     quantity,
     date,
   });
