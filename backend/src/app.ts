@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import stockerRoutes from './routes/stocker';
-// import path from 'path';
+import path from 'path';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
@@ -26,6 +26,7 @@ const options: cors.CorsOptions = {
 app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(json());
+app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/stocker', stockerRoutes);
 
