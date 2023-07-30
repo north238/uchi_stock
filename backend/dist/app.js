@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const stocker_1 = __importDefault(require("./routes/stocker"));
-// import path from 'path';
+const path_1 = __importDefault(require("path"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
@@ -52,6 +52,10 @@ app.use((0, cors_1.default)(options));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, body_parser_1.json)());
 app.use('/stocker', stocker_1.default);
+app.use(express_1.default.static(path_1.default.join(__dirname, 'build')));
+app.get('*', (req, res) => {
+    res.sendFile(path_1.default.resolve(__dirname, 'client', 'build', 'index.html'));
+});
 app.use('*', (err, req, res, next) => {
     if (!err.message) {
         err.message = '問題が起きました';

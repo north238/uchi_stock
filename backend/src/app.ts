@@ -26,10 +26,14 @@ const options: cors.CorsOptions = {
 app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(json());
-app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/stocker', stockerRoutes);
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+});
 app.use('*', (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (!err.message) {
     err.message = '問題が起きました';
