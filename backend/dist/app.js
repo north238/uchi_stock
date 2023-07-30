@@ -53,9 +53,9 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, body_parser_1.json)());
 app.use(express_1.default.static("public"));
 app.use('/stocker', stocker_1.default);
-app.use(express_1.default.static(path_1.default.join(__dirname, 'frontend', 'build')));
+app.use(express_1.default.static(path_1.default.join(__dirname, '..', 'build')));
 app.get('*', (req, res) => {
-    res.sendFile(path_1.default.resolve(__dirname, 'frontend', 'build', 'index.html'));
+    res.sendFile(path_1.default.resolve(__dirname, '..', 'build', 'index.html'));
 });
 app.use('*', (err, req, res, next) => {
     if (!err.message) {
