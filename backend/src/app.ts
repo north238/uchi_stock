@@ -27,14 +27,14 @@ app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(json());
 app.use(express.static("public"));
-
-app.use('/stocker', stockerRoutes);
-
 app.use(express.static(path.join(__dirname, 'frontend', 'build')));
-
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
 });
+
+app.use('/stocker', stockerRoutes);
+
+
 app.use('*', (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (!err.message) {
     err.message = '問題が起きました';
