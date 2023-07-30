@@ -44,17 +44,18 @@ mongoose_1.default
     console.log('MongoDB connection error!!!');
     console.log(err);
 });
-const allowedOrigins = 'http://localhost:3000';
+const allowedOrigins = 'https://stocker-h3dq.onrender.com';
 const options = {
     origin: allowedOrigins,
 };
 app.use((0, cors_1.default)(options));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, body_parser_1.json)());
+app.use(express_1.default.static("public"));
 app.use('/stocker', stocker_1.default);
-app.use(express_1.default.static(path_1.default.join(__dirname, 'build')));
+app.use(express_1.default.static(path_1.default.join(__dirname, 'frontend', 'build')));
 app.get('*', (req, res) => {
-    res.sendFile(path_1.default.resolve(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path_1.default.resolve(__dirname, 'frontend', 'build', 'index.html'));
 });
 app.use('*', (err, req, res, next) => {
     if (!err.message) {

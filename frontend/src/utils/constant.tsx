@@ -1,1 +1,1 @@
-export const baseURL = "http://localhost:5000/stocker";
+export const baseURL = "https://stocker-h3dq.onrender.com";

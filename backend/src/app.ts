@@ -19,20 +19,21 @@ mongoose
     console.log(err);
   });
 
-const allowedOrigins = 'http://localhost:3000';
+const allowedOrigins = 'https://stocker-h3dq.onrender.com';
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
 };
 app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(json());
+app.use(express.static("public"));
 
 app.use('/stocker', stockerRoutes);
 
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
 });
 app.use('*', (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (!err.message) {
