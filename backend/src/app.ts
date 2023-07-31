@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
 import stockerRoutes from './routes/stocker';
-import path from 'path';
 import mongodb from 'mongodb';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -30,12 +29,6 @@ app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(json());
 app.use(express.static('public'));
-// app.use(express.static(path.join(__dirname, '../..', 'frontend/build')));
-// app.get('*', (req, res) => {
-//   res.sendFile(
-//     path.resolve(__dirname, '../..', 'frontend/build', 'index.html')
-//   );
-// });
 
 app.use('/stocker', stockerRoutes);
 
