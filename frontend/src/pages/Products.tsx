@@ -33,13 +33,12 @@ const Products: React.FC<NewProductProps> = (props) => {
           date,
         });
         console.log('データをPOSTしました');
+        navigate('/');
       } catch (err) {
         console.error('データのPOSTに失敗しました', err);
       }
     };
-
     postData();
-    navigate('/');
   };
 
   return (
