@@ -34,8 +34,6 @@ const App: React.FC = () => {
           })
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
-        console.log(fetchProducts);
-        
       } catch (err) {
         console.error('データが見つかりません', err);
       }
