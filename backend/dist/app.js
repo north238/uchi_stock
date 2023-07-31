@@ -35,8 +35,9 @@ const dotenv = __importStar(require("dotenv"));
 const body_parser_1 = require("body-parser");
 const app = (0, express_1.default)();
 dotenv.config();
+const mongoUri = process.env.DB_URI;
 mongoose_1.default
-    .connect(process.env.DB_URL)
+    .connect(mongoUri)
     .then(() => {
     console.log('MongoDB connection OK!!!');
 })
@@ -51,12 +52,12 @@ const options = {
 app.use((0, cors_1.default)(options));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, body_parser_1.json)());
-app.use(express_1.default.static("public"));
-app.use('/stocker', stocker_1.default);
-app.use(express_1.default.static(path_1.default.join(__dirname, '..', 'build')));
+app.use(express_1.default.static('public'));
+app.use(express_1.default.static(path_1.default.join(__dirname, '../..', 'frontend/build')));
 app.get('*', (req, res) => {
-    res.sendFile(path_1.default.resolve(__dirname, '..', 'build', 'index.html'));
+    res.sendFile(path_1.default.resolve(__dirname, '../..', 'frontend/build', 'index.html'));
 });
+app.use('/stocker', stocker_1.default);
 app.use('*', (err, req, res, next) => {
     if (!err.message) {
         err.message = '問題が起きました';
