@@ -47,7 +47,7 @@ const Products: React.FC<NewProductProps> = (props) => {
       <form onSubmit={addProduct} className={styles.form}>
         <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="stocker-name">
-            商品名:
+            商品名
           </label>
           <input
             className={styles.input}
@@ -59,7 +59,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             placeholder="商品名を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-place">
-            場所:
+            場所
           </label>
           <input
             className={styles.input}
@@ -70,7 +70,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             placeholder="保存場所を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-quantity">
-            数量:
+            数量
           </label>
           <input
             className={styles.input}
@@ -83,7 +83,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             placeholder="数量を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-date">
-            購入日:
+            購入日
           </label>
           <input
             className={styles.input}

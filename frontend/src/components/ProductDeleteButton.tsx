@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { RiDeleteBinLine } from 'react-icons/ri'
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { baseURL } from '../utils/constant';
 import CustomDialog from './CustomDialog';
 import styles from './ProductDeleteButton.module.css';
@@ -27,7 +27,6 @@ const ProductDeleteButton: React.FC<ProductDeleteButtonProps> = ({
   return (
     <>
       <button className={styles.button} onClick={() => setIsConfirming(true)}>
-        {' '}
         <RiDeleteBinLine className={styles.icon} />
       </button>
       {isConfirming && (

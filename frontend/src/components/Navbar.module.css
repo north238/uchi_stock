@@ -1,5 +1,27 @@
 .navLink {
-  border-bottom: solid 2px #aaa;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0.5rem 0rem;
+  background-color: #fff;
+  box-shadow: 0 2px 2px 2px rgba(9, 9, 9, 0.23);
+}
+
+.navLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 1.25rem;
+}
+
+.navBrand {
+  font-size: 2rem;
+}
+
+.brandP {
+  margin: 0;
 }
 
 .ul {
@@ -18,18 +40,31 @@
   font-weight: 500;
   font-size: large;
   text-decoration: none;
-  padding: 10px 20px 10px 0px;
 }
 
 .a:hover {
   color: #000;
 }
 
+.liDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem;
+}
+
+.liP {
+  margin: 0;
+  font-size: 0.6rem;
+  color: #888;
+  font-weight: 400;
+}
+
 .icon {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 1.55rem;
 }
 
 @media screen and (max-width: 768px) {

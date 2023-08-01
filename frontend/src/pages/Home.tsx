@@ -28,7 +28,7 @@ interface ProductListProps {
 const Home: React.FC<ProductListProps> = (props) => {
   return (
     <section className="home">
-      <h1 className={styles.title}>Stocker</h1>
+      <h1 className={styles.title}>商品一覧</h1>
       <ul className={styles.ul}>
         {props.items.map((product) => (
           <li key={product._id} className={styles.li}>
