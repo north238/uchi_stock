@@ -10,7 +10,7 @@ interface Stocker extends Document {
 
 const stockerSchema = new Schema<Stocker>({
   name: { type: String, required: true },
-  place: { type: String, required: true },
+  place: { type: String, default: '納戸' },
   quantity: { type: Number, required: true },
   date: { type: Date, default: Date.now },
 });
