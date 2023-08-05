@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BiHome, BiAddToQueue } from 'react-icons/bi';
 import { BsBoxes } from 'react-icons/bs';
+import Tooltip from '@mui/material/Tooltip';
 import styles from './Navbar.module.css';
 
 const Navbar: React.FC = () => {
@@ -14,18 +15,20 @@ const Navbar: React.FC = () => {
       <ul className={styles.ul}>
         <li>
           <div className={styles.liDiv}>
+            <Tooltip title='Home'>
             <Link to={`/`} className={styles.a}>
               <BiHome className={styles.icon} />
             </Link>
-            <p className={styles.liP}>Home</p>
+            </Tooltip>
           </div>
         </li>
         <li>
           <div className={styles.liDiv}>
+            <Tooltip title='Add'>
             <Link to={`/addProducts/`} className={styles.a}>
               <BiAddToQueue className={styles.icon} />
             </Link>
-            <p className={styles.liP}>Add</p>
+            </Tooltip>
           </div>
         </li>
       </ul>
