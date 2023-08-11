@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
+import { BsCartPlus } from 'react-icons/bs';
 import { IoCalendarNumberOutline, IoLocationOutline } from 'react-icons/io5';
 import { BsBoxSeam } from 'react-icons/bs';
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri';
@@ -25,6 +26,7 @@ interface ProductListProps {
   }[];
   onDeleteProduct: (_id: string) => void;
   updateProduct: (_id: string) => void;
+  addToShoppingList: (_id: string) => void;
   onAddProduct: (
     name: string,
     place: string,
@@ -35,8 +37,11 @@ interface ProductListProps {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.white,
-    color: theme.palette.common.black,
+    backgroundColor: '#424242',
+    color: theme.palette.common.white,
+  },
+  '&.zero-quantity': {
+    backgroundColor: '#E57373',
   },
 }));
 
@@ -47,6 +52,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:last-child td, &:last-child th': {
     border: 0,
   },
+  backgroundColor: theme.palette.common.white,
 }));
 
 const Home: React.FC<ProductListProps> = (props) => {
@@ -66,8 +72,9 @@ const Home: React.FC<ProductListProps> = (props) => {
   return (
     <section className="home">
       <h1 className={styles.title}>商品一覧</h1>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 410 }} aria-label="table">
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <TableContainer sx={{ maxHeight: 550 }}>
+        <Table stickyHeader sx={{ minWidth: 410 }} aria-label="table">
           <TableHead>
             <TableRow>
               <StyledTableCell align="center">
@@ -100,7 +107,7 @@ const Home: React.FC<ProductListProps> = (props) => {
             {props.items.map((product) => (
               <StyledTableRow key={product._id}>
                 <StyledTableCell
-                  sx={{ fontSize: { xs: 10, sm: 14 } }}
+                  sx={{ fontSize: { xs: 11, sm: 14 } }}
                   align="center"
                 >
                   {product.name}
@@ -112,10 +119,20 @@ const Home: React.FC<ProductListProps> = (props) => {
                   {product.place}
                 </StyledTableCell>
                 <StyledTableCell
-                  sx={{ fontSize: { xs: 10, sm: 14 } }}
+                  sx={{ fontSize: { xs: 11, sm: 14 } }}
                   align="center"
+                  className={product.quantity === 0 ? 'zero-quantity' : ''}
                 >
-                  {product.quantity}個
+                  {product.quantity === 0 ? (
+                    <button
+                      className={styles.button}
+                      onClick={() => props.addToShoppingList(product._id)}
+                    >
+                      <BsCartPlus className={styles.cartIcon} />
+                    </button>
+                  ) : (
+                    <p>{product.quantity}個</p>
+                  )}
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{ display: { xs: 'none', sm: 'table-cell' } }}
@@ -127,7 +144,7 @@ const Home: React.FC<ProductListProps> = (props) => {
                   <Link to={`/editProduct/`} className={styles.a}>
                     <RiPencilLine
                       onClick={() => props.updateProduct(product._id)}
-                      className={styles.tableCellIcon}
+                      className={styles.icon}
                     />
                   </Link>
                 </StyledTableCell>
@@ -142,6 +159,7 @@ const Home: React.FC<ProductListProps> = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      </Paper>
     </section>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { baseURL } from '../utils/constant';
-import styles from './Home.module.css';
+import styles from './Products.module.css';
 
 type NewProductProps = {
   onAddProduct: (

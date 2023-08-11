@@ -5,12 +5,14 @@ import { Navbar } from './components/index';
 import { ProductProps, ProductWithIdProps } from './models/product-props';
 import Home from './pages/Home';
 import Products from './pages/Products';
-import NotFound from './pages/NotFound';
+import ShoppingList from './pages/ShoppingList';
 import EditProduct from './pages/EditProduct';
+import NotFound from './pages/NotFound';
 import { baseURL } from './utils/constant';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
+  const [shoppingList, setShoppingList] = useState<ProductWithIdProps[]>([]);
   const [editingProduct, setEditingProduct] = useState<ProductWithIdProps>({
     _id: '',
     name: '',
@@ -19,6 +21,7 @@ const App: React.FC = () => {
     date: new Date(),
   });
   const [updateUI, setUpdateUI] = useState(false);
+  const [invisible, setInvisible] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +37,7 @@ const App: React.FC = () => {
           })
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
+        setInvisible(true);
       } catch (err) {
         console.error('データが見つかりません', err);
       }
@@ -52,6 +56,20 @@ const App: React.FC = () => {
       { name, place, quantity, date },
     ]);
     setUpdateUI((prevUpdateUI) => !prevUpdateUI);
+  };
+
+  const handleBadgeVisibility = () => {
+    setInvisible(!invisible);
+  };
+
+  const addToShoppingListHandler = (productId: string) => {
+    const targetProduct = (product as ProductWithIdProps[]).find(
+      (product) => product._id === productId
+    );
+    if (targetProduct) {
+      setShoppingList((prevList) => [...prevList, targetProduct]);
+      handleBadgeVisibility();
+    }
   };
 
   const productUpdateHandler = (productId: string) => {
@@ -94,7 +112,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <Navbar />
+      <Navbar invisible={invisible}/>
       <div>
         <Routes>
           <Route
@@ -105,12 +123,22 @@ const App: React.FC = () => {
                 updateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
                 onAddProduct={productAddHandler}
+                addToShoppingList={addToShoppingListHandler}
               />
             }
           />
           <Route
             path={'/addProducts/'}
             element={<Products onAddProduct={productAddHandler} />}
+          />
+          <Route
+            path={'/shoppingList/'}
+            element={
+              <ShoppingList
+                product={shoppingList}
+                addToShoppingList={addToShoppingListHandler}
+              />
+            }
           />
           <Route
             path={'/editProduct/'}

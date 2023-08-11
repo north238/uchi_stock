@@ -1,91 +1,27 @@
-.button {
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  width: 120px;
-  margin-top: 1rem;
-  padding: 0.5rem;
-  font-size: inherit;
-  font-weight: inherit;
-  border: 2px solid #27acd9;
-  background: #27acd9;
-  color: #fff;
-  border-radius: 6px;
-  transition: 0.5s;
-}
-
-.button:hover {
-  color: #27acd9;
-  background: #fff;
-}
-.a {
-  text-decoration: none;
-  color: #000;
-}
-
 .title {
   text-align: center;
   font-weight: 400;
 }
 
-.form {
-  border: 2px solid #d2d2d2;
-  border-radius: 6px;
-  width: 90%;
-  max-width: 40rem;
-  margin: 1rem auto;
-  padding: 2rem;
+.button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
 }
 
-.form-control {
-  margin-bottom: 1rem;
+.a {
+  text-decoration: none;
+  color: #000;
 }
 
-.label,
-.input {
-  display: flex;
-  width: 80%;
-  color: #333;
-}
-
-.label {
-  margin-bottom: 5px;
-  font-size: 0.9em;
-}
-
-.inputGroup {
-  text-align: center;
-  text-align: -webkit-center;
-}
-
-.input {
-  border: 1px solid #d2d2d2;
-  border-radius: 6px;
-  padding: 0.5rem;
-  margin-bottom: 0.25rem;
-  max-width: 40rem;
-  font: inherit;
-  background-color: #f7f7f7;
-}
-
-.input:focus {
-  outline: none;
-  border-color: #27acd9;
-  box-shadow: 0 0 10px 0 #27acd9;
-}
-
-.input::placeholder {
-  color: #999;
-}
-
-.iconHolder {
-  display: flex;
+.cartIcon,
+.tableIcon,
+.icon {
+  font-size: 24px;
 }
 
 .icon {
-  font-size: 24px;
   padding: 0.5rem;
-  cursor: pointer;
 }
 
 .icon:hover {
@@ -94,81 +30,18 @@
 }
 
 .tableIcon {
-  font-size: 24px;
+  font-weight: bold;
   padding: 0.5rem;
 }
 
-.tableCellIcon {
-  font-size: 24px;
-}
-
-.iconDiv {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.iconP {
-  margin: 0;
-  padding: 0 0.6rem 0 0.6rem;
-  font-weight: bold;
-  background-color: rgba(0, 0, 0, 0.1);
-  border: none;
-  border-radius: 3px;
-}
-
-.icon-container {
-  position: relative;
-}
-
-.ul {
-  list-style: none;
-  margin: 2rem auto;
-  padding: 0;
-  width: 70%;
-}
-
-.li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1rem 0;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
-  border-radius: 6px;
-}
-
 @media screen and (max-width: 768px) {
-  .form {
-    border: 2px solid #d2d2d2;
-    border-radius: 6px;
-    width: 70%;
-    max-width: 40rem;
-    margin: 1rem auto;
-    padding: 2rem;
-  }
-
   .icon,
-  .tableIcon,
-  .tableCellIcon {
+  .cartIcon {
     font-size: 15px;
   }
 
-  .iconDiv,
-  .iconHolder {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .iconP {
-    margin: 0;
-    padding: 0 0.6rem;
-    font-size: 9px;
+  .tableIcon {
+    font-size: 15px;
     font-weight: bold;
-    background-color: rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 3px;
   }
 }
