@@ -1,7 +1,11 @@
-import { Router } from "express";
-import { createStocker, deleteStocker, getStocker, renderStocker, updateStocker } from '../controllers/stocker';
-import { catchAsync } from "../utils/catchAsync";
-
+import { Router } from 'express';
+import {
+  createStocker,
+  deleteStocker,
+  getStocker,
+  updateStocker,
+} from '../controllers/stocker';
+import { catchAsync } from '../utils/catchAsync';
 
 const router = Router();
 

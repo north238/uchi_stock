@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteStocker = exports.updateStocker = exports.renderStocker = exports.createStocker = exports.getStocker = void 0;
+exports.deleteStocker = exports.updateStocker = exports.createStocker = exports.getStocker = void 0;
 const stocker_1 = require("../models/stocker");
 const getStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const stocker = yield stocker_1.StockerModel.find({});
@@ -23,15 +23,6 @@ const createStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     res.status(201).send(stocker);
 });
 exports.createStocker = createStocker;
-const renderStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const stocker = yield stocker_1.StockerModel.findById(id);
-    if (!stocker) {
-        return res.send('Stocker not found!');
-    }
-    res.send(stocker);
-});
-exports.renderStocker = renderStocker;
 const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { name, place, quantity, date } = req.body;

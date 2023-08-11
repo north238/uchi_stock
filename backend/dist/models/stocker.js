@@ -11,6 +11,7 @@ const stockerSchema = new Schema({
     place: { type: String, default: '納戸' },
     quantity: { type: Number, required: true },
     date: { type: Date, default: Date.now },
+    isAddToList: { type: Boolean, default: false }
 });
 exports.StockerModel = mongoose_1.default.model('Stocker', stockerSchema);
 //# sourceMappingURL=stocker.js.map

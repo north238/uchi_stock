@@ -6,6 +6,7 @@ interface Stocker extends Document {
   place: string;
   quantity: number;
   date: Date;
+  isAddToList: boolean;
 }
 
 const stockerSchema = new Schema<Stocker>({
@@ -13,6 +14,7 @@ const stockerSchema = new Schema<Stocker>({
   place: { type: String, default: '納戸' },
   quantity: { type: Number, required: true },
   date: { type: Date, default: Date.now },
+  isAddToList: { type: Boolean, default: false}
 });
 
 export const StockerModel = mongoose.model<Stocker>('Stocker', stockerSchema);

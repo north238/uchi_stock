@@ -6,13 +6,10 @@ import styles from './ShoppingList.module.css';
 
 interface shoppingCartProps {
   product: ProductWithIdProps[];
-  addToShoppingList: (productId: string) => void;
+  DeleteShoppingList: (_id: string) => void;
 }
 
 const ShoppingList: React.FC<shoppingCartProps> = (props) => {
-  const deleteHandler = (productId: string) => {
-    props.addToShoppingList(productId);
-  };
 
   return (
     <section className="shoppingList">
@@ -24,7 +21,7 @@ const ShoppingList: React.FC<shoppingCartProps> = (props) => {
             <Tooltip title="delete">
             <button
               className={styles.button}
-              onClick={() => deleteHandler(item._id)}
+              onClick={() => props.DeleteShoppingList(item._id)}
             >
               <RiDeleteBinLine className={styles.icon}/>
             </button>

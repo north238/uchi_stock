@@ -72,6 +72,12 @@ const App: React.FC = () => {
     }
   };
 
+  const deleteShoppingListHandler = (productId: string) => {
+    setShoppingList((prevList) =>
+      prevList.filter((product) => product._id !== productId)
+    );
+  };
+
   const productUpdateHandler = (productId: string) => {
     const targetProduct = (product as ProductWithIdProps[]).find(
       (product) => product._id === productId
@@ -112,7 +118,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <Navbar invisible={invisible}/>
+      <Navbar invisible={invisible} />
       <div>
         <Routes>
           <Route
@@ -136,7 +142,7 @@ const App: React.FC = () => {
             element={
               <ShoppingList
                 product={shoppingList}
-                addToShoppingList={addToShoppingListHandler}
+                DeleteShoppingList={deleteShoppingListHandler}
               />
             }
           />

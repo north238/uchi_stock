@@ -13,15 +13,6 @@ export const createStocker: RequestHandler = async (req, res, next) => {
   res.status(201).send(stocker);
 };
 
-export const renderStocker: RequestHandler = async (req, res, next) => {
-  const { id } = req.params;
-  const stocker = await StockerModel.findById(id);
-  if (!stocker) {
-    return res.send('Stocker not found!');
-  }
-  res.send(stocker);
-};
-
 export const updateStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   const { name, place, quantity, date } = req.body;
