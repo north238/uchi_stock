@@ -3,6 +3,7 @@ import {
   createStocker,
   deleteStocker,
   getStocker,
+  patchStocker,
   updateStocker,
 } from '../controllers/stocker';
 import { catchAsync } from '../utils/catchAsync';
@@ -14,6 +15,8 @@ router.get('/', catchAsync(getStocker));
 router.post('/addProducts', catchAsync(createStocker));
 
 router.put('/update/:id', updateStocker);
+
+router.patch('/patch/:id', patchStocker);
 
 router.delete('/delete/:id', deleteStocker);
 

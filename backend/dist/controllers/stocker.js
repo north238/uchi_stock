@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteStocker = exports.updateStocker = exports.createStocker = exports.getStocker = void 0;
+exports.deleteStocker = exports.patchStocker = exports.updateStocker = exports.createStocker = exports.getStocker = void 0;
 const stocker_1 = require("../models/stocker");
 const getStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const stocker = yield stocker_1.StockerModel.find({});
@@ -36,6 +36,14 @@ const updateStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     res.send('Updated successfully!');
 });
 exports.updateStocker = updateStocker;
+const patchStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { isAddToList } = req.body;
+    const stocker = yield stocker_1.StockerModel.findByIdAndUpdate(id, { isAddToList }, { new: true });
+    yield (stocker === null || stocker === void 0 ? void 0 : stocker.save());
+    res.send('Patch successfully!');
+});
+exports.patchStocker = patchStocker;
 const deleteStocker = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     yield stocker_1.StockerModel.findByIdAndDelete(id);

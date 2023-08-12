@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BiHome, BiAddToQueue } from 'react-icons/bi';
+import { BiHome, BiAddToQueue, BiCart } from 'react-icons/bi';
 import { BsBoxes } from 'react-icons/bs';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import styles from './Navbar.module.css';
@@ -50,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                   }}
                   color="error"
                 >
-                  <AiOutlineShoppingCart className={styles.icon} />
+                  <BiCart className={styles.icon} />
                 </Badge>
               </Link>
             </Tooltip>

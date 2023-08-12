@@ -3,6 +3,7 @@ export interface ProductProps {
   place: string,
   quantity: number | null;
   date: Date;
+  isAddToList: boolean;
 }
 
 export interface ProductWithIdProps {
@@ -11,4 +12,5 @@ export interface ProductWithIdProps {
   place: string,
   quantity: number | null;
   date: Date;
+  isAddToList: boolean;
 }

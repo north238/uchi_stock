@@ -26,6 +26,18 @@ export const updateStocker: RequestHandler = async (req, res, next) => {
   res.send('Updated successfully!');
 };
 
+export const patchStocker: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+  const { isAddToList } = req.body;
+  const stocker = await StockerModel.findByIdAndUpdate(
+    id,
+    { isAddToList },
+    { new: true }
+  );
+  await stocker?.save();
+  res.send('Patch successfully!');
+};
+
 export const deleteStocker: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   await StockerModel.findByIdAndDelete(id);

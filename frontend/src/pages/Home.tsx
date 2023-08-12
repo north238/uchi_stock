@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
-import { BsCartPlus } from 'react-icons/bs';
+import { BiCartAdd } from 'react-icons/bi';
 import { IoCalendarNumberOutline, IoLocationOutline } from 'react-icons/io5';
 import { BsBoxSeam } from 'react-icons/bs';
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri';
@@ -23,6 +23,7 @@ interface ProductListProps {
     place: string;
     quantity: number | null;
     date: Date;
+    isAddToList: boolean;
   }[];
   onDeleteProduct: (_id: string) => void;
   updateProduct: (_id: string) => void;
@@ -31,7 +32,8 @@ interface ProductListProps {
     name: string,
     place: string,
     quantity: number | null,
-    date: Date
+    date: Date,
+    isAddToList: false,
   ) => void;
 }
 
@@ -128,7 +130,7 @@ const Home: React.FC<ProductListProps> = (props) => {
                       className={styles.button}
                       onClick={() => props.addToShoppingList(product._id)}
                     >
-                      <BsCartPlus className={styles.cartIcon} />
+                      <BiCartAdd className={styles.cartIcon} />
                     </button>
                   ) : (
                     <p>{product.quantity}個</p>

@@ -4,12 +4,13 @@ import axios from 'axios';
 import { baseURL } from '../utils/constant';
 import styles from './Products.module.css';
 
-type NewProductProps = {
+interface NewProductProps {
   onAddProduct: (
     name: string,
     place: string,
     quantity: number | null,
-    date: Date
+    date: Date,
+    isAddToList: boolean
   ) => void;
 };
 
@@ -18,11 +19,12 @@ const Products: React.FC<NewProductProps> = (props) => {
   const [place, setPlace] = useState<string>('');
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date>(new Date());
+  const [isAddToList, setIsAddToList] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const addProduct = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddProduct(name, place, quantity, date);
+    props.onAddProduct(name, place, quantity, date, isAddToList);
 
     const postData = async () => {
       try {
@@ -31,6 +33,7 @@ const Products: React.FC<NewProductProps> = (props) => {
           place,
           quantity,
           date,
+          isAddToList,
         });
         console.log('データをPOSTしました');
         navigate('/');
@@ -92,9 +95,23 @@ const Products: React.FC<NewProductProps> = (props) => {
             value={date.toISOString().slice(0, 10)}
             onChange={(e) => setDate(new Date(e.target.value))}
           />
-        <button className={styles.button} type="submit">
-          商品を追加
-        </button>
+          {isAddToList && (
+            <div>
+              <label className={styles.label} htmlFor="stocker-isAddToList">
+                追加リストに入れる
+              </label>
+              <input
+                className={styles.input}
+                type="checkbox"
+                id="stocker-isAddToList"
+                checked={isAddToList}
+                onChange={() => setIsAddToList(!isAddToList)}
+              />
+            </div>
+          )}
+          <button className={styles.button} type="submit">
+            商品を追加
+          </button>
         </div>
       </form>
     </section>

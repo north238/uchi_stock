@@ -18,6 +18,7 @@ const EditProduct: React.FC<EditProductProps> = ({
   const [place, setPlace] = useState(product.place);
   const [quantity, setQuantity] = useState(product.quantity);
   const [date, setDate] = useState(product.date);
+  const [isAddToList, setIsAddToList] = useState(product.isAddToList);
   const navigate = useNavigate();
 
   const saveHandler = async (event: React.FormEvent) => {
@@ -28,9 +29,23 @@ const EditProduct: React.FC<EditProductProps> = ({
         place,
         quantity,
         date,
+        isAddToList,
       });
-      onSaveProduct({ _id: product._id, name, place, quantity, date });
-      console.log('商品の更新に成功しました', { name, place, quantity, date });
+      onSaveProduct({
+        _id: product._id,
+        name,
+        place,
+        quantity,
+        date,
+        isAddToList,
+      });
+      console.log('商品の更新に成功しました', {
+        name,
+        place,
+        quantity,
+        date,
+        isAddToList,
+      });
       navigate('/');
     } catch (err) {
       console.error('商品の更新に失敗しました', err);
@@ -88,6 +103,20 @@ const EditProduct: React.FC<EditProductProps> = ({
             value={date.toISOString().slice(0, 10)}
             onChange={(e) => setDate(new Date(e.target.value))}
           />
+          {isAddToList && (
+            <div>
+              <label className={styles.label} htmlFor="stocker-isAddToList">
+                追加リストに入れる
+              </label>
+              <input
+                className={styles.input}
+                type="checkbox"
+                id="stocker-isAddToList"
+                checked={isAddToList}
+                onChange={() => setIsAddToList(!isAddToList)}
+              />
+            </div>
+          )}
           <button className={styles.button} type="submit">
             商品を編集
           </button>

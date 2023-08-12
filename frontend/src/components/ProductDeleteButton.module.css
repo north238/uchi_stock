@@ -1,6 +1,6 @@
 .icon {
   font-size: 24px;
-  padding: 0.5rem;
+  padding: .5rem;
 	cursor: pointer;
 }
 
@@ -17,6 +17,6 @@
 
 @media screen and (max-width: 768px) {
   .icon {
-    font-size: 15px;
+    font-size: 20px;
   }
 }

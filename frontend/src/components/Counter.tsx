@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Counter.module.css';
 
-type CounterProps = {
+interface CounterProps {
   count: number;
   onCountChange: (newCount: number) => void;
 };

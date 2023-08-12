@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import { Navbar } from './components/index';
+import { Navbar, TransitionAlerts } from './components/index';
 import { ProductProps, ProductWithIdProps } from './models/product-props';
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -19,9 +19,11 @@ const App: React.FC = () => {
     place: '',
     quantity: null,
     date: new Date(),
+    isAddToList: false,
   });
   const [updateUI, setUpdateUI] = useState(false);
   const [invisible, setInvisible] = useState(true);
+  const [alert, setAlert] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +36,7 @@ const App: React.FC = () => {
             place: item.place,
             quantity: item.quantity,
             date: new Date(item.date),
+            isAddToList: item.isAddToList,
           })
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
@@ -49,33 +52,68 @@ const App: React.FC = () => {
     name: string,
     place: string,
     quantity: number | null,
-    date: Date
+    date: Date,
+    isAddToList: boolean
   ) => {
     setProduct((prevProduct) => [
       ...prevProduct,
-      { name, place, quantity, date },
+      { name, place, quantity, date, isAddToList },
     ]);
     setUpdateUI((prevUpdateUI) => !prevUpdateUI);
   };
 
   const handleBadgeVisibility = () => {
-    setInvisible(!invisible);
-  };
-
-  const addToShoppingListHandler = (productId: string) => {
-    const targetProduct = (product as ProductWithIdProps[]).find(
-      (product) => product._id === productId
-    );
-    if (targetProduct) {
-      setShoppingList((prevList) => [...prevList, targetProduct]);
-      handleBadgeVisibility();
+    if (shoppingList.length >= 0) {
+      setInvisible(false);
+    } else {
+      setInvisible(true);
     }
   };
 
-  const deleteShoppingListHandler = (productId: string) => {
-    setShoppingList((prevList) =>
-      prevList.filter((product) => product._id !== productId)
-    );
+  const addToShoppingListHandler = async (productId: string) => {
+    try {
+      const targetProduct = (product as ProductWithIdProps[]).find(
+        (product) => product._id === productId
+      );
+      if (
+        targetProduct &&
+        !shoppingList.some((item) => item._id === productId)
+      ) {
+        setShoppingList((prevList) => [...prevList, targetProduct]);
+        handleBadgeVisibility();
+        targetProduct.isAddToList = true;
+        setAlert('リストへの追加に成功しました');
+        await axios.patch(`${baseURL}/patch/${productId}`, {
+          isAddToList: true,
+        });
+      }
+    } catch (err) {
+      console.error('リストへの追加に失敗しました', err);
+      setAlert('リストへの追加に失敗しました');
+    }
+  };
+
+  const deleteShoppingListHandler = async (productId: string) => {
+    try {
+      const productIndex = shoppingList.findIndex(
+        (product) => product._id === productId
+      );
+      if (productIndex !== -1) {
+        const updatedShoppingList = shoppingList.filter(
+          (product) => product._id !== productId
+        );
+        setShoppingList(updatedShoppingList);
+        await axios.patch(`${baseURL}/patch/${productId}`, {
+          isAddToList: false,
+        });
+        console.log('リストから削除に成功しました');
+      }
+      if (shoppingList.length === 0) {
+        setInvisible(true);
+      }
+    } catch (err) {
+      console.error('リストから削除に失敗しました', err);
+    }
   };
 
   const productUpdateHandler = (productId: string) => {
@@ -100,6 +138,7 @@ const App: React.FC = () => {
       place: '',
       quantity: null,
       date: new Date(),
+      isAddToList: false,
     });
   };
 
@@ -120,6 +159,7 @@ const App: React.FC = () => {
     <div className="App">
       <Navbar invisible={invisible} />
       <div>
+        {alert && <TransitionAlerts alertMessage={alert} />}
         <Routes>
           <Route
             path={'/'}
