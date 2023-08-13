@@ -1,30 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import Tooltip from '@mui/material/Tooltip';
+import axios from 'axios';
 import { ProductWithIdProps } from '../models/product-props';
+import { baseURL } from '../utils/constant';
 import styles from './ShoppingList.module.css';
 
-interface shoppingCartProps {
-  product: ProductWithIdProps[];
-  DeleteShoppingList: (_id: string) => void;
-}
+const ShoppingList: React.FC = () => {
+  const [filteredProduct, setFilteredProduct] = useState<ProductWithIdProps[]>(
+    []
+  );
 
-const ShoppingList: React.FC<shoppingCartProps> = (props) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/`);
+        const products: ProductWithIdProps[] = response.data;
+        const filteredItems = products.filter((item) => item.isAddToList);
+        setFilteredProduct(filteredItems);
+        console.log(filteredItems);
+      } catch (error) {
+        console.error('APIからデータの取得に失敗しました', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const deleteShoppingListHandler = async (itemId: string) => {
+    try {
+      await axios.patch(`${baseURL}/patch/${itemId}`, {
+        isAddToList: false,
+      });
+      setFilteredProduct((prevFiltered) =>
+        prevFiltered.filter((item) => item._id !== itemId)
+      );
+      console.log('リストから削除に成功しました');
+    } catch (err) {
+      console.error('リストから削除に失敗しました', err);
+    }
+  };
 
   return (
     <section className="shoppingList">
       <h1 className={styles.title}>買い物リスト</h1>
       <ul className={styles.ul}>
-        {props.product.map((item) => (
+        {filteredProduct.map((item) => (
           <li key={item._id} className={styles.li}>
             <span className={styles.span}>{item.name}</span>
             <Tooltip title="delete">
-            <button
-              className={styles.button}
-              onClick={() => props.DeleteShoppingList(item._id)}
-            >
-              <RiDeleteBinLine className={styles.icon}/>
-            </button>
+              <button
+                className={styles.button}
+                onClick={() => deleteShoppingListHandler(item._id)}
+              >
+                <RiDeleteBinLine className={styles.icon} />
+              </button>
             </Tooltip>
           </li>
         ))}

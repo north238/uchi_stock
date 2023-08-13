@@ -93,29 +93,6 @@ const App: React.FC = () => {
     }
   };
 
-  const deleteShoppingListHandler = async (productId: string) => {
-    try {
-      const productIndex = shoppingList.findIndex(
-        (product) => product._id === productId
-      );
-      if (productIndex !== -1) {
-        const updatedShoppingList = shoppingList.filter(
-          (product) => product._id !== productId
-        );
-        setShoppingList(updatedShoppingList);
-        await axios.patch(`${baseURL}/patch/${productId}`, {
-          isAddToList: false,
-        });
-        console.log('リストから削除に成功しました');
-      }
-      if (shoppingList.length === 0) {
-        setInvisible(true);
-      }
-    } catch (err) {
-      console.error('リストから削除に失敗しました', err);
-    }
-  };
-
   const productUpdateHandler = (productId: string) => {
     const targetProduct = (product as ProductWithIdProps[]).find(
       (product) => product._id === productId
@@ -180,10 +157,7 @@ const App: React.FC = () => {
           <Route
             path={'/shoppingList/'}
             element={
-              <ShoppingList
-                product={shoppingList}
-                DeleteShoppingList={deleteShoppingListHandler}
-              />
+              <ShoppingList />
             }
           />
           <Route

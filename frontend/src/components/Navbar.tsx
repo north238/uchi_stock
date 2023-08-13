@@ -38,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         </li>
         <li>
           <div className={styles.shoppingCartDiv}>
-            <Tooltip title="Shopping List">
+            <Tooltip title="List">
               <Link to={`/shoppingList/`} className={styles.a}>
                 <Badge
                   invisible={props.invisible}

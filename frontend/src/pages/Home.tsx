@@ -75,7 +75,7 @@ const Home: React.FC<ProductListProps> = (props) => {
     <section className="home">
       <h1 className={styles.title}>商品一覧</h1>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 550 }}>
+      <TableContainer sx={{ maxHeight: 600 }}>
         <Table stickyHeader sx={{ minWidth: 410 }} aria-label="table">
           <TableHead>
             <TableRow>

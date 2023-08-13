@@ -8,7 +8,7 @@ interface CustomDialogProps {
   onDelete: () => void;
 }
 
-const CustomDialog: React.FC<CustomDialogProps> = ({ onCancel, onDelete }) => {
+const CustomDialog: React.FC<CustomDialogProps> = (props) => {
   return ReactDOM.createPortal(
     <div className={styles.overlay}>
       <div className={styles.dialog}>
@@ -17,10 +17,10 @@ const CustomDialog: React.FC<CustomDialogProps> = ({ onCancel, onDelete }) => {
           <h2>この商品を削除しますか？</h2>
         </div>
         <div className={styles.buttons}>
-          <button className={styles.cancelButton} onClick={onCancel}>
+          <button className={styles.cancelButton} onClick={props.onCancel}>
             キャンセル
           </button>
-          <button className={styles.deleteButton} onClick={onDelete}>
+          <button className={styles.deleteButton} onClick={props.onDelete}>
             削除
           </button>
         </div>

@@ -10,16 +10,13 @@ interface ProductDeleteButtonProps {
   onDelete: () => void;
 }
 
-const ProductDeleteButton: React.FC<ProductDeleteButtonProps> = ({
-  productId,
-  onDelete,
-}) => {
+const ProductDeleteButton: React.FC<ProductDeleteButtonProps> = (props) => {
   const [isConfirming, setIsConfirming] = useState(false);
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${baseURL}/delete/${productId}`);
-      onDelete();
+      await axios.delete(`${baseURL}/delete/${props.productId}`);
+      props.onDelete();
     } catch (err) {
       console.error('商品の削除に失敗しました', err);
     }
