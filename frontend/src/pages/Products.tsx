@@ -47,7 +47,7 @@ const Products: React.FC<NewProductProps> = (props) => {
   return (
     <section className="productInput">
       <h1 className={styles.title}>商品登録</h1>
-      <form onSubmit={addProduct} className={styles.form}>
+      <form onSubmit={addProduct} className={styles.form} >
         <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="stocker-name">
             商品名
@@ -58,6 +58,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             id="stocker-name"
             value={name}
             autoFocus
+            required
             onChange={(e) => setName(e.target.value)}
             placeholder="商品名を入力してください"
           />
@@ -69,6 +70,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             type="text"
             id="stocker-place"
             value={place}
+            required
             onChange={(e) => setPlace(e.target.value)}
             placeholder="保存場所を入力してください"
           />
@@ -80,6 +82,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             type="number"
             id="stocker-quantity"
             value={quantity !== null ? quantity.toString() : ''}
+            required
             onChange={(e) =>
               setQuantity(e.target.value ? parseInt(e.target.value) : null)
             }
@@ -93,6 +96,7 @@ const Products: React.FC<NewProductProps> = (props) => {
             type="date"
             id="stocker-date"
             value={date.toISOString().slice(0, 10)}
+            required
             onChange={(e) => setDate(new Date(e.target.value))}
           />
           {isAddToList && (

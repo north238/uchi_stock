@@ -13,7 +13,7 @@ const TransitionAlerts: React.FC<TransitionAlertProps> = (props) => {
   const [open, setOpen] = React.useState(true);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} >
       <Collapse in={open}>
         <Alert
           action={
