@@ -21,7 +21,7 @@ mongoose
     console.log(err);
   });
 
-const allowedOrigins = ['https://stocker-h3dq.onrender.com'];
+const allowedOrigins = ['https://stocker-h3dq.onrender.com', 'https://stocker-sage.vercel.app'];
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
 };
