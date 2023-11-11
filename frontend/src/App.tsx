@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, TransitionAlerts } from './components/index';
-import { ProductProps, ProductWithIdProps } from './models/product-props';
+import { ProductProps, ProductWithIdProps } from './models/props';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ShoppingList from './pages/ShoppingList';
@@ -25,6 +25,7 @@ const App: React.FC = () => {
   const [updateUI, setUpdateUI] = useState(false);
   const [invisible, setInvisible] = useState(true);
   const [alert, setAlert] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +44,7 @@ const App: React.FC = () => {
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
         setInvisible(true);
+        setLoading(false);
       } catch (err) {
         console.error('データが見つかりません', err);
       }
@@ -66,11 +68,10 @@ const App: React.FC = () => {
   };
 
   const handleBadgeVisibility = () => {
-    if (shoppingList.length >= 0) {
+    if (shoppingList.length === 0) {
       setInvisible(false);
-    } else {
-      setInvisible(true);
     }
+    return;
   };
 
   const addToShoppingListHandler = async (productId: string) => {
@@ -146,6 +147,7 @@ const App: React.FC = () => {
             path={'/'}
             element={
               <Home
+                loading={loading}
                 items={product as ProductWithIdProps[]}
                 updateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
@@ -158,12 +160,7 @@ const App: React.FC = () => {
             path={'/addProducts/'}
             element={<Products onAddProduct={productAddHandler} />}
           />
-          <Route
-            path={'/shoppingList/'}
-            element={
-              <ShoppingList />
-            }
-          />
+          <Route path={'/shoppingList/'} element={<ShoppingList />} />
           <Route
             path={'/editProduct/'}
             element={

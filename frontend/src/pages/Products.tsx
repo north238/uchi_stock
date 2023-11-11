@@ -4,17 +4,7 @@ import axios from 'axios';
 import { baseURL } from '../utils/constant';
 import { selectCategories } from '../utils/selectCategories';
 import styles from './Products.module.css';
-
-interface NewProductProps {
-  onAddProduct: (
-    name: string,
-    place: string,
-    categories: string,
-    quantity: number | null,
-    date: Date,
-    isAddToList: boolean
-  ) => void;
-}
+import { NewProductProps } from '../models/props';
 
 const Products: React.FC<NewProductProps> = (props) => {
   const [name, setName] = useState<string>('');

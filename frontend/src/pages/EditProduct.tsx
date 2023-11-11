@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './EditProduct.module.css';
-import { ProductWithIdProps } from '../models/product-props';
 import axios from 'axios';
+import styles from './EditProduct.module.css';
+import { useNavigate } from 'react-router-dom';
+import { EditProductProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import { selectCategories } from '../utils/selectCategories';
-
-interface EditProductProps {
-  product: ProductWithIdProps;
-  onSaveProduct: (updateProduct: ProductWithIdProps) => void;
-}
+import { TransitionAlerts } from '../components/index';
 
 const EditProduct: React.FC<EditProductProps> = ({
   product,
@@ -21,6 +17,7 @@ const EditProduct: React.FC<EditProductProps> = ({
   const [quantity, setQuantity] = useState(product.quantity);
   const [date, setDate] = useState(product.date);
   const [isAddToList, setIsAddToList] = useState(product.isAddToList);
+  const [alert, setAlert] = useState('');
   const navigate = useNavigate();
 
   const saveHandler = async (event: React.FormEvent) => {
@@ -43,14 +40,8 @@ const EditProduct: React.FC<EditProductProps> = ({
         date,
         isAddToList,
       });
-      console.log('商品の更新に成功しました', {
-        name,
-        place,
-        categories,
-        quantity,
-        date,
-        isAddToList,
-      });
+      console.log('商品の更新に成功しました');
+      setAlert('リストへの追加に成功しました');
       navigate('/');
     } catch (err) {
       console.error('商品の更新に失敗しました', err);
@@ -59,6 +50,7 @@ const EditProduct: React.FC<EditProductProps> = ({
 
   return (
     <section className="editProduct">
+      {alert && <TransitionAlerts alertMessage={alert} />}
       <h1 className={styles.title}>商品編集</h1>
       <form onSubmit={saveHandler} className={styles.form}>
         <div className={styles.inputGroup}>

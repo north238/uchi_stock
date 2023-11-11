@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import Tooltip from '@mui/material/Tooltip';
 import axios from 'axios';
-import { ProductWithIdProps } from '../models/product-props';
+import { ProductWithIdProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import styles from './ShoppingList.module.css';
+import { TransitionAlerts } from '../components/index';
 
 const ShoppingList: React.FC = () => {
   const [filteredProduct, setFilteredProduct] = useState<ProductWithIdProps[]>(
     []
   );
+  const [alert, setAlert] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +20,6 @@ const ShoppingList: React.FC = () => {
         const products: ProductWithIdProps[] = response.data;
         const filteredItems = products.filter((item) => item.isAddToList);
         setFilteredProduct(filteredItems);
-        console.log(filteredItems);
       } catch (error) {
         console.error('APIからデータの取得に失敗しました', error);
       }
@@ -35,6 +36,7 @@ const ShoppingList: React.FC = () => {
         prevFiltered.filter((item) => item._id !== itemId)
       );
       console.log('リストから削除に成功しました');
+      setAlert('リストから削除に成功しました');
     } catch (err) {
       console.error('リストから削除に失敗しました', err);
     }
@@ -42,6 +44,7 @@ const ShoppingList: React.FC = () => {
 
   return (
     <section className="shoppingList">
+      {alert && <TransitionAlerts alertMessage={alert} />}
       <h1 className={styles.title}>買い物リスト</h1>
       <ul className={styles.ul}>
         {filteredProduct.map((item) => (
