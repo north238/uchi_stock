@@ -5,7 +5,7 @@ import axios from 'axios';
 import { ProductWithIdProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import styles from './ShoppingList.module.css';
-import { TransitionAlerts } from '../components/index';
+import TransitionAlerts from '../components/Alert';
 
 const ShoppingList: React.FC = () => {
   const [filteredProduct, setFilteredProduct] = useState<ProductWithIdProps[]>(
@@ -16,8 +16,8 @@ const ShoppingList: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${baseURL}/`);
-        const products: ProductWithIdProps[] = response.data;
+        const res = await axios.get(`${baseURL}/`);
+        const products: ProductWithIdProps[] = res.data;
         const filteredItems = products.filter((item) => item.isAddToList);
         setFilteredProduct(filteredItems);
       } catch (error) {

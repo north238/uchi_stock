@@ -14,14 +14,9 @@
   color: #000;
 }
 
-.cartIcon,
-.tableIcon,
 .icon {
   font-size: 24px;
-}
-
-.icon {
-  padding: .5rem;
+  padding: 0.5rem;
 }
 
 .icon:hover {
@@ -29,24 +24,9 @@
   border-radius: 100%;
 }
 
-.tableIcon {
-  font-weight: bold;
-  padding: 0;
-}
-
-.cartIcon {
-  color: #000;
-  padding: 0;
-}
-
 @media screen and (max-width: 768px) {
-  .icon,
-  .cartIcon {
-    font-size: 20px;
-  }
-
-  .tableIcon {
-    font-size: 20px;
-    font-weight: bold;
+  .icon {
+    font-size: 1rem;
+    padding: 6px;
   }
 }

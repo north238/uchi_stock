@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import { Navbar, TransitionAlerts } from './components/index';
 import { ProductProps, ProductWithIdProps } from './models/props';
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -9,6 +8,8 @@ import ShoppingList from './pages/ShoppingList';
 import EditProduct from './pages/EditProduct';
 import NotFound from './pages/NotFound';
 import { baseURL } from './utils/constant';
+import TransitionAlerts from './components/Alert';
+import Navbar from './components/Navbar';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
@@ -43,7 +44,6 @@ const App: React.FC = () => {
           })
         );
         setProduct(fetchProducts as ProductWithIdProps[]);
-        setInvisible(true);
         setLoading(false);
       } catch (err) {
         console.error('データが見つかりません', err);
@@ -68,7 +68,7 @@ const App: React.FC = () => {
   };
 
   const handleBadgeVisibility = () => {
-    if (shoppingList.length === 0) {
+    if (shoppingList.length=== 0) {
       setInvisible(false);
     }
     return;
@@ -83,13 +83,14 @@ const App: React.FC = () => {
         targetProduct &&
         !shoppingList.some((item) => item._id === productId)
       ) {
-        setShoppingList((prevList) => [...prevList, targetProduct]);
-        handleBadgeVisibility();
-        targetProduct.isAddToList = true;
-        setAlert('リストへの追加に成功しました');
         await axios.patch(`${baseURL}/patch/${productId}`, {
           isAddToList: true,
         });
+        targetProduct.isAddToList = true;
+        setShoppingList((prevList) => [...prevList, targetProduct]);
+        handleBadgeVisibility();
+        setAlert('リストへの追加に成功しました');
+        console.log('addToShoppingListHandler', shoppingList.length, invisible);
       }
     } catch (err) {
       console.error('リストへの追加に失敗しました', err);

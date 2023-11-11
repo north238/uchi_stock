@@ -97,18 +97,8 @@ const Home: React.FC<ProductListProps> = (props) => {
                       数量
                     </TableSortLabel>
                   </StyledTableCell>
-                  <StyledTableCell
-                    align="center"
-                    sx={{ fontSize: { xs: 10, sm: 10 } }}
-                  >
-                    編集
-                  </StyledTableCell>
-                  <StyledTableCell
-                    align="center"
-                    sx={{ fontSize: { xs: 10, sm: 10 } }}
-                  >
-                    削除
-                  </StyledTableCell>
+                  <StyledTableCell align="center">編集</StyledTableCell>
+                  <StyledTableCell align="center">削除</StyledTableCell>
                 </TableRow>
               </TableHead>
 
@@ -119,7 +109,7 @@ const Home: React.FC<ProductListProps> = (props) => {
                   .map((product) => (
                     <StyledTableRow key={product._id}>
                       <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 } }}
+                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
                         align="center"
                       >
                         {product.name}
@@ -131,13 +121,13 @@ const Home: React.FC<ProductListProps> = (props) => {
                         {product.place}
                       </StyledTableCell>
                       <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 } }}
+                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
                         align="center"
                       >
                         {product.categories}
                       </StyledTableCell>
                       <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 } }}
+                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
                         align="center"
                         className={
                           product.quantity === 0 ? 'zero-quantity' : ''

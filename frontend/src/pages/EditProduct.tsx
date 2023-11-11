@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { EditProductProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import { selectCategories } from '../utils/selectCategories';
-import { TransitionAlerts } from '../components/index';
+import TransitionAlerts from '../components/Alert';
 
 const EditProduct: React.FC<EditProductProps> = ({
   product,
