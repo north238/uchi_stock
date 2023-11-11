@@ -1,26 +1,73 @@
-import React from 'react';
-import styles from './Counter.module.css';
+import React, { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
 interface CounterProps {
-  count: number;
+  newCount: number | null;
   onCountChange: (newCount: number) => void;
-};
+}
 
-const Counter: React.FC<CounterProps> = (props) => {
-  const { count, onCountChange } = props;
+const Counter: React.FC<CounterProps> = ({
+  newCount,
+  onCountChange,
+}: CounterProps) => {
+  const [count, setCount] = useState(newCount);
+
+  useEffect(() => {
+    setCount(newCount);
+  }, [newCount]);
 
   const handleIncrement = () => {
-    onCountChange(count + 1);
+    const updatedCount = (count || 0) + 1;
+    setCount(updatedCount);
+    if (onCountChange) {
+      onCountChange(updatedCount);
+    }
   };
   const handleDecrement = () => {
-    onCountChange(count > 0 ? count - 1 : 0);
+    const updatedCount = (count || 0) - 1;
+    setCount(updatedCount);
+    if (onCountChange) {
+      onCountChange(updatedCount);
+    }
   };
+
   return (
-    <div className={styles.counter}>
-      <button className={styles.upButton} onClick={handleIncrement}>+</button>
-      <span className={styles.span}>{count}</span>
-      <button className={styles.downButton} onClick={handleDecrement}>-</button>
-    </div>
+    <Box
+      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+    >
+      <Box sx={{ m: 2 }}>{count}</Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <ButtonGroup
+          size="small"
+          orientation="vertical"
+          aria-label="vertical outlined button group"
+        >
+          <Button onClick={handleIncrement}>
+            <KeyboardArrowUpOutlinedIcon />
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup
+          size="small"
+          orientation="vertical"
+          aria-label="vertical contained button group"
+        >
+          <Button onClick={handleDecrement}>
+            <KeyboardArrowDownOutlinedIcon />
+          </Button>
+        </ButtonGroup>
+      </Box>
+    </Box>
   );
 };
 

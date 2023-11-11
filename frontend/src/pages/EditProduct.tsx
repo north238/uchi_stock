@@ -64,7 +64,6 @@ const EditProduct: React.FC<EditProductProps> = ({
             value={name}
             autoFocus
             onChange={(e) => setName(e.target.value)}
-            placeholder="商品名を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-place">
             場所
@@ -75,7 +74,6 @@ const EditProduct: React.FC<EditProductProps> = ({
             id="stocker-place"
             value={place}
             onChange={(e) => setPlace(e.target.value)}
-            placeholder="保存場所を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-categories">
             カテゴリ
@@ -104,7 +102,6 @@ const EditProduct: React.FC<EditProductProps> = ({
             onChange={(e) =>
               setQuantity(e.target.value ? parseInt(e.target.value) : null)
             }
-            placeholder="数量を入力してください"
           />
           <label className={styles.label} htmlFor="stocker-date">
             購入日
@@ -119,7 +116,7 @@ const EditProduct: React.FC<EditProductProps> = ({
           {isAddToList && (
             <div>
               <label className={styles.label} htmlFor="stocker-isAddToList">
-                追加リストに入れる
+                ステータス
               </label>
               <input
                 className={styles.input}

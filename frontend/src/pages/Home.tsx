@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { createTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
@@ -16,6 +18,9 @@ import { ProductWithIdProps, ProductListProps } from '../models/props';
 import { StyledTableCell, StyledTableRow } from '../utils/styles';
 import { getComparator, Order } from '../utils/sortComparator';
 import LoadSpinner from '../components/LoadSpinner';
+import Counter from '../components/Counter';
+import axios from 'axios';
+import { baseURL } from '../utils/constant';
 
 const Home: React.FC<ProductListProps> = (props) => {
   createTheme({
@@ -43,130 +48,166 @@ const Home: React.FC<ProductListProps> = (props) => {
     };
   };
 
+  const navigate = useNavigate();
+  const [products, setProducts] = useState<ProductWithIdProps[]>([]);
+  const handleCountChange = (productId: string, newCount: number) => {
+    // 商品データを更新
+    const updatedProducts = props.items.map((product) =>
+      product._id === productId ? { ...product, quantity: newCount } : product
+    );
+    setProducts(updatedProducts);
+
+    const saveHandler = async () => {
+      try {
+        await axios.put(`${baseURL}/update/${updatedProducts}`, {
+        updatedProducts});
+        console.log('商品の更新に成功しました');
+        setAlert('リストへの追加に成功しました');
+        navigate('/');
+      } catch (err) {
+        console.error('商品の更新に失敗しました', err);
+      }
+    };
+    saveHandler();
+  };
+
   return (
     <section className="home">
       <h1 className={styles.title}>商品一覧</h1>
-      {props.loading ? (
-        <LoadSpinner />
-      ) : (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={3}>
-          <TableContainer sx={{ maxHeight: 600 }}>
-            <Table stickyHeader sx={{ minWidth: 410 }} aria-label="table">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell align="center">
-                    <TableSortLabel
-                      sx={{ fontSize: { xs: 12, sm: 14 } }}
-                      active={orderBy === 'name'}
-                      direction={orderBy === 'name' ? order : 'asc'}
-                      onClick={createSortHandler('name')}
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        {props.loading ? (
+          <LoadSpinner />
+        ) : (
+          <Paper sx={{ display: 'flex', width: '95%' }} elevation={3}>
+            <TableContainer sx={{ maxHeight: 590 }}>
+              <Table stickyHeader sx={{ minWidth: 410 }} aria-label="table">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell align="center">
+                      <TableSortLabel
+                        sx={{ fontSize: { xs: 12, sm: 14 } }}
+                        active={orderBy === 'name'}
+                        direction={orderBy === 'name' ? order : 'asc'}
+                        onClick={createSortHandler('name')}
+                      >
+                        名前
+                      </TableSortLabel>
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      align="center"
                     >
-                      名前
-                    </TableSortLabel>
-                  </StyledTableCell>
-                  <StyledTableCell
-                    sx={{ display: { xs: 'none', sm: 'table-cell' } }}
-                    align="center"
-                  >
-                    <TableSortLabel
-                      sx={{ fontSize: { xs: 12, sm: 14 } }}
-                      active={orderBy === 'place'}
-                      direction={orderBy === 'place' ? order : 'asc'}
-                      onClick={createSortHandler('place')}
-                    >
-                      場所
-                    </TableSortLabel>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <TableSortLabel
-                      sx={{ fontSize: { xs: 12, sm: 14 } }}
-                      active={orderBy === 'categories'}
-                      direction={orderBy === 'categories' ? order : 'asc'}
-                      onClick={createSortHandler('categories')}
-                    >
-                      カテゴリ
-                    </TableSortLabel>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <TableSortLabel
-                      sx={{ fontSize: { xs: 12, sm: 14 } }}
-                      active={orderBy === 'quantity'}
-                      direction={orderBy === 'quantity' ? order : 'asc'}
-                      onClick={createSortHandler('quantity')}
-                    >
-                      数量
-                    </TableSortLabel>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">編集</StyledTableCell>
-                  <StyledTableCell align="center">削除</StyledTableCell>
-                </TableRow>
-              </TableHead>
+                      <TableSortLabel
+                        sx={{ fontSize: { xs: 12, sm: 14 } }}
+                        active={orderBy === 'place'}
+                        direction={orderBy === 'place' ? order : 'asc'}
+                        onClick={createSortHandler('place')}
+                      >
+                        場所
+                      </TableSortLabel>
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <TableSortLabel
+                        sx={{ fontSize: { xs: 12, sm: 14 } }}
+                        active={orderBy === 'categories'}
+                        direction={orderBy === 'categories' ? order : 'asc'}
+                        onClick={createSortHandler('categories')}
+                      >
+                        カテゴリ
+                      </TableSortLabel>
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <TableSortLabel
+                        sx={{ fontSize: { xs: 12, sm: 14 } }}
+                        active={orderBy === 'quantity'}
+                        direction={orderBy === 'quantity' ? order : 'asc'}
+                        onClick={createSortHandler('quantity')}
+                      >
+                        数量
+                      </TableSortLabel>
+                    </StyledTableCell>
+                    <StyledTableCell align="center">編集</StyledTableCell>
+                    <StyledTableCell align="center">削除</StyledTableCell>
+                  </TableRow>
+                </TableHead>
 
-              <TableBody>
-                {props.items
-                  .slice()
-                  .sort(getComparator(order, orderBy))
-                  .map((product) => (
-                    <StyledTableRow key={product._id}>
-                      <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
-                        align="center"
-                      >
-                        {product.name}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
-                        align="center"
-                      >
-                        {product.place}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
-                        align="center"
-                      >
-                        {product.categories}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ fontSize: { xs: 10, sm: 14 }, p: 1 }}
-                        align="center"
-                        className={
-                          product.quantity === 0 ? 'zero-quantity' : ''
-                        }
-                      >
-                        {product.quantity === 0 ? (
-                          <button
-                            className={styles.button}
-                            onClick={() => props.addToShoppingList(product._id)}
-                          >
-                            <BiCartAdd className={styles.cartIcon} />
-                          </button>
-                        ) : (
-                          <p>{product.quantity}個</p>
-                        )}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Link to={`/editProduct/`} className={styles.a}>
-                          <RiPencilLine
-                            onClick={() => props.updateProduct(product._id)}
-                            className={styles.icon}
+                <TableBody>
+                  {props.items
+                    .slice()
+                    .sort(getComparator(order, orderBy))
+                    .map((product) => (
+                      <StyledTableRow key={product._id}>
+                        <StyledTableCell
+                          sx={{ fontSize: { xs: 11, sm: 14 }, p: 1 }}
+                          align="center"
+                        >
+                          {product.name}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                          align="center"
+                        >
+                          {product.place}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ fontSize: { xs: 11, sm: 14 }, p: 1 }}
+                          align="center"
+                        >
+                          {product.categories}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ fontSize: { xs: 11, sm: 14 }, p: 1 }}
+                          align="center"
+                          className={
+                            product.quantity === 0 ? 'zero-quantity' : ''
+                          }
+                        >
+                          {product.quantity === 0 ? (
+                            <button
+                              className={styles.button}
+                              onClick={() =>
+                                props.addToShoppingList(product._id)
+                              }
+                            >
+                              <BiCartAdd className={styles.cartIcon} />
+                            </button>
+                          ) : (
+                            <Counter
+                              onCountChange={(newCount) =>
+                                handleCountChange(product._id, newCount)
+                              }
+                              newCount={product.quantity}
+                            />
+                          )}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Link to={`/editProduct/`} className={styles.a}>
+                            <RiPencilLine
+                              onClick={() => props.updateProduct(product._id)}
+                              className={styles.icon}
+                            />
+                          </Link>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <ProductDeleteButton
+                            productId={product._id}
+                            onDelete={() => props.onDeleteProduct(product._id)}
                           />
-                        </Link>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <ProductDeleteButton
-                          productId={product._id}
-                          onDelete={() => props.onDeleteProduct(product._id)}
-                        />
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      )}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )}
+      </Box>
     </section>
   );
 };
 
 export default Home;
+function setAlert(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+
