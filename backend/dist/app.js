@@ -44,7 +44,11 @@ mongoose_1.default
     console.log('MongoDB connection error!!!');
     console.log(err);
 });
-const allowedOrigins = ['https://stocker-h3dq.onrender.com', 'https://stocker-sage.vercel.app'];
+const allowedOrigins = [
+    'https://stocker-h3dq.onrender.com',
+    'https://stocker-sage.vercel.app',
+    'http://localhost:3000',
+];
 const options = {
     origin: allowedOrigins,
 };

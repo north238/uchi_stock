@@ -9,6 +9,7 @@ const { Schema } = mongoose_1.default;
 const stockerSchema = new Schema({
     name: { type: String, required: true },
     place: { type: String, default: '納戸' },
+    categories: { type: String, required: true },
     quantity: { type: Number, required: true },
     date: { type: Date, default: Date.now },
     isAddToList: { type: Boolean, default: false }

@@ -17,6 +17,7 @@ const App: React.FC = () => {
     _id: '',
     name: '',
     place: '',
+    categories: '',
     quantity: null,
     date: new Date(),
     isAddToList: false,
@@ -34,6 +35,7 @@ const App: React.FC = () => {
             _id: item._id,
             name: item.name,
             place: item.place,
+            categories: item.categories,
             quantity: item.quantity,
             date: new Date(item.date),
             isAddToList: item.isAddToList,
@@ -51,13 +53,14 @@ const App: React.FC = () => {
   const productAddHandler = (
     name: string,
     place: string,
+    categories: string,
     quantity: number | null,
     date: Date,
     isAddToList: boolean
   ) => {
     setProduct((prevProduct) => [
       ...prevProduct,
-      { name, place, quantity, date, isAddToList },
+      { name, place, categories, quantity, date, isAddToList },
     ]);
     setUpdateUI((prevUpdateUI) => !prevUpdateUI);
   };
@@ -113,6 +116,7 @@ const App: React.FC = () => {
       _id: '',
       name: '',
       place: '',
+      categories: '',
       quantity: null,
       date: new Date(),
       isAddToList: false,

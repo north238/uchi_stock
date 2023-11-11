@@ -4,6 +4,7 @@ import styles from './EditProduct.module.css';
 import { ProductWithIdProps } from '../models/product-props';
 import axios from 'axios';
 import { baseURL } from '../utils/constant';
+import { selectCategories } from '../utils/selectCategories';
 
 interface EditProductProps {
   product: ProductWithIdProps;
@@ -16,6 +17,7 @@ const EditProduct: React.FC<EditProductProps> = ({
 }) => {
   const [name, setName] = useState(product.name);
   const [place, setPlace] = useState(product.place);
+  const [categories, setCategories] = useState(product.categories);
   const [quantity, setQuantity] = useState(product.quantity);
   const [date, setDate] = useState(product.date);
   const [isAddToList, setIsAddToList] = useState(product.isAddToList);
@@ -27,6 +29,7 @@ const EditProduct: React.FC<EditProductProps> = ({
       await axios.put(`${baseURL}/update/${product._id}`, {
         name,
         place,
+        categories,
         quantity,
         date,
         isAddToList,
@@ -35,6 +38,7 @@ const EditProduct: React.FC<EditProductProps> = ({
         _id: product._id,
         name,
         place,
+        categories,
         quantity,
         date,
         isAddToList,
@@ -42,6 +46,7 @@ const EditProduct: React.FC<EditProductProps> = ({
       console.log('商品の更新に成功しました', {
         name,
         place,
+        categories,
         quantity,
         date,
         isAddToList,
@@ -80,6 +85,22 @@ const EditProduct: React.FC<EditProductProps> = ({
             onChange={(e) => setPlace(e.target.value)}
             placeholder="保存場所を入力してください"
           />
+          <label className={styles.label} htmlFor="stocker-categories">
+            カテゴリ
+          </label>
+          <select
+            className={styles.input}
+            id="stocker-categories"
+            value={categories}
+            required
+            onChange={(e) => setCategories(e.target.value)}
+          >
+            {selectCategories.map((item) => (
+              <option value={item.category} key={item.id}>
+                {item.category}
+              </option>
+            ))}
+          </select>
           <label className={styles.label} htmlFor="stocker-quantity">
             数量
           </label>

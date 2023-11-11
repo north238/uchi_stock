@@ -2,39 +2,44 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { baseURL } from '../utils/constant';
+import { selectCategories } from '../utils/selectCategories';
 import styles from './Products.module.css';
 
 interface NewProductProps {
   onAddProduct: (
     name: string,
     place: string,
+    categories: string,
     quantity: number | null,
     date: Date,
     isAddToList: boolean
   ) => void;
-};
+}
 
 const Products: React.FC<NewProductProps> = (props) => {
   const [name, setName] = useState<string>('');
   const [place, setPlace] = useState<string>('');
+  const [categories, setCategories] = useState<string>('');
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date>(new Date());
   const [isAddToList, setIsAddToList] = useState<boolean>(false);
+  const productData = {
+    name,
+    place,
+    categories,
+    quantity,
+    date,
+    isAddToList,
+  };
   const navigate = useNavigate();
 
   const addProduct = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddProduct(name, place, quantity, date, isAddToList);
+    props.onAddProduct(name, place, categories, quantity, date, isAddToList);
 
     const postData = async () => {
       try {
-        await axios.post(`${baseURL}/addProducts`, {
-          name,
-          place,
-          quantity,
-          date,
-          isAddToList,
-        });
+        await axios.post(`${baseURL}/addProducts`, productData);
         console.log('データをPOSTしました');
         navigate('/');
       } catch (err) {
@@ -47,7 +52,7 @@ const Products: React.FC<NewProductProps> = (props) => {
   return (
     <section className="productInput">
       <h1 className={styles.title}>商品登録</h1>
-      <form onSubmit={addProduct} className={styles.form} >
+      <form onSubmit={addProduct} className={styles.form}>
         <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="stocker-name">
             商品名
@@ -70,10 +75,25 @@ const Products: React.FC<NewProductProps> = (props) => {
             type="text"
             id="stocker-place"
             value={place}
-            required
             onChange={(e) => setPlace(e.target.value)}
             placeholder="保存場所を入力してください"
           />
+          <label className={styles.label} htmlFor="stocker-categories">
+            カテゴリ
+          </label>
+          <select
+            className={styles.input}
+            id="stocker-categories"
+            value={categories}
+            required
+            onChange={(e) => setCategories(e.target.value)}
+          >
+            {selectCategories.map((item) => (
+              <option value={item.category} key={item.id}>
+                {item.category}
+              </option>
+            ))}
+          </select>
           <label className={styles.label} htmlFor="stocker-quantity">
             数量
           </label>
