@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface ProductProps {
   name: string;
   place: string,
@@ -20,6 +22,7 @@ export interface ProductWithIdProps {
 export interface ProductListProps {
   loading: boolean;
   items: ProductWithIdProps[];
+  setProduct: Dispatch<SetStateAction<ProductProps[]>>;
   onDeleteProduct: (_id: string) => void;
   updateProduct: (_id: string) => void;
   addToShoppingList: (_id: string) => void;
@@ -47,4 +50,9 @@ export interface NewProductProps {
     date: Date,
     isAddToList: boolean
   ) => void;
+}
+
+export interface CounterProps {
+  newCount: number | null;
+  onCountChange: (newCount: number) => void;
 }

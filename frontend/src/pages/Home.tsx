@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { createTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,8 +18,7 @@ import { StyledTableCell, StyledTableRow } from '../utils/styles';
 import { getComparator, Order } from '../utils/sortComparator';
 import LoadSpinner from '../components/LoadSpinner';
 import Counter from '../components/Counter';
-import axios from 'axios';
-import { baseURL } from '../utils/constant';
+import updateDatabase from '../api/api';
 
 const Home: React.FC<ProductListProps> = (props) => {
   createTheme({
@@ -34,7 +32,6 @@ const Home: React.FC<ProductListProps> = (props) => {
       },
     },
   });
-
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof ProductWithIdProps>('name');
   const createSortHandler = (property: keyof ProductWithIdProps) => {
@@ -48,27 +45,12 @@ const Home: React.FC<ProductListProps> = (props) => {
     };
   };
 
-  const navigate = useNavigate();
-  const [products, setProducts] = useState<ProductWithIdProps[]>([]);
-  const handleCountChange = (productId: string, newCount: number) => {
-    // 商品データを更新
+  const handleCountChange = (productId: string, newCount: number): void => {
     const updatedProducts = props.items.map((product) =>
       product._id === productId ? { ...product, quantity: newCount } : product
     );
-    setProducts(updatedProducts);
-
-    const saveHandler = async () => {
-      try {
-        await axios.put(`${baseURL}/update/${updatedProducts}`, {
-        updatedProducts});
-        console.log('商品の更新に成功しました');
-        setAlert('リストへの追加に成功しました');
-        navigate('/');
-      } catch (err) {
-        console.error('商品の更新に失敗しました', err);
-      }
-    };
-    saveHandler();
+    props.setProduct(updatedProducts);
+    updateDatabase(productId, newCount);
   };
 
   return (
@@ -207,7 +189,3 @@ const Home: React.FC<ProductListProps> = (props) => {
 };
 
 export default Home;
-function setAlert(arg0: string) {
-  throw new Error('Function not implemented.');
-}
-

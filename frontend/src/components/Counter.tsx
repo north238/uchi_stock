@@ -4,11 +4,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-
-interface CounterProps {
-  newCount: number | null;
-  onCountChange: (newCount: number) => void;
-}
+import { CounterProps } from '../models/props';
 
 const Counter: React.FC<CounterProps> = ({
   newCount,

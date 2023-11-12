@@ -10,19 +10,13 @@ import NotFound from './pages/NotFound';
 import { baseURL } from './utils/constant';
 import TransitionAlerts from './components/Alert';
 import Navbar from './components/Navbar';
+import { productsData } from './models/productsData';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
   const [shoppingList, setShoppingList] = useState<ProductWithIdProps[]>([]);
-  const [editingProduct, setEditingProduct] = useState<ProductWithIdProps>({
-    _id: '',
-    name: '',
-    place: '',
-    categories: '',
-    quantity: null,
-    date: new Date(),
-    isAddToList: false,
-  });
+  const [editingProduct, setEditingProduct] =
+    useState<ProductWithIdProps>(productsData);
   const [updateUI, setUpdateUI] = useState(false);
   const [invisible, setInvisible] = useState(true);
   const [alert, setAlert] = useState('');
@@ -68,7 +62,7 @@ const App: React.FC = () => {
   };
 
   const handleBadgeVisibility = () => {
-    if (shoppingList.length=== 0) {
+    if (shoppingList.length === 0) {
       setInvisible(false);
     }
     return;
@@ -90,7 +84,6 @@ const App: React.FC = () => {
         setShoppingList((prevList) => [...prevList, targetProduct]);
         handleBadgeVisibility();
         setAlert('リストへの追加に成功しました');
-        console.log('addToShoppingListHandler', shoppingList.length, invisible);
       }
     } catch (err) {
       console.error('リストへの追加に失敗しました', err);
@@ -114,15 +107,7 @@ const App: React.FC = () => {
         product._id === updatedProduct._id ? updatedProduct : product
       )
     );
-    setEditingProduct({
-      _id: '',
-      name: '',
-      place: '',
-      categories: '',
-      quantity: null,
-      date: new Date(),
-      isAddToList: false,
-    });
+    setEditingProduct(productsData);
   };
 
   const productDeleteHandler = async (productId: string) => {
@@ -150,6 +135,7 @@ const App: React.FC = () => {
               <Home
                 loading={loading}
                 items={product as ProductWithIdProps[]}
+                setProduct={setProduct}
                 updateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
                 onAddProduct={productAddHandler}
