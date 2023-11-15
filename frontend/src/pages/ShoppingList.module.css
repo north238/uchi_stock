@@ -31,18 +31,7 @@
   padding-left: 1.5rem;
 }
 
-.icon {
-  font-size: 24px;
-  padding: 0.5rem;
-  cursor: pointer;
-  color: #ff0000;
-}
-
 @media screen and (max-width: 768px) {
-  .icon {
-    font-size: 20px;
-  }
-
   .ul {
     margin: 1rem auto;
     width: 90%;

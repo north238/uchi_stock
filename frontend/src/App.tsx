@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import { ProductProps, ProductWithIdProps } from './models/props';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ShoppingList from './pages/ShoppingList';
 import EditProduct from './pages/EditProduct';
 import NotFound from './pages/NotFound';
-import { baseURL } from './utils/constant';
 import Navbar from './components/Navbar';
+import { ProductProps, ProductWithIdProps } from './models/props';
 import { productsData } from './models/productsData';
+import { baseURL } from './utils/constant';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
@@ -34,6 +34,10 @@ const App: React.FC = () => {
             isAddToList: item.isAddToList,
           })
         );
+        const filteredItems: ProductWithIdProps[] = res.data.filter(
+          (item: ProductWithIdProps) => item.quantity === 0
+        );
+        setBadgeCount(filteredItems.length);
         setProduct(fetchProducts as ProductWithIdProps[]);
         setLoading(false);
       } catch (err) {
@@ -116,7 +120,6 @@ const App: React.FC = () => {
             path={'/shoppingList/'}
             element={
               <ShoppingList
-                loading={loading}
                 badgeCount={badgeCount}
                 setBadgeCount={setBadgeCount}
               />

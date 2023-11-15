@@ -52,7 +52,6 @@ export interface NewProductProps {
 }
 
 export interface ShoppingListProps {
-  loading: boolean;
   badgeCount: number;
   setBadgeCount: Dispatch<SetStateAction<number>>;
 }

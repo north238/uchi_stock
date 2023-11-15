@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { RiPencilLine } from 'react-icons/ri';
 import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -8,16 +10,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
-import { Link } from 'react-router-dom';
-import { RiPencilLine } from 'react-icons/ri';
-import styles from './Home.module.css';
+import updateDatabase from '../api/api';
+import Counter from '../components/Counter';
+import LoadSpinner from '../components/LoadSpinner';
 import ProductDeleteButton from '../components/ProductDeleteButton';
 import { ProductWithIdProps, ProductListProps } from '../models/props';
-import { StyledTableCell, StyledTableRow } from '../utils/styles';
 import { getComparator, Order } from '../utils/sortComparator';
-import LoadSpinner from '../components/LoadSpinner';
-import Counter from '../components/Counter';
-import updateDatabase from '../api/api';
+import { StyledTableCell, StyledTableRow } from '../utils/styles';
+import styles from './Home.module.css';
 
 const Home: React.FC<ProductListProps> = (props) => {
   createTheme({

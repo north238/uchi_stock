@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { NewProductProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import { selectCategories } from '../utils/selectCategories';
 import styles from './Products.module.css';
-import { NewProductProps } from '../models/props';
 
 const Products: React.FC<NewProductProps> = (props) => {
   const [name, setName] = useState<string>('');

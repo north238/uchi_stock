@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import styles from './EditProduct.module.css';
 import { useNavigate } from 'react-router-dom';
+import TransitionAlerts from '../components/Alert';
 import { EditProductProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import { selectCategories } from '../utils/selectCategories';
-import TransitionAlerts from '../components/Alert';
+import styles from './EditProduct.module.css';
 
 const EditProduct: React.FC<EditProductProps> = ({
   product,

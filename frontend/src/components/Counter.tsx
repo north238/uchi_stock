@@ -25,7 +25,11 @@ const Counter: React.FC<CounterProps> = ({
   };
   const handleDecrement = () => {
     const updatedCount = (count || 0) - 1;
-    setCount(updatedCount >= 0 ? 0 : updatedCount);
+    if(updatedCount === -1) {
+      return 0;
+    } else {
+      setCount(updatedCount);
+    }
     if (onCountChange) {
       onCountChange(updatedCount);
     }

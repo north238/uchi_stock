@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BiHome, BiAddToQueue, BiCart } from 'react-icons/bi';
 import { BsBoxes } from 'react-icons/bs';
-import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
-import styles from './Navbar.module.css';
+import Tooltip from '@mui/material/Tooltip';
 import { NavbarProps } from '../models/props';
+import styles from './Navbar.module.css';
 
 const Navbar: React.FC<NavbarProps> = (props) => {
   return (

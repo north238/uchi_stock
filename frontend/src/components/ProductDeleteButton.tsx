@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { RiDeleteBinLine } from 'react-icons/ri';
-import { baseURL } from '../utils/constant';
 import CustomDialog from './CustomDialog';
+import { baseURL } from '../utils/constant';
 import styles from './ProductDeleteButton.module.css';
 
 interface ProductDeleteButtonProps {
