@@ -6,8 +6,10 @@ import { ProductWithIdProps } from '../models/props';
 import { baseURL } from '../utils/constant';
 import styles from './ShoppingList.module.css';
 import TransitionAlerts from '../components/Alert';
+import { ShoppingListProps } from '../models/props';
+import LoadSpinner from '../components/LoadSpinner';
 
-const ShoppingList: React.FC = () => {
+const ShoppingList: React.FC<ShoppingListProps> = (props) => {
   const [filteredProduct, setFilteredProduct] = useState<ProductWithIdProps[]>(
     []
   );
@@ -18,14 +20,16 @@ const ShoppingList: React.FC = () => {
       try {
         const res = await axios.get(`${baseURL}/`);
         const products: ProductWithIdProps[] = res.data;
-        const filteredItems = products.filter((item) => item.isAddToList);
+        const filteredItems = products.filter((item) => item.quantity === 0);
         setFilteredProduct(filteredItems);
+        props.setBadgeCount(filteredItems.length);
+        console.log('APIからデータの取得に成功しました');
       } catch (error) {
         console.error('APIからデータの取得に失敗しました', error);
       }
     };
     fetchData();
-  }, []);
+  }, [props]);
 
   const deleteShoppingListHandler = async (itemId: string) => {
     try {
@@ -46,21 +50,25 @@ const ShoppingList: React.FC = () => {
     <section className="shoppingList">
       {alert && <TransitionAlerts alertMessage={alert} />}
       <h1 className={styles.title}>買い物リスト</h1>
-      <ul className={styles.ul}>
-        {filteredProduct.map((item) => (
-          <li key={item._id} className={styles.li}>
-            <span className={styles.span}>{item.name}</span>
-            <Tooltip title="delete">
-              <button
-                className={styles.button}
-                onClick={() => deleteShoppingListHandler(item._id)}
-              >
-                <RiDeleteBinLine className={styles.icon} />
-              </button>
-            </Tooltip>
-          </li>
-        ))}
-      </ul>
+      {props.loading ? (
+        <LoadSpinner />
+      ) : (
+        <ul className={styles.ul}>
+          {filteredProduct.map((item) => (
+            <li key={item._id} className={styles.li}>
+              <span className={styles.span}>{item.name}</span>
+              <Tooltip title="delete">
+                <button
+                  className={styles.button}
+                  onClick={() => deleteShoppingListHandler(item._id)}
+                >
+                  <RiDeleteBinLine className={styles.icon} />
+                </button>
+              </Tooltip>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 };

@@ -5,10 +5,7 @@ import { BsBoxes } from 'react-icons/bs';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import styles from './Navbar.module.css';
-
-interface NavbarProps {
-  invisible: boolean;
-}
+import { NavbarProps } from '../models/props';
 
 const Navbar: React.FC<NavbarProps> = (props) => {
   return (
@@ -41,8 +38,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             <Tooltip title="List">
               <Link to={`/shoppingList/`} className={styles.a}>
                 <Badge
-                  invisible={props.invisible}
-                  variant="dot"
+                  badgeContent={props.badgeCount}
                   anchorOrigin={{
                     vertical: 'top',
                     horizontal: 'right',

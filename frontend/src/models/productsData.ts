@@ -8,4 +8,4 @@ const productsData = {
   isAddToList: false,
 };
 
-export {productsData}
+export { productsData };

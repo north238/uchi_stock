@@ -8,18 +8,15 @@ import ShoppingList from './pages/ShoppingList';
 import EditProduct from './pages/EditProduct';
 import NotFound from './pages/NotFound';
 import { baseURL } from './utils/constant';
-import TransitionAlerts from './components/Alert';
 import Navbar from './components/Navbar';
 import { productsData } from './models/productsData';
 
 const App: React.FC = () => {
   const [product, setProduct] = useState<ProductProps[]>([]);
-  const [shoppingList, setShoppingList] = useState<ProductWithIdProps[]>([]);
+  const [badgeCount, setBadgeCount] = useState(0);
   const [editingProduct, setEditingProduct] =
     useState<ProductWithIdProps>(productsData);
   const [updateUI, setUpdateUI] = useState(false);
-  const [invisible, setInvisible] = useState(true);
-  const [alert, setAlert] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,36 +58,6 @@ const App: React.FC = () => {
     setUpdateUI((prevUpdateUI) => !prevUpdateUI);
   };
 
-  const handleBadgeVisibility = () => {
-    if (shoppingList.length === 0) {
-      setInvisible(false);
-    }
-    return;
-  };
-
-  const addToShoppingListHandler = async (productId: string) => {
-    try {
-      const targetProduct = (product as ProductWithIdProps[]).find(
-        (product) => product._id === productId
-      );
-      if (
-        targetProduct &&
-        !shoppingList.some((item) => item._id === productId)
-      ) {
-        await axios.patch(`${baseURL}/patch/${productId}`, {
-          isAddToList: true,
-        });
-        targetProduct.isAddToList = true;
-        setShoppingList((prevList) => [...prevList, targetProduct]);
-        handleBadgeVisibility();
-        setAlert('リストへの追加に成功しました');
-      }
-    } catch (err) {
-      console.error('リストへの追加に失敗しました', err);
-      setAlert('リストへの追加に失敗しました');
-    }
-  };
-
   const productUpdateHandler = (productId: string) => {
     const targetProduct = (product as ProductWithIdProps[]).find(
       (product) => product._id === productId
@@ -101,7 +68,7 @@ const App: React.FC = () => {
     }
   };
 
-  const saveProductHandler = (updatedProduct: ProductWithIdProps) => {
+  const productSaveHandler = (updatedProduct: ProductWithIdProps) => {
     setProduct((prevProduct) =>
       (prevProduct as ProductWithIdProps[]).map((product) =>
         product._id === updatedProduct._id ? updatedProduct : product
@@ -125,9 +92,8 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <Navbar invisible={invisible} />
+      <Navbar badgeCount={badgeCount} />
       <div>
-        {alert && <TransitionAlerts alertMessage={alert} />}
         <Routes>
           <Route
             path={'/'}
@@ -136,10 +102,9 @@ const App: React.FC = () => {
                 loading={loading}
                 items={product as ProductWithIdProps[]}
                 setProduct={setProduct}
-                updateProduct={productUpdateHandler}
+                onUpdateProduct={productUpdateHandler}
                 onDeleteProduct={productDeleteHandler}
                 onAddProduct={productAddHandler}
-                addToShoppingList={addToShoppingListHandler}
               />
             }
           />
@@ -147,13 +112,22 @@ const App: React.FC = () => {
             path={'/addProducts/'}
             element={<Products onAddProduct={productAddHandler} />}
           />
-          <Route path={'/shoppingList/'} element={<ShoppingList />} />
+          <Route
+            path={'/shoppingList/'}
+            element={
+              <ShoppingList
+                loading={loading}
+                badgeCount={badgeCount}
+                setBadgeCount={setBadgeCount}
+              />
+            }
+          />
           <Route
             path={'/editProduct/'}
             element={
               <EditProduct
                 product={editingProduct}
-                onSaveProduct={saveProductHandler}
+                onSaveProduct={productSaveHandler}
               />
             }
           />

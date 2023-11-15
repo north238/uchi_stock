@@ -24,8 +24,7 @@ export interface ProductListProps {
   items: ProductWithIdProps[];
   setProduct: Dispatch<SetStateAction<ProductProps[]>>;
   onDeleteProduct: (_id: string) => void;
-  updateProduct: (_id: string) => void;
-  addToShoppingList: (_id: string) => void;
+  onUpdateProduct: (_id: string) => void;
   onAddProduct: (
     name: string,
     place: string,
@@ -52,7 +51,17 @@ export interface NewProductProps {
   ) => void;
 }
 
+export interface ShoppingListProps {
+  loading: boolean;
+  badgeCount: number;
+  setBadgeCount: Dispatch<SetStateAction<number>>;
+}
+
 export interface CounterProps {
   newCount: number | null;
   onCountChange: (newCount: number) => void;
+}
+
+export interface NavbarProps {
+  badgeCount: number;
 }
