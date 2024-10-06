@@ -1,8 +1,8 @@
 {
-  "name": "stockers_app",
+  "name": "stockers_frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://stocker-h3dq.onrender.com",
+  "proxy": "http://express-container:3001",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

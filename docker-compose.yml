@@ -19,7 +19,7 @@ services:
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./docker/db/logs:/var/log/mysql
     networks:
-      - stockers_app
+      - stockers_network
 
   frontend:
     container_name: stockers_frontend
@@ -31,12 +31,12 @@ services:
     volumes:
       - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
-    command: sh -c "cd stockers_app && npm run winstart"
+    command: sh -c "npm run winstart"
     environment:
       - CHOKIDAR_USEPOLLING=true
     tty: true
     networks:
-      - stockers_app
+      - stockers_network
 
   backend:
     container_name: stockers_backend
@@ -53,12 +53,14 @@ services:
     ports:
       - 3001:3001
     working_dir: /usr/src/app
-    command: sh -c "npm install && npm global add nodemon && nodemon app.js"
+    command: sh -c "npm install && npm global add nodemon && nodemon app.ts"
+    depends_on:
+      - db
     networks:
-      - stockers_app
+      - stockers_network
 
 networks:
-  stockers_app:
+  stockers_network:
     driver: bridge
 
 volumes:

@@ -10,4 +10,4 @@ RUN npm install
 
 COPY ./backend .
 
-CMD ["npx", "nodemon", "app.js"]
+CMD ["npx", "nodemon", "app.ts"]
