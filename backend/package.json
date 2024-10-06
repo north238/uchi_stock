@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "winstart": "WATCHPACK_POLLING=true react-scripts start",
     "start": "node dist/app.js"
   },
   "author": "Fumiya Kitayama",

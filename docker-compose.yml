@@ -1,0 +1,67 @@
+services:
+  db:
+    container_name: stockers_db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    environment:
+      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - TZ=${TZ}
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    ports:
+      - '3336:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/logs:/var/log/mysql
+    networks:
+      - stockers_app
+
+  frontend:
+    container_name: stockers_frontend
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
+    ports:
+      - "3030:3000"
+    volumes:
+      - react-data:/usr/src/app/node_modules
+      - ./frontend:/usr/src/app
+    command: sh -c "cd stockers_app && npm run winstart"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    tty: true
+    networks:
+      - stockers_app
+
+  backend:
+    container_name: stockers_backend
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    tty: true
+    environment:
+      - NODE_ENV=DEVELOPMENT
+      - PORT=3001
+    volumes:
+      - express-data:/usr/src/app/node_modules
+      - ./backend:/usr/src/app
+    ports:
+      - 3001:3001
+    working_dir: /usr/src/app
+    command: sh -c "npm install && npm global add nodemon && nodemon app.js"
+    networks:
+      - stockers_app
+
+networks:
+  stockers_app:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  express-data:
+  react-data:
