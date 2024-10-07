@@ -1,23 +1,23 @@
-import { Router } from 'express';
-import {
-  createStocker,
-  deleteStocker,
-  getStocker,
-  patchStocker,
-  updateStocker,
-} from '../controllers/stocker';
-import { catchAsync } from '../utils/catchAsync';
+// import { Router } from 'express';
+// import {
+//   createStocker,
+//   deleteStocker,
+//   getStocker,
+//   patchStocker,
+//   updateStocker,
+// } from '../controllers/stocker';
+// import { catchAsync } from '../utils/catchAsync';
 
-const router = Router();
+// const router = Router();
 
-router.get('/', catchAsync(getStocker));
+// router.get('/', catchAsync(getStocker));
 
-router.post('/addProducts', catchAsync(createStocker));
+// router.post('/addProducts', catchAsync(createStocker));
 
-router.put('/update/:id', updateStocker);
+// router.put('/update/:id', updateStocker);
 
-router.patch('/patch/:id', patchStocker);
+// router.patch('/patch/:id', patchStocker);
 
-router.delete('/delete/:id', deleteStocker);
+// router.delete('/delete/:id', deleteStocker);
 
-export default router;
+// export default router;

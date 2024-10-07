@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.20
+FROM node:18-alpine
 
 EXPOSE 3001
 
@@ -8,6 +8,8 @@ COPY ./backend/package*.json ./
 
 RUN npm install
 
+RUN npm install --save-dev nodemon
+
 COPY ./backend .
 
-CMD ["npx", "nodemon", "app.ts"]
+CMD ["npx", "nodemon", "dist/app.js"]

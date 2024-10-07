@@ -11,7 +11,7 @@ services:
       - MYSQL_PASSWORD=${DB_PASS}
       - MYSQL_ROOT_PASSWORD=${DB_PASS}
       - TZ=${TZ}
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - '3336:3306'
     volumes:
@@ -34,6 +34,7 @@ services:
     command: sh -c "npm run winstart"
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - NODE_OPTIONS=--openssl-legacy-provider
     tty: true
     networks:
       - stockers_network
@@ -45,6 +46,10 @@ services:
       dockerfile: ./docker/backend/Dockerfile
     tty: true
     environment:
+      - DB_HOST=${DB_ROOT_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
       - NODE_ENV=DEVELOPMENT
       - PORT=3001
     volumes:
@@ -53,7 +58,7 @@ services:
     ports:
       - 3001:3001
     working_dir: /usr/src/app
-    command: sh -c "npm install && npm global add nodemon && nodemon app.ts"
+    command: sh -c "npx nodemon app.js"
     depends_on:
       - db
     networks:

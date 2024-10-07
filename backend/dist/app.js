@@ -27,28 +27,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const stocker_1 = __importDefault(require("./routes/stocker"));
-const mongoose_1 = __importDefault(require("mongoose"));
+// import stockerRoutes from './routes/stocker';
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
 const body_parser_1 = require("body-parser");
+const promise_1 = __importDefault(require("mysql2/promise")); // MySQL2をインポート
 const app = (0, express_1.default)();
 dotenv.config();
-const mongoUri = process.env.DB_URI;
-mongoose_1.default
-    .connect(mongoUri)
-    .then(() => {
-    console.log('MongoDB connection OK!!!');
+// MySQL接続の設定
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'your_username',
+    password: process.env.DB_PASS || 'your_password',
+    database: process.env.DB_NAME || 'your_database',
+};
+const pool = promise_1.default.createPool(dbConfig); // プールを作成
+// MySQL接続のテスト
+pool
+    .getConnection()
+    .then((connection) => {
+    console.log('MySQL connection OK!!!');
+    connection.release(); // 接続を解放
 })
     .catch((err) => {
-    console.log('MongoDB connection error!!!');
+    console.log('MySQL connection error!!!');
     console.log(err);
 });
-const allowedOrigins = [
-    'https://stocker-h3dq.onrender.com',
-    'https://stocker-sage.vercel.app',
-    'http://localhost:3000',
-];
+const allowedOrigins = ['http://localhost:3000'];
 const options = {
     origin: allowedOrigins,
 };
@@ -56,7 +61,8 @@ app.use((0, cors_1.default)(options));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, body_parser_1.json)());
 app.use(express_1.default.static('public'));
-app.use('/stocker', stocker_1.default);
+// app.use('/stocker', stockerRoutes);
+// エラーハンドリング
 app.use('*', (err, req, res, next) => {
     if (!err.message) {
         err.message = '問題が起きました';

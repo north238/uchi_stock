@@ -1,5 +1,5 @@
 # ベースイメージの指定
-FROM node:lts-alpine3.20
+FROM node:18-alpine
 
 EXPOSE 3030
 
