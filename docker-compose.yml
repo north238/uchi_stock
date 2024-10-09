@@ -3,21 +3,20 @@ services:
     container_name: stockers_db
     build:
       context: .
-      dockerfile: ./docker/db/Dockerfile
+      dockerfile: ./docker/mysql/Dockerfile
     environment:
-      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASS}
-      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - TZ=${TZ}
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: mysqld --default-authentication-plugin=mysql_native_password
     ports:
-      - '3336:3306'
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./docker/db/logs:/var/log/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/logs:/var/log/mysql
     networks:
       - stockers_network
 
@@ -25,9 +24,9 @@ services:
     container_name: stockers_frontend
     build:
       context: .
-      dockerfile: ./docker/frontend/Dockerfile
+      dockerfile: ./docker/react/Dockerfile
     ports:
-      - "3030:3000"
+      - "3001:3000"
     volumes:
       - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
@@ -35,6 +34,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - NODE_OPTIONS=--openssl-legacy-provider
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
     tty: true
     networks:
       - stockers_network
@@ -43,24 +43,34 @@ services:
     container_name: stockers_backend
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
-    tty: true
+      dockerfile: ./docker/laravel/Dockerfile
     environment:
-      - DB_HOST=${DB_ROOT_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - NODE_ENV=DEVELOPMENT
-      - PORT=3001
     volumes:
-      - express-data:/usr/src/app/node_modules
-      - ./backend:/usr/src/app
+      - ./backend:/var/www/html
     ports:
-      - 3001:3001
-    working_dir: /usr/src/app
-    command: sh -c "npx nodemon app.js"
+      - "8080:8000"
+    working_dir: /var/www/html
+    tty: true
     depends_on:
       - db
+    networks:
+      - stockers_network
+
+  web:
+    container_name: stockers_web
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+    working_dir: /var/www/html
+    depends_on:
+      - backend
     networks:
       - stockers_network
 
@@ -70,5 +80,4 @@ networks:
 
 volumes:
   mysql_data:
-  express-data:
   react-data:

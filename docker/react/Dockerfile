@@ -1,7 +1,7 @@
 # ベースイメージの指定
-FROM node:18-alpine
+FROM node:lts-alpine3.20
 
-EXPOSE 3030
+EXPOSE 3001
 
 # 作業ディレクトリの指定
 WORKDIR /usr/src/app
