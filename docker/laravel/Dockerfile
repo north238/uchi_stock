@@ -43,10 +43,10 @@ ENV PATH $PATH:/composer/vendor/bin
 
 WORKDIR /var/www/html
 
-COPY . .
-COPY ./docker/php/php.ini /usr/local/etc/php/
+COPY ./backend .
+COPY ./docker/laravel/php.ini /usr/local/etc/php/
 
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod 755 -R /var/www/html
+RUN chown -R www-data:www-data /var/www/html/ && \
+    chmod 755 -R /var/www/html/
 
 CMD ["php-fpm", "-F"]
