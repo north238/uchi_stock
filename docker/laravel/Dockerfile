@@ -1,5 +1,7 @@
 FROM php:8.2-fpm-alpine AS php-fpm
 
+EXPOSE 9000
+
 # PHPの依存関係をインストール
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
@@ -47,6 +49,6 @@ COPY ./backend .
 COPY ./docker/laravel/php.ini /usr/local/etc/php/
 
 RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 755 -R /var/www/html/
+    chmod 777 -R /var/www/html/storage/
 
 CMD ["php-fpm", "-F"]
