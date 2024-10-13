@@ -1,0 +1,32 @@
+[2024-10-13 05:26:04] local.ERROR: Unknown or bad timezone (JP) {"exception":"[object] (Carbon\\Exceptions\\InvalidTimeZoneException(code: 0): Unknown or bad timezone (JP) at /var/www/html/vendor/nesbot/carbon/src/Carbon/CarbonTimeZone.php:109)
+[stacktrace]
+#0 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(626): Carbon\\CarbonTimeZone::instance('JP', NULL)
+#1 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(1631): Carbon\\Carbon::safeCreateDateTimeZone('JP')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(226): Carbon\\Carbon->setTimezone('JP')
+#3 /var/www/html/artisan(51): Illuminate\\Foundation\\Console\\Kernel->terminate(Object(Symfony\\Component\\Console\\Input\\ArgvInput), 0)
+#4 {main}
+"} 
+[2024-10-13 05:27:18] local.ERROR: Unknown or bad timezone (jp) {"exception":"[object] (Carbon\\Exceptions\\InvalidTimeZoneException(code: 0): Unknown or bad timezone (jp) at /var/www/html/vendor/nesbot/carbon/src/Carbon/CarbonTimeZone.php:109)
+[stacktrace]
+#0 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(626): Carbon\\CarbonTimeZone::instance('jp', NULL)
+#1 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(1631): Carbon\\Carbon::safeCreateDateTimeZone('jp')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(226): Carbon\\Carbon->setTimezone('jp')
+#3 /var/www/html/artisan(51): Illuminate\\Foundation\\Console\\Kernel->terminate(Object(Symfony\\Component\\Console\\Input\\ArgvInput), 0)
+#4 {main}
+"} 
+[2024-10-13 05:27:31] local.ERROR: Unknown or bad timezone (Jp) {"exception":"[object] (Carbon\\Exceptions\\InvalidTimeZoneException(code: 0): Unknown or bad timezone (Jp) at /var/www/html/vendor/nesbot/carbon/src/Carbon/CarbonTimeZone.php:109)
+[stacktrace]
+#0 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(626): Carbon\\CarbonTimeZone::instance('Jp', NULL)
+#1 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(1631): Carbon\\Carbon::safeCreateDateTimeZone('Jp')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(226): Carbon\\Carbon->setTimezone('Jp')
+#3 /var/www/html/artisan(51): Illuminate\\Foundation\\Console\\Kernel->terminate(Object(Symfony\\Component\\Console\\Input\\ArgvInput), 0)
+#4 {main}
+"} 
+[2024-10-13 05:28:19] local.ERROR: Unknown or bad timezone (Jp) {"exception":"[object] (Carbon\\Exceptions\\InvalidTimeZoneException(code: 0): Unknown or bad timezone (Jp) at /var/www/html/vendor/nesbot/carbon/src/Carbon/CarbonTimeZone.php:109)
+[stacktrace]
+#0 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(626): Carbon\\CarbonTimeZone::instance('Jp', NULL)
+#1 /var/www/html/vendor/nesbot/carbon/src/Carbon/Traits/Date.php(1631): Carbon\\Carbon::safeCreateDateTimeZone('Jp')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(226): Carbon\\Carbon->setTimezone('Jp')
+#3 /var/www/html/artisan(51): Illuminate\\Foundation\\Console\\Kernel->terminate(Object(Symfony\\Component\\Console\\Input\\ArgvInput), 0)
+#4 {main}
+"} 
