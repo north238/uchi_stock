@@ -25,8 +25,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/react/Dockerfile
-    ports:
-      - "3001:3000"
     volumes:
       - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
@@ -52,8 +50,6 @@ services:
       - NODE_ENV=DEVELOPMENT
     volumes:
       - ./backend:/var/www/html
-    ports:
-      - "8080:8000"
     working_dir: /var/www/html
     tty: true
     depends_on:
@@ -67,10 +63,11 @@ services:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     ports:
-      - "80:80"
+      - "8080:80"
     working_dir: /var/www/html
     depends_on:
       - backend
+      - frontend
     networks:
       - stockers_network
 
