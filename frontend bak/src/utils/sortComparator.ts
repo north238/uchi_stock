@@ -1,4 +1,4 @@
-type Order = 'asc' | 'desc';
+export type Order = 'asc' | 'desc';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -23,5 +23,3 @@ function getComparator<Key extends keyof any>(
 }
 
 export { getComparator };
-export type { Order };
-

@@ -28,7 +28,7 @@ services:
     volumes:
       - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
-    command: sh -c "npm run winstart"
+    command: sh -c "npm run start"
     environment:
       - CHOKIDAR_USEPOLLING=true
       - NODE_OPTIONS=--openssl-legacy-provider

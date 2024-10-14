@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 
 COPY ./frontend/package*.json ./
 
-RUN npm install
+# RUN npm install
 
 COPY ./frontend .
 
