@@ -26,14 +26,11 @@ services:
       context: .
       dockerfile: ./docker/react/Dockerfile
     volumes:
-      - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
-    command: sh -c "npm run start"
+      - react-data:/usr/src/app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - NODE_OPTIONS=--openssl-legacy-provider
       - REACT_APP_API_URL=${REACT_APP_API_URL}
-    tty: true
     networks:
       - stockers_network
 

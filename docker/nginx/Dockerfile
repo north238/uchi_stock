@@ -5,7 +5,7 @@ COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /var/www/html
 
-COPY ./frontend /usr/share/nginx/html
+COPY ./frontend /usr/src/app
 COPY ./backend /var/www/html
 
 RUN adduser -s /bin/sh -D -G www-data www-data
