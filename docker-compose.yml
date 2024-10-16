@@ -25,15 +25,14 @@ services:
     build:
       context: .
       dockerfile: ./docker/react/Dockerfile
+    ports:
+      - "3001:3000"
     volumes:
-      - react-data:/usr/src/app/node_modules
       - ./frontend:/usr/src/app
-    command: sh -c "npm run winstart"
+      - react-data:/usr/src/app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - NODE_OPTIONS=--openssl-legacy-provider
       - REACT_APP_API_URL=${REACT_APP_API_URL}
-    tty: true
     networks:
       - stockers_network
 
