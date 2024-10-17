@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_group', function (Blueprint $table) {
-            $table->id();
             $table->unsignedBigInteger('user_id')->comment('ユーザーID');
             $table->unsignedBigInteger('group_id')->comment('グループID');
-            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
+
+            $table->primary(['user_id', 'group_id']);
         });
     }
 

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->comment('タグ名');
+            $table->string('name')->unique()->comment('タグ名');
+            $table->string('description')->nullable()->comment('タグの説明');
             $table->timestamps();
         });
     }

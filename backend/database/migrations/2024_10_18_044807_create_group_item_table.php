@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item_tag', function (Blueprint $table) {
+        Schema::create('group_item', function (Blueprint $table) {
             $table->unsignedBigInteger('item_id')->comment('アイテムID');
-            $table->unsignedBigInteger('tag_id')->comment('タグID');
+            $table->unsignedBigInteger('group_id')->comment('グループID');
 
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
 
-            $table->primary(['item_id', 'tag_id']);
+            $table->primary(['item_id', 'group_id']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item_tag');
+        Schema::dropIfExists('group_item');
     }
 };

@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->comment('ユーザーID');
+            $table->unsignedBigInteger('item_id')->comment('アイテムID');
             $table->string('message')->comment('通知メッセージ');
             $table->boolean('is_read')->default(false)->comment('未読既読フラグ');
             $table->string('status')->default('pending')->comment('ステータス');
+            $table->timestamp('sent_at')->nullable()->comment('通知送信日時');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
         });
     }
 
