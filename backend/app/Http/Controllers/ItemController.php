@@ -4,19 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ItemController extends Controller
 {
+
     /**
-     * Display a listing of the resource.
+     * @var Item $item
+     */
+    protected $item;
+
+    public function __construct(Item $item)
+    {
+        $this->item = $item;
+    }
+    /**
+     * 初期表示画面
      */
     public function index()
     {
-        //
+        $userId = Auth::user()->id;
+        $items = $this->item->getUserToItems($userId);
+
+        if (empty($items)) {
+            return response()->json(['error' => 'アイテムが見つからないか、アクセス権限がありません。'], 403);
+        }
+
+        return response()->json($items, 200);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * アイテム登録画面
      */
     public function create()
     {
@@ -24,7 +42,7 @@ class ItemController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * データベースへの登録
      */
     public function store(Request $request)
     {

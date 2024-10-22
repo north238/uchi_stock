@@ -48,4 +48,18 @@ class Item extends Model
     public function tags() {
         return $this->belongsToMany(Tag::class, 'item_tag');
     }
+
+    /**
+     * ユーザーに紐づくアイテムの取得
+     *
+     * @param string $userId ユーザーID
+     * @return collection $result ユーザーに紐づいたアイテム
+     */
+    public function getUserToItems($userId) {
+        $result = Item::query()
+            ->where('user_id', $userId)
+            ->get();
+
+        return $result;
+    }
 }

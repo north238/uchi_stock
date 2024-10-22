@@ -47,8 +47,9 @@ WORKDIR /var/www/html
 
 COPY ./backend .
 COPY ./docker/laravel/php.ini /usr/local/etc/php/
+COPY ./docker/laravel/www.conf /usr/local/etc/php-fpm.d/www-custom.conf
 
 RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 777 -R /var/www/html/storage/
+    chmod 755 -R /var/www/html/storage/
 
 CMD ["php-fpm", "-F"]
