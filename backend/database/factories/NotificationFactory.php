@@ -18,7 +18,7 @@ class NotificationFactory extends Factory
     {
         return [
             'user_id' => \App\Models\User::factory(),
-            'genre_id' => \App\Models\Item::factory(),
+            'item_id' => \App\Models\Item::factory(),
             'message' => $this->faker->sentence,
             'is_read' => $this->faker->boolean,
             'status' => $this->faker->randomElement(['pending', 'sent', 'failed']),

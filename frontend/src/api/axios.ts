@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api' // ここにベースURLを指定
+  baseURL: process.env.REACT_APP_API_URL, // ここにベースURLを指定
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // async function updateDatabase(
@@ -23,4 +26,5 @@ const api = axios.create({
 // }
 
 // export default updateDatabase;
+
 export { api };

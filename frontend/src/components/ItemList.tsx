@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../api/axios'
+import { api, fetchUserData } from '../api/axios';
 
 // Itemインターフェースを定義
 interface Item {

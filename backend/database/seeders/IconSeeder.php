@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Icon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,6 @@ class IconSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Icon::factory()->count(5)->create();
     }
 }
