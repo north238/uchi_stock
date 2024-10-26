@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { fetchAuthenticatedUser, login, logout } from '../api/auth'; // 認証APIを呼び出す
 
+// ユーザーの型定義
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
 // 認証情報を管理するカスタムフック
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
