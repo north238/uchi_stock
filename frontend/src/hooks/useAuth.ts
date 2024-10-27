@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { fetchAuthenticatedUser, login, logout } from '../api/auth'; // 認証APIを呼び出す
+import { fetchAuthenticatedUser, login, logout, register } from '../api/auth'; // 認証APIを呼び出す
 
 // ユーザーの型定義
 interface User {
   id: number;
   name: string;
   email: string;
+  password: string;
 }
 
 // 認証情報を管理するカスタムフック
@@ -48,10 +49,30 @@ export function useAuth() {
     }
   }
 
+  async function handleRegister(
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string
+  ) {
+    try {
+      const loggedInUser = await register(
+        name,
+        email,
+        password,
+        password_confirmation
+      );
+      setUser(loggedInUser);
+    } catch (error) {
+      console.error('ログイン失敗', error);
+    }
+  }
+
   return {
     user,
     loading,
     login: handleLogin,
     logout: handleLogout,
+    register: handleRegister,
   };
 }
