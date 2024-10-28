@@ -1,8 +1,11 @@
 import React from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 const Header: React.FC = () => {
+  const { logout, user } = useAuth();
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -12,12 +15,20 @@ const Header: React.FC = () => {
         <Button color="inherit" component={RouterLink} to="/">
           Home
         </Button>
-        <Button color="inherit" component={RouterLink} to="/login">
-          Login
-        </Button>
-        <Button color="inherit" component={RouterLink} to="/register">
-          Register
-        </Button>
+        {user ? (
+          <Button color="inherit" onClick={logout}>
+            Logout
+          </Button>
+        ) : (
+          <>
+            <Button color="inherit" component={RouterLink} to="/login">
+              Login
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/register">
+              Register
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );

@@ -12,9 +12,8 @@ interface User {
 // ログイン関数の型定義
 async function login(email: string, password: string): Promise<User> {
   try {
-    await axios.get('http://localhost:8080/api/sanctum/csrf-cookie', {
-      withCredentials: true,
-    });
+    axios.defaults.withCredentials = true;
+    await api.get('/sanctum/csrf-cookie');
     const response = await api.post<{ token: string; user: User }>('/login', {
       email,
       password,
@@ -36,9 +35,12 @@ async function login(email: string, password: string): Promise<User> {
 async function fetchAuthenticatedUser(): Promise<User> {
   try {
     const token = localStorage.getItem('auth_token');
+    console.log('取得したトークン:', token);
 
     // トークンが存在する場合、認証ヘッダーを追加してユーザー情報を取得
     if (token) {
+      axios.defaults.withCredentials = true;
+      await api.get('/sanctum/csrf-cookie');
       const response = await api.get<User>('/user', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +75,6 @@ async function logout(): Promise<void> {
 
       // ログアウト後にトークンを削除
       localStorage.removeItem('auth_token');
-      console.log('ログアウト成功');
     }
   } catch (error) {
     console.error('ログアウトに失敗しました:', error);

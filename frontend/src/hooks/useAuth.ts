@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { fetchAuthenticatedUser, login, logout, register } from '../api/auth'; // 認証APIを呼び出す
+import { fetchAuthenticatedUser, login, logout, register } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 // ユーザーの型定義
 interface User {
@@ -13,6 +14,7 @@ interface User {
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // 認証ユーザーを取得して状態を更新する
   useEffect(() => {
@@ -34,6 +36,7 @@ export function useAuth() {
     try {
       const loggedInUser = await login(email, password);
       setUser(loggedInUser);
+      navigate('/');
     } catch (error) {
       console.error('ログイン失敗', error);
     }
@@ -44,6 +47,7 @@ export function useAuth() {
     try {
       await logout();
       setUser(null);
+      navigate('/login');
     } catch (error) {
       console.error('ログアウト失敗', error);
     }
@@ -63,6 +67,7 @@ export function useAuth() {
         password_confirmation
       );
       setUser(loggedInUser);
+      navigate('/');
     } catch (error) {
       console.error('ログイン失敗', error);
     }

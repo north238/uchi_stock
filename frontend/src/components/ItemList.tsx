@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { api } from '../api/axios';
 
 // Itemインターフェースを定義
@@ -13,11 +14,12 @@ const ItemList: React.FC = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        axios.defaults.withCredentials = true;
+        await api.get('/sanctum/csrf-cookie');
         const response = await api.get('/items'); // APIからアイテムを取得
-        console.log('API Response:', response);
         setItems(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('アイテムの取得に失敗しました。', error);
       }
     };
 
