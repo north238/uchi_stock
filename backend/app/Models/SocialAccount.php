@@ -25,4 +25,21 @@ class SocialAccount extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * ソーシャルユーザーが存在するか確認する
+     *
+     * @param string $id プロバイダーID
+     * @param string $provider プロバイダー名
+     * @return
+     */
+    public function getSocialUser($id, $provider)
+    {
+        $result = SocialAccount::query()
+            ->where('provider_id', $id)
+            ->where('provider_name', $provider)
+            ->first();
+
+        return $result;
+    }
 }
