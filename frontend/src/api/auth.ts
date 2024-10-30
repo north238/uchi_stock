@@ -35,7 +35,6 @@ async function login(email: string, password: string): Promise<User> {
 async function fetchAuthenticatedUser(): Promise<User> {
   try {
     const token = localStorage.getItem('auth_token');
-    console.log('取得したトークン:', token);
 
     // トークンが存在する場合、認証ヘッダーを追加してユーザー情報を取得
     if (token) {
@@ -106,7 +105,6 @@ async function register(
     // トークンをlocalStorageに保存
     localStorage.setItem('auth_token', token);
 
-    console.log('新規会員登録成功:', response.data.user);
     return response.data.user; // ユーザー情報を返す
   } catch (error: any) {
     console.error('新規会員登録失敗:', error.response?.data || error);

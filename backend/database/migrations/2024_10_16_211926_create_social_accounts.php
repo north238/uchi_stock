@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->comment('ユーザーID');
             $table->string('provider_name')->comment('プロバイダー名');
             $table->string('provider_id')->comment('プロバイダーID');
+            $table->string('avatar')->nullable()->comment('プロフィール写真リンク');
             $table->string('access_token')->nullable()->comment('アクセストークン');
             $table->string('refresh_token')->nullable()->comment('リフレッシュトークン');
             $table->timestamps();

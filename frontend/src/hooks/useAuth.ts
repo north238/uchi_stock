@@ -53,6 +53,7 @@ export function useAuth() {
     }
   }
 
+  // ユーザー新規登録
   async function handleRegister(
     name: string,
     email: string,

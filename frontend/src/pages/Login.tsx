@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import axios from 'axios';
+import { api } from '../api/axios';
 import Loader from 'components/ui/Loader';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
@@ -15,6 +17,19 @@ const Login: React.FC = () => {
       console.log('ログイン成功');
     } catch (error) {
       console.error('ログイン失敗', error);
+    }
+  };
+
+  // LINE認証処理関数
+  const handleLineLogin = async () => {
+    try {
+      axios.defaults.withCredentials = true;
+      await api.get('/sanctum/csrf-cookie');
+      const response = await api.get('/auth/line/redirect');
+      window.location.href = await response.data.url;
+      console.log('LINEログイン成功');
+    } catch (error) {
+      console.error('LINEログインに失敗しました', error);
     }
   };
 
@@ -57,6 +72,16 @@ const Login: React.FC = () => {
         sx={{ mt: 2 }}
       >
         ログイン
+      </Button>
+
+      <Button
+        variant="outlined"
+        color="secondary"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={handleLineLogin}
+      >
+        LINEでログイン
       </Button>
       {user && (
         <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>

@@ -44,28 +44,36 @@ class SocialAccountController extends Controller
             $providerUser = Socialite::driver($provider)->user();
             $userSocialId = $providerUser->getId();
             $userSocialName = $providerUser->getName();
-            
+            $userSocialAvatar = $providerUser->getAvatar() ?? null;
+            $socialUser = $this->socialAccount->getSocialUser($userSocialId, $provider);
 
-            // ユーザーがいなければ登録する
-            if (!) {
+            // ユーザーがなければ登録する
+            if (!$socialUser) {
                 $newUser = new User();
                 $newUser->name = $userSocialName;
-                $newUser->email = $providerUser->getEmail() ?? '000@example.com';
+                $newUser->email = $providerUser->getEmail();
                 $newUser->save();
 
-                $newUserSocial = new SocialAccount();
-                $newUserSocial->user_id = $newUser->id;
-                $newUserSocial->provider_name = $provider;
-                $newUserSocial->provider_id = $userSocialId;
-                $newUserSocial->access_token = $providerUser->token;
-                $newUserSocial->refresh_token = $providerUser->refreshToken;
+                $newUserSocial = new SocialAccount([
+                    'user_id' => $newUser->id,
+                    'provider_id' => $userSocialId,
+                    'provider_name' => $provider,
+                    'avatar' => $userSocialAvatar,
+                    'access_token' => $providerUser->token,
+                    'refresh_token' => $providerUser->refreshToken,
+                ]);
+
                 $newUserSocial->save();
 
                 event(new Registered($newUser));
                 Auth::login($newUser);
+                return response()->json($newUser);
             }
 
-            return response()->json($newUser);
+            // ユーザー情報を取得
+            $user = $socialUser->user;
+            Auth::login($user);
+            return response()->json($user);
         } catch (\Exception $e) {
             Log::error('handleProviderCallback()でエラーが発生しています。', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'LINE認証に失敗しました。'], 500);
