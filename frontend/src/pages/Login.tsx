@@ -1,37 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import axios from 'axios';
-import { api } from '../api/axios';
 import Loader from 'components/ui/Loader';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, user, loading } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      console.log('ログイン成功');
-    } catch (error) {
-      console.error('ログイン失敗', error);
-    }
-  };
-
-  // LINE認証処理関数
-  const handleLineLogin = async () => {
-    try {
-      axios.defaults.withCredentials = true;
-      await api.get('/sanctum/csrf-cookie');
-      const response = await api.get('/auth/line/redirect');
-      window.location.href = await response.data.url;
-      console.log('LINEログイン成功');
-    } catch (error) {
-      console.error('LINEログインに失敗しました', error);
-    }
-  };
+  const { login, lineLogin, errors, user, loading } = useAuth();
 
   if (loading) {
     return <Loader />;
@@ -40,12 +15,18 @@ const Login: React.FC = () => {
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
+      onSubmit={() => login(email, password)}
       sx={{ maxWidth: 400, mx: 'auto', mt: 5 }}
     >
       <Typography variant="h5" component="h2" gutterBottom>
         ログイン
       </Typography>
+
+      {errors.general && (
+        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+          {errors.general}
+        </Typography>
+      )}
       <TextField
         label="メールアドレス"
         variant="outlined"
@@ -54,6 +35,8 @@ const Login: React.FC = () => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        error={!!errors.password}
+        helperText={errors.password}
       />
       <TextField
         label="パスワード"
@@ -63,6 +46,8 @@ const Login: React.FC = () => {
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        error={!!errors.password}
+        helperText={errors.password}
       />
       <Button
         type="submit"
@@ -79,10 +64,11 @@ const Login: React.FC = () => {
         color="secondary"
         fullWidth
         sx={{ mt: 2 }}
-        onClick={handleLineLogin}
+        onClick={lineLogin}
       >
-        LINEでログイン
+        LINEログイン
       </Button>
+
       {user && (
         <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>
           ログイン中: {user.name}

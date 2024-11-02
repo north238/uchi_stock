@@ -62,18 +62,19 @@ class SocialAccountController extends Controller
                     'access_token' => $providerUser->token,
                     'refresh_token' => $providerUser->refreshToken,
                 ]);
-
                 $newUserSocial->save();
 
                 event(new Registered($newUser));
                 Auth::login($newUser);
-                return response()->json($newUser);
+                $token = $newUser->createToken('auth_token')->plainTextToken;
+                return redirect()->away(env('FRONTEND_URL') . "/line-login-success?token=$token");
             }
 
             // ユーザー情報を取得
             $user = $socialUser->user;
             Auth::login($user);
-            return response()->json($user);
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return redirect()->away(env('FRONTEND_URL') . "/line-login-success?token=$token");
         } catch (\Exception $e) {
             Log::error('handleProviderCallback()でエラーが発生しています。', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'LINE認証に失敗しました。'], 500);

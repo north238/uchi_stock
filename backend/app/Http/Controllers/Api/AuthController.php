@@ -22,8 +22,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
-            dd($token);
+            $request->authenticate();
+            $request->session()->regenerate();
+            $request->tokens()->delete();
+            $token = $request->user()->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'message' => 'ログイン成功',
                 'token' => $token,
@@ -37,7 +40,11 @@ class AuthController extends Controller
     // ログアウト
     public function logout(Request $request)
     {
+        Auth::guard('web')->logout();
+        // sanctumのトークン削除
         $request->user()->tokens()->delete();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return response()->json(['message' => 'ログアウト成功']);
     }
 
@@ -66,10 +73,18 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
+        if (!$user) {
+            return response()->json(['message' => '認証失敗'], 401);
+        }
+
         event(new Registered($user));
-
         Auth::login($user);
+        $token = $request->user()->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['message' => '新規会員登録成功']);
+        return response()->json([
+            'message' => '新規会員登録成功',
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 }

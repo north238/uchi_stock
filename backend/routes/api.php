@@ -25,8 +25,10 @@ Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 // ログイン関係の処理
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function() {
+  Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+  Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum');
+});
 
 // LINE認証
 Route::middleware(['web'])->group(function () {

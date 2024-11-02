@@ -4,6 +4,7 @@ import Layout from 'components/Layout';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import LineLoginSuccess from 'pages/LineLoginSuccess';
 import NoMatch from '../pages/NoMatch';
 
 const AppRoutes: React.FC = () => (
@@ -12,6 +13,7 @@ const AppRoutes: React.FC = () => (
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/line-login-success" element={<LineLoginSuccess />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
   </Routes>

@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { fetchAuthenticatedUser, login, logout, register } from '../api/auth';
+import {
+  fetchAuthenticatedUser,
+  login,
+  logout,
+  register,
+  lineRedirect,
+} from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 
 // ユーザーの型定義
@@ -14,6 +20,7 @@ interface User {
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
 
   // 認証ユーザーを取得して状態を更新する
@@ -69,8 +76,27 @@ export function useAuth() {
       );
       setUser(loggedInUser);
       navigate('/');
-    } catch (error) {
-      console.error('ログイン失敗', error);
+    } catch (error: any) {
+      // サーバーから返されたエラーメッセージを設定
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setErrors({ general: '登録処理でエラーが発生しました。' });
+      }
+    }
+  }
+
+  // LINE認証処理関数
+  async function handleLineLogin() {
+    try {
+      await lineRedirect();
+    } catch (error: any) {
+      // サーバーから返されたエラーメッセージを設定
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setErrors({ general: '登録処理でエラーが発生しました。' });
+      }
     }
   }
 
@@ -80,5 +106,7 @@ export function useAuth() {
     login: handleLogin,
     logout: handleLogout,
     register: handleRegister,
+    lineLogin: handleLineLogin,
+    errors,
   };
 }
