@@ -11,11 +11,12 @@ const AppRoutes: React.FC = () => (
   <Routes>
     <Route element={<Layout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
       <Route path="/line-login-success" element={<LineLoginSuccess />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
+
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
   </Routes>
 );
 

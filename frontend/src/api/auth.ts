@@ -41,11 +41,8 @@ async function login(email: string, password: string): Promise<User> {
       password,
     });
     const token = response.data.token;
-
     // トークンをlocalStorageに保存
     localStorage.setItem('auth_token', token);
-
-    console.log('ログイン成功:', response.data.user);
     return response.data.user; // ユーザー情報を返す
   } catch (error: any) {
     console.error('ログイン失敗:', error.response?.data || error);
@@ -64,7 +61,6 @@ async function logout(): Promise<void> {
           Authorization: `Bearer ${token}`,
         },
       });
-
       // ログアウト後にトークンを削除
       localStorage.removeItem('auth_token');
     }
@@ -93,7 +89,6 @@ async function register(
       }
     );
     const token = response.data.token;
-
     // トークンをlocalStorageに保存
     localStorage.setItem('auth_token', token);
 
@@ -108,6 +103,7 @@ async function register(
 async function lineRedirect() {
   try {
     const response = await api.get('/auth/line/redirect');
+    // サーバーから返却されたURLをセット（LINEコールバック）
     window.location.href = await response.data.url;
   } catch (error: any) {
     console.error('LINEログイン失敗:', error.response?.data || error);
@@ -115,4 +111,4 @@ async function lineRedirect() {
   }
 }
 
-export { login, logout, fetchAuthenticatedUser, register, lineRedirect };
+export { fetchAuthenticatedUser, login, logout, register, lineRedirect };

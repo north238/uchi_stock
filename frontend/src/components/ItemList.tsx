@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { api } from '../api/axios';
+import { api, initializeCsrfToken } from '../api/axios';
 
 // Itemインターフェースを定義
 interface Item {
@@ -9,17 +8,19 @@ interface Item {
 }
 
 const ItemList: React.FC = () => {
-  const [items, setItems] = useState<Item[]>([]); // itemsの型を指定
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        axios.defaults.withCredentials = true;
-        await api.get('/sanctum/csrf-cookie');
-        const response = await api.get('/items'); // APIからアイテムを取得
+        await initializeCsrfToken();
+        const response = await api.get('/items');
         setItems(response.data);
       } catch (error) {
         console.error('アイテムの取得に失敗しました。', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -29,11 +30,17 @@ const ItemList: React.FC = () => {
   return (
     <div>
       <h2>Item List</h2>
-      <ul>
-        {items.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>読み込み中...</p>
+      ) : items.length > 0 ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>アイテムがありません。</p>
+      )}
     </div>
   );
 };

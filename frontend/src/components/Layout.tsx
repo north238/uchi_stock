@@ -1,13 +1,14 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { Box } from '@mui/material';
 import Header from './Header';
 
 const Layout: React.FC = () => (
   <div>
     <Header />
-    <main>
+    <Box component="main" sx={{ width: '80%', margin: '0 auto' }}>
       <Outlet />
-    </main>
+    </Box>
   </div>
 );
 
