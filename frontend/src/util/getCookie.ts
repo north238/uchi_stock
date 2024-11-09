@@ -1,9 +1,14 @@
-// CSRFトークンを取得するヘルパー関数
-export function getCookie(name: string): string | null {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  const cookieValue =
-    parts.length === 2 ? parts.pop()?.split(';').shift() : null;
+const checkCookies = () => {
+  console.log('Current cookies:', document.cookie);
 
-  return cookieValue || null;
-}
+  // クッキーを取得してオブジェクトに変換
+  const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+    const [name, value] = cookie.trim().split('=');
+    acc[name] = value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  return cookies; // 取得したクッキー情報を返す
+};
+
+export default checkCookies;

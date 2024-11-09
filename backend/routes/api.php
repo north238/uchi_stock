@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\SocialAccountController;
 use Illuminate\Http\Request;
@@ -25,7 +24,8 @@ Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 // ログイン関係の処理
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->group(function() {
+
+Route::middleware(['auth:sanctum'])->group(function() {
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::get('/user', [AuthController::class, 'getUser']);
 });

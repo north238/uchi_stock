@@ -102,7 +102,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
       setPasswordErrorMessage('');
     }
 
-    if (password.value === passwordConfirmation.value) {
+    if (password.value !== passwordConfirmation.value) {
       setPasswordConfirmationError(true);
       setPasswordConfirmationErrorMessage('パスワードが一致していません。');
       isValid = false;

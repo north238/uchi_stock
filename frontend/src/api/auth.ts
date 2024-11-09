@@ -1,4 +1,5 @@
 import { api, initializeCsrfToken } from '../api/axios';
+import checkCookies from '../util/getCookie';
 
 // ユーザーの型定義
 interface User {
@@ -11,21 +12,28 @@ interface User {
 // 認証ユーザーの取得関数
 async function fetchAuthenticatedUser(): Promise<User> {
   try {
-    const token = localStorage.getItem('auth_token');
+    // CSRFトークンの初期化
+    await initializeCsrfToken();
 
-    // トークンが存在する場合、認証ヘッダーを追加してユーザー情報を取得
-    if (token) {
-      await initializeCsrfToken();
-      const response = await api.get<User>('/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('認証ユーザー情報:', response.data);
-      return response.data;
-    } else {
-      throw new Error('トークンが見つかりません');
+    // クッキー取得
+    const cookies = checkCookies();
+    const xsrfToken = decodeURIComponent(cookies['XSRF-TOKEN'] || '');
+
+    // `XSRF-TOKEN`が取得できているか確認
+    if (!xsrfToken) {
+      throw new Error('XSRF-TOKENが見つかりません');
     }
+
+    // 認証ユーザー情報の取得
+    const response = await api.get<User>('/user', {
+      headers: {
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+      withCredentials: true,
+    });
+
+    console.log('認証ユーザー情報:', response.data);
+    return response.data;
   } catch (error) {
     console.error('認証ユーザーの取得に失敗しました:', error);
     throw error;
@@ -40,9 +48,7 @@ async function login(email: string, password: string): Promise<User> {
       email,
       password,
     });
-    const token = response.data.token;
-    // トークンをlocalStorageに保存
-    localStorage.setItem('auth_token', token);
+
     return response.data.user; // ユーザー情報を返す
   } catch (error: any) {
     console.error('ログイン失敗:', error.response?.data || error);
@@ -53,17 +59,20 @@ async function login(email: string, password: string): Promise<User> {
 // ログアウト関数
 async function logout(): Promise<void> {
   try {
-    const token = localStorage.getItem('auth_token');
-
-    if (token) {
-      await api.post('/logout', {
+    await initializeCsrfToken();
+    const cookies = checkCookies();
+    const xsrfToken = decodeURIComponent(cookies['XSRF-TOKEN'] || '');
+    await api.post(
+      '/logout',
+      {},
+      {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'X-XSRF-TOKEN': xsrfToken,
         },
-      });
-      // ログアウト後にトークンを削除
-      localStorage.removeItem('auth_token');
-    }
+      }
+    );
+    // ローカルストレージからトークンを削除
+    localStorage.removeItem('auth_token');
   } catch (error) {
     console.error('ログアウトに失敗しました:', error);
     throw error;
@@ -88,9 +97,6 @@ async function register(
         password_confirmation,
       }
     );
-    const token = response.data.token;
-    // トークンをlocalStorageに保存
-    localStorage.setItem('auth_token', token);
 
     return response.data.user;
   } catch (error: any) {

@@ -61,6 +61,8 @@ services:
       - db
     networks:
       - stockers_network
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     env_file:
       - .env
 
@@ -71,6 +73,8 @@ services:
       dockerfile: ./docker/nginx/Dockerfile
     ports:
       - '8080:80'
+    volumes:
+      - ./backend:/var/www/html
     working_dir: /var/www/html
     depends_on:
       - backend

@@ -11,10 +11,10 @@ const AppRoutes: React.FC = () => (
   <Routes>
     <Route element={<Layout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/line-login-success" element={<LineLoginSuccess />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
 
+    <Route path="/line-login-success" element={<LineLoginSuccess />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
   </Routes>

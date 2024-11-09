@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 
 class AuthController extends Controller
@@ -24,12 +25,9 @@ class AuthController extends Controller
             $user = Auth::user();
             $request->authenticate();
             $request->session()->regenerate();
-            $request->tokens()->delete();
-            $token = $request->user()->createToken('auth_token')->plainTextToken;
 
             return response()->json([
                 'message' => 'ログイン成功',
-                'token' => $token,
                 'user' => $user
             ]);
         } else {
@@ -40,18 +38,36 @@ class AuthController extends Controller
     // ログアウト
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        // sanctumのトークン削除
-        $request->user()->tokens()->delete();
+        $user = auth()->user();
+
+        // トークンを削除（auth_tokenという名前のトークン）
+        $user->tokens->each(function ($token) {
+            $token->delete();
+        });
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return response()->json(['message' => 'ログアウト成功']);
     }
 
     // 認証ユーザー取得
     public function getUser(Request $request)
     {
-        return response()->json($request->user());
+        Log::debug("getUser メソッドにアクセス");
+        Log::debug("認証状態:", ['authenticated' => Auth::check()]);
+        Log::debug("現在のユーザー:", ['user' => $request->user()]);
+
+        // ユーザーが認証されているか確認
+        if (!Auth::check()) {
+            Log::debug("未認証のアクセス");
+            return response()->json(['message' => '未認証のユーザー'], 401);
+        }
+
+        $user = $request->user();
+        Log::debug("返却するユーザー情報:", ['user' => $user]);
+
+        return response()->json($user);
     }
 
     /**
@@ -79,11 +95,9 @@ class AuthController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
-        $token = $request->user()->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => '新規会員登録成功',
-            'token' => $token,
             'user' => $user
         ]);
     }

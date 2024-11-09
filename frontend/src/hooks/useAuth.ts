@@ -26,21 +26,18 @@ export function useAuth() {
   // 認証ユーザーを取得して状態を更新する
   useEffect(() => {
     async function loadUser() {
-      if (!user) {
-        try {
-          const authenticatedUser = await fetchAuthenticatedUser();
-          setUser(authenticatedUser);
-        } catch (error) {
-          console.error('認証情報の取得に失敗しました', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      try {
+        const authenticatedUser = await fetchAuthenticatedUser();
+
+        setUser(authenticatedUser);
+      } catch (error) {
+        console.error('認証情報の取得に失敗しました', error);
+      } finally {
         setLoading(false);
       }
     }
     loadUser();
-  }, [user]);
+  }, []);
 
   // ログイン関数
   async function handleLogin(email: string, password: string) {
