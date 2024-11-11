@@ -226,15 +226,9 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
               新規登録をする
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              <span>
-                <Link
-                  href="/login"
-                  variant="body2"
-                  sx={{ alignSelf: 'center' }}
-                >
-                  ログインはこちら
-                </Link>
-              </span>
+              <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>
+                ログインはこちら
+              </Link>
             </Typography>
           </Box>
           <Divider>

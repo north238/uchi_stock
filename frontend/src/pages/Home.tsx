@@ -9,15 +9,15 @@ const Home: React.FC = () => {
   // 認証ユーザーを取得して状態を更新する
   useEffect(() => {
     async function updateUser() {
-      const fetchedUser = await fetchAuthenticatedUser();
-      setUser(fetchedUser);
+      try {
+        const fetchedUser = await fetchAuthenticatedUser();
+        setUser(fetchedUser);
+      } catch (error) {
+        console.error('ユーザー情報の取得に失敗しました:', error);
+      }
     }
     updateUser();
   }, [setUser]);
-
-  // if (loading) {
-  //   return <Loader />;
-  // }
 
   return (
     <Card>
