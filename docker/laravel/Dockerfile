@@ -15,12 +15,13 @@ RUN apk add --no-cache \
     tzdata \
     php-mysqli \
     mysql-client \
+    linux-headers \
     bash
 
 # PHP拡張機能をインストール
-RUN pecl install redis && \
+RUN pecl install redis xdebug && \
     docker-php-ext-configure intl &&\
-    docker-php-ext-enable redis && \
+    docker-php-ext-enable redis xdebug && \
     docker-php-ext-install zip \
     intl \
     pdo_mysql \
@@ -47,8 +48,11 @@ WORKDIR /var/www/html
 
 COPY ./backend .
 COPY ./docker/laravel/php.ini /usr/local/etc/php/
+COPY ./docker/laravel/www.conf /usr/local/etc/php-fpm.d/www-custom.conf
+
+RUN mkdir -p /var/log && chmod -R 777 /var/log
 
 RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 777 -R /var/www/html/storage/
+    chmod 755 -R /var/www/html/storage/
 
 CMD ["php-fpm", "-F"]
