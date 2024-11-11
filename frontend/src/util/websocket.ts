@@ -13,6 +13,10 @@ const connectWebSocket = (): WebSocket => {
     console.log('WebSocket disconnected');
   };
 
+  socket.addEventListener('error', (event) => {
+    console.log('WebSocket error: ', event);
+  });
+
   return socket;
 };
 

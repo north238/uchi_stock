@@ -12,13 +12,15 @@ services:
       - TZ=${TZ}
     command: mysqld --default-authentication-plugin=mysql_native_password
     ports:
-      - "3307:3306"
+      - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./docker/mysql/logs:/var/log/mysql
     networks:
       - stockers_network
+    env_file:
+      - .env
 
   frontend:
     container_name: stockers_frontend
@@ -26,7 +28,7 @@ services:
       context: .
       dockerfile: ./docker/react/Dockerfile
     ports:
-      - "3001:3000"
+      - '3001:3000'
     volumes:
       - ./frontend:/usr/src/app
       - react-data:/usr/src/app/node_modules
@@ -35,12 +37,16 @@ services:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
     networks:
       - stockers_network
+    env_file:
+      - .env
 
   backend:
     container_name: stockers_backend
     build:
       context: .
       dockerfile: ./docker/laravel/Dockerfile
+    ports:
+      - '9000:9000'
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
@@ -55,6 +61,10 @@ services:
       - db
     networks:
       - stockers_network
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      - .env
 
   web:
     container_name: stockers_web
@@ -62,7 +72,9 @@ services:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     ports:
-      - "8080:80"
+      - '8080:80'
+    volumes:
+      - ./backend:/var/www/html
     working_dir: /var/www/html
     depends_on:
       - backend

@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique()->comment('保管場所名');
+            $table->string('name')->comment('保管場所名');
             $table->unsignedBigInteger('user_id')->comment('ユーザーID');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->unique(['name', 'user_id']);
         });
     }
 
