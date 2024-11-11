@@ -1,49 +1,22 @@
-import { useState, useEffect } from 'react';
-import {
-  fetchAuthenticatedUser,
-  login,
-  logout,
-  register,
-  lineRedirect,
-} from '../api/auth';
+import { useState } from 'react';
+import { login, logout, register, lineRedirect } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
-
-// ユーザーの型定義
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-}
+import { useAuthContext } from 'contexts/AuthContext';
 
 // 認証情報を管理するカスタムフック
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, setUser, isAuthenticated, setIsAuthenticated } =
+    useAuthContext();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
-
-  // 認証ユーザーを取得して状態を更新する
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const authenticatedUser = await fetchAuthenticatedUser();
-
-        setUser(authenticatedUser);
-      } catch (error) {
-        console.error('認証情報の取得に失敗しました', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadUser();
-  }, []);
 
   // ログイン関数
   async function handleLogin(email: string, password: string) {
     try {
       const loggedInUser = await login(email, password);
+
       setUser(loggedInUser);
+      setIsAuthenticated(true);
       navigate('/');
     } catch (error) {
       console.error('ログイン失敗', error);
@@ -55,6 +28,7 @@ export function useAuth() {
     try {
       await logout();
       setUser(null);
+      setIsAuthenticated(false);
       navigate('/login');
     } catch (error) {
       console.error('ログアウト失敗', error);
@@ -76,6 +50,7 @@ export function useAuth() {
         password_confirmation
       );
       setUser(loggedInUser);
+      setIsAuthenticated(true);
       navigate('/');
     } catch (error: any) {
       // サーバーから返されたエラーメッセージを設定
@@ -104,7 +79,7 @@ export function useAuth() {
   return {
     user,
     errors,
-    loading,
+    isAuthenticated,
     login: handleLogin,
     logout: handleLogout,
     register: handleRegister,

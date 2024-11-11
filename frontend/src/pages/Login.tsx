@@ -18,7 +18,6 @@ import { LineIcon } from '../components/ui/CustomIcons';
 import AppTheme from '../components/mui/AppTheme';
 import ColorModeSelect from '../components/mui/ColorModeSelect';
 import { useAuth } from '../hooks/useAuth';
-import Loader from 'components/ui/Loader';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -68,7 +67,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
-  const { login, lineLogin, loading } = useAuth();
+  const { login, lineLogin } = useAuth();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -78,29 +77,11 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
     setOpen(false);
   };
 
-  const submitLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-
-    const email = data.get('email') as string;
-    const password = data.get('password') as string;
-
-    await login(email, password);
-  };
-
+  // 入力項目のバリデーション
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
-
     let isValid = true;
-
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
       setEmailErrorMessage('メールアドレス形式で入力してください。');
@@ -109,7 +90,6 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
       setEmailError(false);
       setEmailErrorMessage('');
     }
-
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage('パスワードは6文字以上です。');
@@ -118,13 +98,21 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
       setPasswordError(false);
       setPasswordErrorMessage('');
     }
-
     return isValid;
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  // ボタンクリック時の挙動
+  const submitLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validateInputs()) {
+      return;
+    }
+    const data = new FormData(event.currentTarget);
+    const email = data.get('email') as string;
+    const password = data.get('password') as string;
+
+    await login(email, password);
+  };
 
   return (
     <AppTheme {...props}>
@@ -191,7 +179,6 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
@@ -203,12 +190,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
               label="ログイン情報を保存する"
             />
             <ForgotPassword open={open} handleClose={handleClose} />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               ログイン
             </Button>
             <Typography sx={{ textAlign: 'center' }}>

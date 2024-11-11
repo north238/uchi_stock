@@ -15,7 +15,6 @@ import AppTheme from '../components/mui/AppTheme';
 import { LineIcon } from '../components/ui/CustomIcons';
 import ColorModeSelect from '../components/mui/ColorModeSelect';
 import { useAuth } from '../hooks/useAuth';
-import Loader from 'components/ui/Loader';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -72,8 +71,9 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   ] = React.useState('');
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const { register, lineLogin, loading } = useAuth();
+  const { register, lineLogin } = useAuth();
 
+  // 入力項目のバリデーション
   const validateInputs = () => {
     const name = document.getElementById('name') as HTMLInputElement;
     const email = document.getElementById('email') as HTMLInputElement;
@@ -123,11 +123,13 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
     return isValid;
   };
 
+  // ボタンクリック時の挙動
   const submitRegister = async (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError || passwordConfirmationError) {
-      event.preventDefault();
+    event.preventDefault();
+    if (!validateInputs()) {
       return;
     }
+
     const data = new FormData(event.currentTarget);
     const name = data.get('name') as string;
     const email = data.get('email') as string;
@@ -136,10 +138,6 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
 
     await register(name, email, password, passwordConfirmation);
   };
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <AppTheme {...props}>
@@ -166,6 +164,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 autoComplete="name"
                 name="name"
                 required
+                autoFocus
                 fullWidth
                 id="name"
                 placeholder="山田 太郎"
@@ -212,7 +211,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
               <TextField
                 required
                 fullWidth
-                name="password"
+                name="passwordConfirmation"
                 placeholder="••••••"
                 type="password"
                 id="passwordConfirmation"
@@ -223,12 +222,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 color={passwordConfirmationError ? 'error' : 'primary'}
               />
             </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               新規登録をする
             </Button>
             <Typography sx={{ textAlign: 'center' }}>

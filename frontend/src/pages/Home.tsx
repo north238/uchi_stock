@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import ItemList from 'components/ItemList';
-import { useAuth } from 'hooks/useAuth';
+import { useAuthContext } from 'contexts/AuthContext';
+import { fetchAuthenticatedUser } from 'api/auth';
 
 const Home: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuthContext();
+  // 認証ユーザーを取得して状態を更新する
+  useEffect(() => {
+    async function updateUser() {
+      const fetchedUser = await fetchAuthenticatedUser();
+      setUser(fetchedUser);
+    }
+    updateUser();
+  }, [setUser]);
+
+  // if (loading) {
+  //   return <Loader />;
+  // }
 
   return (
     <Card>

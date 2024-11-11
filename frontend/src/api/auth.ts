@@ -44,10 +44,11 @@ async function fetchAuthenticatedUser(): Promise<User> {
 async function login(email: string, password: string): Promise<User> {
   try {
     await initializeCsrfToken();
-    const response = await api.post<{ token: string; user: User }>('/login', {
+    const response = await api.post<{ user: User }>('/login', {
       email,
       password,
     });
+    console.log(response);
 
     return response.data.user; // ユーザー情報を返す
   } catch (error: any) {
@@ -60,19 +61,7 @@ async function login(email: string, password: string): Promise<User> {
 async function logout(): Promise<void> {
   try {
     await initializeCsrfToken();
-    const cookies = checkCookies();
-    const xsrfToken = decodeURIComponent(cookies['XSRF-TOKEN'] || '');
-    await api.post(
-      '/logout',
-      {},
-      {
-        headers: {
-          'X-XSRF-TOKEN': xsrfToken,
-        },
-      }
-    );
-    // ローカルストレージからトークンを削除
-    localStorage.removeItem('auth_token');
+    await api.post('/logout');
   } catch (error) {
     console.error('ログアウトに失敗しました:', error);
     throw error;

@@ -1,6 +1,4 @@
 const checkCookies = () => {
-  console.log('Current cookies:', document.cookie);
-
   // クッキーを取得してオブジェクトに変換
   const cookies = document.cookie.split(';').reduce((acc, cookie) => {
     const [name, value] = cookie.trim().split('=');
