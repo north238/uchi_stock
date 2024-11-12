@@ -50,9 +50,11 @@ COPY ./backend .
 COPY ./docker/laravel/php.ini /usr/local/etc/php/
 COPY ./docker/laravel/www.conf /usr/local/etc/php-fpm.d/www-custom.conf
 
+# xdebugを稼働させるために必要
 RUN mkdir -p /var/log && chmod -R 777 /var/log
 
+# nginxからのアクセスを可能にするため
 RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 755 -R /var/www/html/storage/
+    chmod 775 -R /var/www/html/storage/ /var/www/html/public/
 
 CMD ["php-fpm", "-F"]
