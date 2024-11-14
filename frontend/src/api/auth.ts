@@ -32,7 +32,6 @@ async function fetchAuthenticatedUser(): Promise<User> {
       withCredentials: true,
     });
 
-    console.log('認証ユーザー情報:', response.data);
     return response.data;
   } catch (error) {
     console.error('認証ユーザーの取得に失敗しました:', error);
@@ -48,11 +47,10 @@ async function login(email: string, password: string): Promise<User> {
       email,
       password,
     });
-    console.log(response);
 
-    return response.data.user; // ユーザー情報を返す
-  } catch (error: any) {
-    console.error('ログイン失敗:', error.response?.data || error);
+    return response.data.user;
+  } catch (error) {
+    console.error('ログイン失敗:', error);
     throw error;
   }
 }
@@ -88,8 +86,8 @@ async function register(
     );
 
     return response.data.user;
-  } catch (error: any) {
-    console.error('新規会員登録失敗:', error.response?.data || error);
+  } catch (error) {
+    console.error('新規会員登録失敗:', error);
     throw error;
   }
 }
@@ -100,8 +98,8 @@ async function lineRedirect() {
     const response = await api.get('/auth/line/redirect');
     // サーバーから返却されたURLをセット（LINEコールバック）
     window.location.href = await response.data.url;
-  } catch (error: any) {
-    console.error('LINEログイン失敗:', error.response?.data || error);
+  } catch (error) {
+    console.error('LINEログイン失敗:', error);
     throw error;
   }
 }

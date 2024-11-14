@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { login, logout, register, lineRedirect } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from 'contexts/AuthContext';
+import { useLoading } from 'contexts/LoadingContext';
 
 // 認証情報を管理するカスタムフック
 export function useAuth() {
   const { user, setUser, isAuthenticated, setIsAuthenticated } =
     useAuthContext();
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { setLoading } = useLoading();
 
   // ログイン関数
   async function handleLogin(email: string, password: string) {
@@ -17,9 +19,15 @@ export function useAuth() {
 
       setUser(loggedInUser);
       setIsAuthenticated(true);
+      setLoading(false);
       navigate('/');
-    } catch (error) {
-      console.error('ログイン失敗', error);
+    } catch (error: any) {
+      setLoading(false);
+      if (error.response?.data?.message) {
+        setErrors(error.response.data.message);
+      } else {
+        setErrors('ログインでエラーが発生しました。');
+      }
     }
   }
 
@@ -29,9 +37,15 @@ export function useAuth() {
       await logout();
       setUser(null);
       setIsAuthenticated(false);
+      setLoading(false);
       navigate('/login');
-    } catch (error) {
-      console.error('ログアウト失敗', error);
+    } catch (error: any) {
+      setLoading(false);
+      if (error.response?.data?.message) {
+        setErrors(error.response.data.message);
+      } else {
+        setErrors('登録処理でエラーが発生しました。');
+      }
     }
   }
 
@@ -51,13 +65,14 @@ export function useAuth() {
       );
       setUser(loggedInUser);
       setIsAuthenticated(true);
+      setLoading(false);
       navigate('/');
     } catch (error: any) {
-      // サーバーから返されたエラーメッセージを設定
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+      setLoading(false);
+      if (error.response?.data?.message) {
+        setErrors(error.response.data.message);
       } else {
-        setErrors({ general: '登録処理でエラーが発生しました。' });
+        setErrors('登録処理でエラーが発生しました。');
       }
     }
   }
@@ -66,12 +81,13 @@ export function useAuth() {
   async function handleLineLogin() {
     try {
       await lineRedirect();
+      setLoading(false);
     } catch (error: any) {
-      // サーバーから返されたエラーメッセージを設定
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+      setLoading(false);
+      if (error.response?.data?.message) {
+        setErrors(error.response.data.message);
       } else {
-        setErrors({ general: '登録処理でエラーが発生しました。' });
+        setErrors('登録処理でエラーが発生しました。');
       }
     }
   }
@@ -79,6 +95,7 @@ export function useAuth() {
   return {
     user,
     errors,
+    setErrors,
     isAuthenticated,
     login: handleLogin,
     logout: handleLogout,
