@@ -7,16 +7,20 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import LoginIcon from '@mui/icons-material/Login';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress';
 import ForgotPassword from './ForgotPassword';
 import { LineIcon } from '../components/ui/CustomIcons';
 import AppTheme from '../components/mui/AppTheme';
+import AlertWithErrors from 'components/mui/AlertWithErrors';
 import ColorModeSelect from '../components/mui/ColorModeSelect';
+import { useLoading } from 'contexts/LoadingContext';
 import { useAuth } from '../hooks/useAuth';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -66,15 +70,16 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
-  const { login, lineLogin } = useAuth();
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const { login, lineLogin, errors, setErrors } = useAuth();
+  const { loading, setLoading } = useLoading();
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setModalOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setModalOpen(false);
   };
 
   // 入力項目のバリデーション
@@ -110,6 +115,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
     const data = new FormData(event.currentTarget);
     const email = data.get('email') as string;
     const password = data.get('password') as string;
+    setLoading(true);
 
     await login(email, password);
   };
@@ -121,6 +127,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
         <ColorModeSelect
           sx={{ position: 'fixed', top: '1rem', right: '1rem' }}
         />
+        <AlertWithErrors errors={errors} setErrors={setErrors} />
         <Card variant="outlined">
           <Typography
             component="h1"
@@ -189,9 +196,22 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
               control={<Checkbox value="remember" color="primary" />}
               label="ログイン情報を保存する"
             />
-            <ForgotPassword open={open} handleClose={handleClose} />
-            <Button type="submit" fullWidth variant="contained">
-              ログイン
+            <ForgotPassword modalOpen={modalOpen} handleClose={handleClose} />
+            <Button
+              type="submit"
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  <LoginIcon color="inherit" />
+                )
+              }
+            >
+              {loading ? 'Loading...' : 'ログイン'}
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               <Link
@@ -203,7 +223,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
               </Link>
             </Typography>
           </Box>
-          <Divider>or</Divider>
+          <Divider>OR</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               fullWidth

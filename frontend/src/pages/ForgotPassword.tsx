@@ -8,17 +8,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
 
 interface ForgotPasswordProps {
-  open: boolean;
+  modalOpen: boolean;
   handleClose: () => void;
 }
 
 export default function ForgotPassword({
-  open,
+  modalOpen,
   handleClose,
 }: ForgotPasswordProps) {
   return (
     <Dialog
-      open={open}
+      open={modalOpen}
       onClose={handleClose}
       PaperProps={{
         component: 'form',
