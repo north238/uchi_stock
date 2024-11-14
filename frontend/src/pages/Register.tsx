@@ -5,15 +5,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import LoginIcon from '@mui/icons-material/Login';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress';
 import AppTheme from '../components/mui/AppTheme';
 import { LineIcon } from '../components/ui/CustomIcons';
+import AlertWithErrors from 'components/mui/AlertWithErrors';
 import ColorModeSelect from '../components/mui/ColorModeSelect';
+import { useLoading } from 'contexts/LoadingContext';
 import { useAuth } from '../hooks/useAuth';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -71,7 +75,8 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   ] = React.useState('');
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const { register, lineLogin } = useAuth();
+  const { register, lineLogin, errors, setErrors } = useAuth();
+  const { loading, setLoading } = useLoading();
 
   // 入力項目のバリデーション
   const validateInputs = () => {
@@ -135,6 +140,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
     const email = data.get('email') as string;
     const password = data.get('password') as string;
     const passwordConfirmation = data.get('passwordConfirmation') as string;
+    setLoading(true);
 
     await register(name, email, password, passwordConfirmation);
   };
@@ -144,6 +150,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer direction="column" justifyContent="space-between">
+        <AlertWithErrors errors={errors} setErrors={setErrors} />
         <Card variant="outlined">
           <Typography
             component="h1"
@@ -222,8 +229,21 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 color={passwordConfirmationError ? 'error' : 'primary'}
               />
             </FormControl>
-            <Button type="submit" fullWidth variant="contained">
-              新規登録をする
+            <Button
+              type="submit"
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  <LoginIcon color="inherit" />
+                )
+              }
+            >
+              {loading ? 'Loading...' : '新規登録をする'}
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>

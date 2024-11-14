@@ -35,7 +35,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => '認証失敗'], 401);
+            return response()->json(['message' => 'ログイン情報が間違っています。もう一度お試しください。'], 401);
         }
 
         $user = Auth::user();
