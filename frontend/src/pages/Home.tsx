@@ -20,7 +20,7 @@ const Home: React.FC = () => {
   }, [setUser]);
 
   return (
-    <Card>
+    <Card sx={{ p: '10px', mt: '10px' }}>
       <CardContent>
         <Typography variant="h5" component="div">
           Welcome to Home Page
