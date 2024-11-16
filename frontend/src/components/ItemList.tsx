@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { api, initializeCsrfToken } from '../api/axios';
+import Loader from './ui/Loader';
+import ItemCard from './mui/ItemCard';
+import Typography from '@mui/material/Typography';
 
 // Itemインターフェースを定義
 interface Item {
   id: number;
   name: string;
+  is_favorite: boolean;
+  description: string;
 }
 
 const ItemList: React.FC = () => {
@@ -27,21 +32,22 @@ const ItemList: React.FC = () => {
     fetchItems();
   }, []);
 
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (!items || items.length === 0) {
+    console.warn('No items provided'); // デバッグ用
+  }
+
   return (
-    <div>
-      <h2>Item List</h2>
-      {loading ? (
-        <p>読み込み中...</p>
-      ) : items.length > 0 ? (
-        <ul>
-          {items.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+    <Typography variant="h5" component="div">
+      {items.length > 0 ? (
+        items.map((item) => <ItemCard key={item.id} item={item} />)
       ) : (
-        <p>アイテムがありません。</p>
+        <Typography variant="body2">アイテムがありません。</Typography>
       )}
-    </div>
+    </Typography>
   );
 };
 

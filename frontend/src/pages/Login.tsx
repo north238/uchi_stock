@@ -116,6 +116,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
     const email = data.get('email') as string;
     const password = data.get('password') as string;
     setLoading(true);
+    setErrors(null);
 
     await login(email, password);
   };

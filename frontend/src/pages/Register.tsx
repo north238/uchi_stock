@@ -141,6 +141,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
     const password = data.get('password') as string;
     const passwordConfirmation = data.get('passwordConfirmation') as string;
     setLoading(true);
+    setErrors(null);
 
     await register(name, email, password, passwordConfirmation);
   };

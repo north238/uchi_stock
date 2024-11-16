@@ -5,6 +5,7 @@ import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
 
 // 認証情報を管理するカスタムフック
+// TODO: errorの型を正確に指定する
 export function useAuth() {
   const { user, setUser, isAuthenticated, setIsAuthenticated } =
     useAuthContext();
