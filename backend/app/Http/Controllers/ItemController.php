@@ -34,19 +34,11 @@ class ItemController extends Controller
     }
 
     /**
-     * アイテム登録画面
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * データベースへの登録
      */
     public function store(Request $request)
     {
-        //
+        return response()->json('登録処理に成功しました。', 200);
     }
 
     /**
