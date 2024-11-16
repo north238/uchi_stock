@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
@@ -14,6 +14,13 @@ const AlertWithErrors: React.FC<AlertWithErrorsProps> = ({
   setErrors,
 }) => {
   const [open, setOpen] = useState(true);
+
+  // エラーメッセージがあれば開くようにする（状態を監視）
+  useEffect(() => {
+    if (errors) {
+      setOpen(true);
+    }
+  }, [errors]);
 
   if (!open || !errors) {
     return null; // エラーがないか、閉じられている場合は何も表示しない
