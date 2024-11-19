@@ -38,15 +38,23 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = Auth::user()->id;
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'string|max:255',
             'quantity' => 'required|integer',
             'genre_id' => 'required|exists:genres,id',
             'category_id' => 'required|exists:categories,id',
+            'location_id' => 'required|exists:locations,id',
         ]);
 
+        $validated['user_id'] = $userId;
+
         $item = Item::create($validated);
-        return response()->json($item, 201);
+        return response()->json([
+            'message' => 'アイテムの登録に成功しました。',
+            'data' => $item
+        ], 201);
     }
 
     /**

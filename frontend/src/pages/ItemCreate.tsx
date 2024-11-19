@@ -10,9 +10,10 @@ import {
   InputLabel,
   FormControl,
 } from '@mui/material';
-import { api, initializeCsrfToken } from 'api/axios';
+import { api } from 'api/axios';
 import Loader from 'components/ui/Loader';
 import AlertWithErrors from 'components/mui/AlertWithErrors';
+import AlertWithSuccess from 'components/mui/AlertWithSuccess';
 
 interface Genre {
   id: number;
@@ -41,6 +42,7 @@ const ItemCreate: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // サーバーからデータを取得
   useEffect(() => {
@@ -79,9 +81,7 @@ const ItemCreate: React.FC = () => {
     };
 
     try {
-      await initializeCsrfToken();
-      const response = await api.post('/items', data); // アイテム登録エンドポイント
-      console.log('登録成功:', response.data);
+      const res = await api.post('/items', data); // アイテム登録エンドポイント
       // 入力フィールドをリセット
       setName('');
       setQuantity(1);
@@ -89,6 +89,8 @@ const ItemCreate: React.FC = () => {
       setGenreId('');
       setCategoryId('');
       setLocationId('');
+      setErrors(null);
+      setSuccess(res.data.message);
     } catch (error) {
       console.error('登録に失敗しました:', error);
       setErrors('登録に失敗しました。');
@@ -103,6 +105,7 @@ const ItemCreate: React.FC = () => {
 
   return (
     <>
+      <AlertWithSuccess success={success} setSuccess={setSuccess} />
       <AlertWithErrors errors={errors} setErrors={setErrors} />
       <Paper
         elevation={3}
