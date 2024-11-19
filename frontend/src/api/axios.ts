@@ -17,9 +17,8 @@ const initializeCsrfToken = async () => {
   if (isCSRFInitialized) return;
 
   try {
-    const res = await api.get('/sanctum/csrf-cookie');
+    await api.get('/sanctum/csrf-cookie');
     isCSRFInitialized = true;
-    console.log('CSRFトークンの初期化に成功しました', res);
   } catch (error) {
     console.error('CSRFトークンの初期化に失敗しました', error);
     throw error;

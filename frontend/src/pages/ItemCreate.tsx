@@ -10,7 +10,7 @@ import {
   InputLabel,
   FormControl,
 } from '@mui/material';
-import { api } from 'api/axios';
+import { api, initializeCsrfToken } from 'api/axios';
 import Loader from 'components/ui/Loader';
 import AlertWithErrors from 'components/mui/AlertWithErrors';
 
@@ -24,14 +24,21 @@ interface Category {
   name: string;
 }
 
+interface Location {
+  id: number;
+  name: string;
+}
+
 const ItemCreate: React.FC = () => {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');
   const [genreId, setGenreId] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [locationId, setLocationId] = useState('');
   const [genres, setGenres] = useState<Genre[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
 
@@ -40,12 +47,14 @@ const ItemCreate: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [genreRes, categoryRes] = await Promise.all([
-          api.get('/genres'), // サーバーのジャンル取得エンドポイント
-          api.get('/categories'), // サーバーのカテゴリ取得エンドポイント
+        const [genreRes, categoryRes, locationRes] = await Promise.all([
+          api.get('/genres'),
+          api.get('/categories'),
+          api.get('/locations'),
         ]);
         setGenres(genreRes.data);
         setCategories(categoryRes.data);
+        setLocations(locationRes.data);
       } catch (error) {
         console.error('データの取得に失敗しました', error);
         setErrors('データの取得に失敗しました');
@@ -66,10 +75,12 @@ const ItemCreate: React.FC = () => {
       description,
       genre_id: genreId,
       category_id: categoryId,
+      location_id: locationId,
     };
 
     try {
-      const response = await api.post('/items/create', data); // アイテム登録エンドポイント
+      await initializeCsrfToken();
+      const response = await api.post('/items', data); // アイテム登録エンドポイント
       console.log('登録成功:', response.data);
       // 入力フィールドをリセット
       setName('');
@@ -77,6 +88,7 @@ const ItemCreate: React.FC = () => {
       setDescription('');
       setGenreId('');
       setCategoryId('');
+      setLocationId('');
     } catch (error) {
       console.error('登録に失敗しました:', error);
       setErrors('登録に失敗しました。');
@@ -124,18 +136,8 @@ const ItemCreate: React.FC = () => {
             margin="normal"
             required
           />
-          <TextField
-            label="説明"
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            margin="normal"
-          />
           <FormControl fullWidth margin="normal">
-            <InputLabel id="genre-select-label">ジャンル</InputLabel>
+            <InputLabel id="genre-select-label">ジャンル名</InputLabel>
             <Select
               labelId="genre-select-label"
               value={genreId}
@@ -150,7 +152,7 @@ const ItemCreate: React.FC = () => {
             </Select>
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <InputLabel id="category-select-label">カテゴリ</InputLabel>
+            <InputLabel id="category-select-label">カテゴリ名</InputLabel>
             <Select
               labelId="category-select-label"
               value={categoryId}
@@ -164,6 +166,31 @@ const ItemCreate: React.FC = () => {
               ))}
             </Select>
           </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="category-select-label">保管場所</InputLabel>
+            <Select
+              labelId="location-select-label"
+              value={locationId}
+              onChange={(e) => setLocationId(e.target.value)}
+              required
+            >
+              {locations.map((location) => (
+                <MenuItem key={location.id} value={location.id}>
+                  {location.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <TextField
+            label="説明"
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            margin="normal"
+          />
           <Button
             type="submit"
             variant="contained"

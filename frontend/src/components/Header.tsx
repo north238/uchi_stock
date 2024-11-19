@@ -3,8 +3,18 @@ import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-const Header: React.FC = () => {
-  const { logout, user } = useAuth();
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface HeaderProps {
+  user: User | null;
+}
+
+const Header: React.FC<HeaderProps> = (user) => {
+  const { logout } = useAuth();
 
   return (
     <AppBar position="static">

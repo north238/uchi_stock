@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import Header from './Header';
+import { useAuthContext } from 'contexts/AuthContext';
 
-const Layout: React.FC = () => (
-  <div>
-    <Header />
-    <Box component="main" sx={{ width: '80%', margin: '0 auto' }}>
-      <Outlet />
+const Layout: React.FC = () => {
+  const { user } = useAuthContext();
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Header user={user} />
+      <Box component="main" sx={{ flexGrow: 1, py: 4 }}>
+        <Container maxWidth="lg">
+          <Outlet />
+        </Container>
+      </Box>
     </Box>
-  </div>
-);
+  );
+};
 
 export default Layout;
