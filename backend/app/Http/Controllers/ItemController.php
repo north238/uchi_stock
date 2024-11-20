@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ItemController extends Controller
 {
@@ -84,8 +85,22 @@ class ItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Item $item)
+    public function destroy($id)
     {
-        //
+        $userId = Auth::user()->id;
+        $item = $this->item->getUserToItem($userId, $id);
+
+        if (!$item) {
+            return response()->json(['message' => 'アイテムが見つからないか、削除権限がありません。'], 404);
+        }
+
+        try {
+            $item->delete();
+            return response()->json(['message' => 'アイテムの削除に成功しました。']);
+        } catch (\Exception $e) {
+            Log::error(["message" => $e->getMessage()]);
+            return response()->json(['message' => 'アイテムの削除に失敗しました。'], 500);
+        }
+
     }
 }

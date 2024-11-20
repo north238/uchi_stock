@@ -81,7 +81,10 @@ const ItemCreate: React.FC = () => {
     };
 
     try {
-      const res = await api.post('/items', data); // アイテム登録エンドポイント
+      const res = await api.post('/items', data);
+      // 結果をアラート表示
+      setSuccess(res.data.message);
+
       // 入力フィールドをリセット
       setName('');
       setQuantity(1);
@@ -90,7 +93,6 @@ const ItemCreate: React.FC = () => {
       setCategoryId('');
       setLocationId('');
       setErrors(null);
-      setSuccess(res.data.message);
     } catch (error) {
       console.error('登録に失敗しました:', error);
       setErrors('登録に失敗しました。');

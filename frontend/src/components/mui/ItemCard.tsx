@@ -5,8 +5,10 @@ import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import ShareIcon from '@mui/icons-material/Share';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Typography from '@mui/material/Typography';
 import { red } from './themePrimitives';
+import { deleteItem } from 'api/ItemApi';
 
 interface Item {
   id: number;
@@ -43,6 +45,9 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         </IconButton>
         <IconButton aria-label="share">
           <ShareIcon />
+        </IconButton>
+        <IconButton aria-label="delete" onClick={() => deleteItem(item.id)}>
+          <DeleteOutlineIcon />
         </IconButton>
       </CardActions>
     </Card>
