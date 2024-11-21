@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import { Item } from 'types';
 import Loader from './ui/Loader';
 import ItemCard from './mui/ItemCard';
+import { getItems } from 'api/ItemApi';
 
 const ItemList: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
@@ -11,7 +12,7 @@ const ItemList: React.FC = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetchItems();
+        const response = await getItems();
         setItems(response);
       } catch (error) {
         console.error('アイテムの取得に失敗しました。', error);

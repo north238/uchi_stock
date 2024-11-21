@@ -1,7 +1,7 @@
 import { api, initializeCsrfToken } from './axios';
 import { Item, CreateItemRequest, CreateItemResponse } from 'types';
 
-const fetchItems = async (): Promise<Item[]> => {
+const getItems = async (): Promise<Item[]> => {
   await initializeCsrfToken();
   const response = await api.get('/items');
   return response.data;
@@ -36,4 +36,4 @@ const deleteItem = async (id: number): Promise<CreateItemResponse> => {
   return response.data.message;
 };
 
-export { fetchItems, createItem, showItem, editItem, deleteItem };
+export { getItems, createItem, showItem, editItem, deleteItem };

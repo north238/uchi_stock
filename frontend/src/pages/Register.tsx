@@ -139,8 +139,8 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
     const name = data.get('name') as string;
     const email = data.get('email') as string;
     const password = data.get('password') as string;
-    const passwordConfirmation = data.get('passwordConfirmation') as string;
-    const params = { name, email, password, passwordConfirmation };
+    const password_confirmation = data.get('passwordConfirmation') as string;
+    const params = { name, email, password, password_confirmation };
     setLoading(true);
     setErrors(null);
 

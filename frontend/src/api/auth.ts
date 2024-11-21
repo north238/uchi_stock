@@ -36,9 +36,7 @@ async function fetchAuthenticatedUser(): Promise<User> {
 async function login(params: LoginParams): Promise<User> {
   try {
     await initializeCsrfToken();
-    const response = await api.post<{ user: User }>('/login', {
-      params,
-    });
+    const response = await api.post<{ user: User }>('/login', params);
 
     return response.data.user;
   } catch (error) {
@@ -64,9 +62,7 @@ async function register(params: RegisterParams): Promise<User> {
     await initializeCsrfToken();
     const response = await api.post<{ token: string; user: User }>(
       '/register',
-      {
-        params,
-      }
+      params
     );
 
     return response.data.user;
