@@ -14,21 +14,8 @@ import { api } from 'api/axios';
 import Loader from 'components/ui/Loader';
 import AlertWithErrors from 'components/mui/AlertWithErrors';
 import AlertWithSuccess from 'components/mui/AlertWithSuccess';
-
-interface Genre {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Location {
-  id: number;
-  name: string;
-}
+import { createItem } from 'api/ItemApi';
+import { Genre, Category, Location } from 'types';
 
 const ItemCreate: React.FC = () => {
   const [name, setName] = useState('');
@@ -81,9 +68,9 @@ const ItemCreate: React.FC = () => {
     };
 
     try {
-      const res = await api.post('/items', data);
+      const response = await createItem(data);
       // 結果をアラート表示
-      setSuccess(res.data.message);
+      setSuccess(response.message);
 
       // 入力フィールドをリセット
       setName('');
@@ -149,7 +136,7 @@ const ItemCreate: React.FC = () => {
               onChange={(e) => setGenreId(e.target.value)}
               required
             >
-              {genres.map((genre) => (
+              {genres.map((genre: Genre) => (
                 <MenuItem key={genre.id} value={genre.id}>
                   {genre.name}
                 </MenuItem>
@@ -164,7 +151,7 @@ const ItemCreate: React.FC = () => {
               onChange={(e) => setCategoryId(e.target.value)}
               required
             >
-              {categories.map((category) => (
+              {categories.map((category: Category) => (
                 <MenuItem key={category.id} value={category.id}>
                   {category.name}
                 </MenuItem>
@@ -179,7 +166,7 @@ const ItemCreate: React.FC = () => {
               onChange={(e) => setLocationId(e.target.value)}
               required
             >
-              {locations.map((location) => (
+              {locations.map((location: Location) => (
                 <MenuItem key={location.id} value={location.id}>
                   {location.name}
                 </MenuItem>

@@ -5,6 +5,7 @@ import { useAuthContext } from 'contexts/AuthContext';
 
 const Home: React.FC = () => {
   const { user } = useAuthContext();
+
   return (
     <Card sx={{ p: '10px', mt: '10px' }}>
       <CardContent>

@@ -3,16 +3,12 @@ import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
-
-interface AlertWithSuccessProps {
-  success: string | null;
-  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
-}
+import { AlertWithSuccessProps } from 'types';
 
 const AlertWithSuccess: React.FC<AlertWithSuccessProps> = ({
   success,
   setSuccess,
-}) => {
+}: AlertWithSuccessProps) => {
   const [open, setOpen] = useState(true);
 
   // エラーメッセージがあれば開くようにする（状態を監視）

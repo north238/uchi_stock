@@ -9,19 +9,9 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Typography from '@mui/material/Typography';
 import { red } from './themePrimitives';
 import { deleteItem } from 'api/ItemApi';
+import { ItemCardProps } from 'types';
 
-interface Item {
-  id: number;
-  name: string;
-  is_favorite: boolean;
-  description: string;
-}
-
-interface ItemCardProps {
-  item: Item;
-}
-
-const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
+const ItemCard: React.FC<ItemCardProps> = ({ item }: ItemCardProps) => {
   if (!item) {
     console.error('item is undefined');
     return null;

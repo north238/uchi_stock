@@ -1,18 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  password?: string | null;
-}
-
-interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  isAuthenticated: boolean;
-  setIsAuthenticated: (authenticated: boolean) => void;
-}
+import { AuthContextType, User } from 'types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

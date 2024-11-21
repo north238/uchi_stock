@@ -140,10 +140,11 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
     const email = data.get('email') as string;
     const password = data.get('password') as string;
     const passwordConfirmation = data.get('passwordConfirmation') as string;
+    const params = { name, email, password, passwordConfirmation };
     setLoading(true);
     setErrors(null);
 
-    await register(name, email, password, passwordConfirmation);
+    await register(params);
   };
 
   return (

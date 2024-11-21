@@ -2,18 +2,9 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { HeaderProps } from 'types';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-interface HeaderProps {
-  user: User | null;
-}
-
-const Header: React.FC<HeaderProps> = (user) => {
+const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
   const { logout } = useAuth();
 
   return (

@@ -1,13 +1,6 @@
+import { LoginParams, RegisterParams, User } from 'types';
 import { api, initializeCsrfToken } from '../api/axios';
 import checkCookies from '../util/getCookie';
-
-// ユーザーの型定義
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-}
 
 // 認証ユーザーの取得関数
 async function fetchAuthenticatedUser(): Promise<User> {
@@ -40,12 +33,11 @@ async function fetchAuthenticatedUser(): Promise<User> {
 }
 
 // ログイン関数の型定義
-async function login(email: string, password: string): Promise<User> {
+async function login(params: LoginParams): Promise<User> {
   try {
     await initializeCsrfToken();
     const response = await api.post<{ user: User }>('/login', {
-      email,
-      password,
+      params,
     });
 
     return response.data.user;
@@ -67,21 +59,13 @@ async function logout(): Promise<void> {
 }
 
 // 新規会員登録
-async function register(
-  name: string,
-  email: string,
-  password: string,
-  password_confirmation: string
-): Promise<User> {
+async function register(params: RegisterParams): Promise<User> {
   try {
     await initializeCsrfToken();
     const response = await api.post<{ token: string; user: User }>(
       '/register',
       {
-        name,
-        email,
-        password,
-        password_confirmation,
+        params,
       }
     );
 
