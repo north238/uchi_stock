@@ -1,17 +1,16 @@
 import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import ShareIcon from '@mui/icons-material/Share';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import Typography from '@mui/material/Typography';
+import { Card, CardActions, CardContent, Typography } from '@mui/material';
 import { red } from './themePrimitives';
-import { deleteItem } from 'api/ItemApi';
 import { ItemCardProps } from 'types';
 
-const ItemCard: React.FC<ItemCardProps> = ({ item }: ItemCardProps) => {
+const ItemCard: React.FC<ItemCardProps> = ({
+  item,
+  deleteItem,
+}: ItemCardProps) => {
   if (!item) {
     console.error('item is undefined');
     return null;

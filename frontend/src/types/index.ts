@@ -47,6 +47,7 @@ export interface CreateItemResponse {
 
 export interface ItemCardProps {
   item: Item;
+  deleteItem: (id: number) => void;
 }
 
 export interface ErrorResponse {
@@ -74,6 +75,11 @@ export interface AlertWithSuccessProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+export interface ItemListProps {
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 export interface HeaderProps {
   user: User | null;
 }
@@ -83,4 +89,9 @@ export interface AuthContextType {
   setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   setIsAuthenticated: (authenticated: boolean) => void;
+}
+
+export interface LoadingContextType {
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
 }

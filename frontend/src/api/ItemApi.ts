@@ -33,7 +33,7 @@ const editItem = async (
 const deleteItem = async (id: number): Promise<CreateItemResponse> => {
   await initializeCsrfToken();
   const response = await api.delete(`/items/${id}`);
-  return response.data.message;
+  return response.data;
 };
 
 export { getItems, createItem, showItem, editItem, deleteItem };

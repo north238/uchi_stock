@@ -1,10 +1,6 @@
 // contexts/LoadingContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-type LoadingContextType = {
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-};
+import { LoadingContextType } from 'types';
 
 // コンテキストの作成と初期値設定
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
