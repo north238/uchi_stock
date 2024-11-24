@@ -27,24 +27,32 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   };
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await getItems();
-        setItems(response);
-        const allData = await fetchAllData();
-        setGenres(allData.genres);
-        setCategories(allData.categories);
-        setLocations(allData.locations);
-      } catch (error) {
-        console.error('アイテムの取得に失敗しました。', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchItems = async () => {
+    try {
+      const response = await getItems();
+      setItems(response);
+    } catch (error) {
+      console.error('アイテムの取得に失敗しました。', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchApiAllData = async () => {
+    try {
+      const allData = await fetchAllData();
+      setGenres(allData.genres);
+      setCategories(allData.categories);
+      setLocations(allData.locations);
+    } catch (error) {
+      console.log('データ取得に失敗しました。', error);
+    }
+  };
+
+  useEffect(() => {
     fetchItems();
-  }, [setGenres, setCategories, setLocations]);
+    fetchApiAllData();
+  }, []);
 
   if (loading) {
     return <Loader />;

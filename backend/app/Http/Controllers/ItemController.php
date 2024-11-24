@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+use function Laravel\Prompts\error;
+
 class ItemController extends Controller
 {
 
@@ -42,7 +44,7 @@ class ItemController extends Controller
         $userId = Auth::user()->id;
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'string|max:255',
+            'description' => 'nullable|string|max:255',
             'quantity' => 'required|integer',
             'genre_id' => 'required|exists:genres,id',
             'category_id' => 'required|exists:categories,id',
@@ -77,7 +79,37 @@ class ItemController extends Controller
      */
     public function update(Request $request, Item $item)
     {
-        //
+        $userId = Auth::user()->id;
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'genre_id' => 'required|exists:genres,id',
+            'category_id' => 'required|exists:categories,id',
+            'location_id' => 'required|exists:locations,id',
+        ]);
+
+        try {
+            $item->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'quantity' => $validated['quantity'],
+                'genre_id' => $validated['genre_id'],
+                'category_id' => $validated['category_id'],
+                'location_id' => $validated['location_id'],
+                'user_id' => $userId,
+            ]);
+            return response()->json([
+                'message' => 'アイテムの更新に成功しました。',
+                'data' => $item
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error(["message" => $e->getMessage()]);
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

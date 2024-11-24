@@ -40,6 +40,15 @@ export interface CreateItemRequest {
   is_favorite?: boolean;
 }
 
+export interface UpdatedItemRequest {
+  name: string;
+  quantity: number;
+  genre_id: string;
+  category_id: string;
+  location_id: string;
+  description: string;
+}
+
 export interface CreateItemResponse {
   message: string;
   item: Item;
@@ -108,5 +117,5 @@ export interface DataContextType {
 export interface ItemUpdateDialogProps {
   open: boolean;
   setOpen: (value: boolean) => void;
-  item?: Item;
+  item: Item;
 }

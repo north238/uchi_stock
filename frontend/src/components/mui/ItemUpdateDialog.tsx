@@ -11,8 +11,15 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { Category, Genre, Location, ItemUpdateDialogProps } from 'types';
+import {
+  Category,
+  Genre,
+  Location,
+  ItemUpdateDialogProps,
+  UpdatedItemRequest,
+} from 'types';
 import { useDataContext } from 'contexts/DataContext';
+import { EditItem } from 'api/ItemApi';
 
 export default function ItemUpdateDialog({
   open,
@@ -45,18 +52,25 @@ export default function ItemUpdateDialog({
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const updatedItem = {
+    const updatedItem: UpdatedItemRequest = {
       name,
       quantity,
-      genreId,
-      categoryId,
-      locationId,
+      genre_id: genreId,
+      category_id: categoryId,
+      location_id: locationId,
       description,
     };
-    console.log(updatedItem);
-    handleClose();
+
+    try {
+      const response = await EditItem(item.id, updatedItem);
+      console.log(response);
+    } catch (error) {
+      console.log('アイテムの編集に失敗しました。', error);
+    } finally {
+      handleClose();
+    }
   };
 
   return (
