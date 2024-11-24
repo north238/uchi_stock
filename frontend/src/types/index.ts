@@ -95,3 +95,18 @@ export interface LoadingContextType {
   loading: boolean;
   setLoading: (loading: boolean) => void;
 }
+
+export interface DataContextType {
+  genres: Genre[];
+  categories: Category[];
+  locations: Location[];
+  setGenres: (genres: Genre[]) => void;
+  setCategories: (categories: Category[]) => void;
+  setLocations: (locations: Location[]) => void;
+}
+
+export interface ItemUpdateDialogProps {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  item?: Item;
+}

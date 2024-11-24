@@ -3,7 +3,8 @@ import Typography from '@mui/material/Typography';
 import { Item, ItemListProps } from 'types';
 import Loader from './ui/Loader';
 import ItemCard from './mui/ItemCard';
-import { getItems, deleteItem } from 'api/ItemApi';
+import { getItems, deleteItem, fetchAllData } from 'api/ItemApi';
+import { useDataContext } from 'contexts/DataContext';
 
 const ItemList: React.FC<ItemListProps> = ({
   setErrors,
@@ -11,6 +12,7 @@ const ItemList: React.FC<ItemListProps> = ({
 }: ItemListProps) => {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setGenres, setCategories, setLocations } = useDataContext();
 
   const deleteItemHandler = async (id: number) => {
     try {
@@ -30,6 +32,10 @@ const ItemList: React.FC<ItemListProps> = ({
       try {
         const response = await getItems();
         setItems(response);
+        const allData = await fetchAllData();
+        setGenres(allData.genres);
+        setCategories(allData.categories);
+        setLocations(allData.locations);
       } catch (error) {
         console.error('アイテムの取得に失敗しました。', error);
       } finally {
@@ -38,7 +44,7 @@ const ItemList: React.FC<ItemListProps> = ({
     };
 
     fetchItems();
-  }, []);
+  }, [setGenres, setCategories, setLocations]);
 
   if (loading) {
     return <Loader />;

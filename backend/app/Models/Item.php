@@ -59,6 +59,7 @@ class Item extends Model
     {
         $result = Item::query()
             ->where('user_id', $userId)
+            ->orderBy('id', 'DESC')
             ->get();
 
         return $result;

@@ -61,17 +61,15 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Item $item)
+    public function show($id)
     {
-        //
-    }
+        $userId = Auth::user()->id;
+        $item = $this->item->getUserToItem($userId, $id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Item $item)
-    {
-        //
+        return response()->json([
+            'message' => 'アイテムの取得に成功しました。',
+            'data' => $item
+        ], 201);
     }
 
     /**

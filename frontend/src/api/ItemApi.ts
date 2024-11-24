@@ -18,7 +18,7 @@ const createItem = async (
 const showItem = async (id: number): Promise<CreateItemResponse> => {
   await initializeCsrfToken();
   const response = await api.get(`/items/${id}`);
-  return response.data.message;
+  return response.data;
 };
 
 const editItem = async (
@@ -27,7 +27,7 @@ const editItem = async (
 ): Promise<CreateItemResponse> => {
   await initializeCsrfToken();
   const response = await api.put(`/items/${id}`, itemData);
-  return response.data.message;
+  return response.data;
 };
 
 const deleteItem = async (id: number): Promise<CreateItemResponse> => {
@@ -36,4 +36,19 @@ const deleteItem = async (id: number): Promise<CreateItemResponse> => {
   return response.data;
 };
 
-export { getItems, createItem, showItem, editItem, deleteItem };
+const fetchAllData = async () => {
+  await initializeCsrfToken();
+  const [genreRes, categoryRes, locationRes] = await Promise.all([
+    api.get('/genres'),
+    api.get('/categories'),
+    api.get('/locations'),
+  ]);
+
+  return {
+    genres: genreRes.data,
+    categories: categoryRes.data,
+    locations: locationRes.data,
+  };
+};
+
+export { getItems, createItem, showItem, editItem, deleteItem, fetchAllData };

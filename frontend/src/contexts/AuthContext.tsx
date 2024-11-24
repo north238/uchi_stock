@@ -3,7 +3,11 @@ import { AuthContextType, User } from 'types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
+export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 

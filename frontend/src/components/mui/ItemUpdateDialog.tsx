@@ -1,89 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  TextField,
   Button,
-  Typography,
-  Paper,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
-  InputLabel,
-  FormControl,
 } from '@mui/material';
-import Loader from 'components/ui/Loader';
-import AlertWithErrors from 'components/mui/AlertWithErrors';
-import AlertWithSuccess from 'components/mui/AlertWithSuccess';
-import { createItem } from 'api/ItemApi';
-import { Genre, Category, Location } from 'types';
+import { Category, Genre, Location, ItemUpdateDialogProps } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 
-const ItemCreate: React.FC = () => {
+export default function ItemUpdateDialog({
+  open,
+  setOpen,
+  item,
+}: ItemUpdateDialogProps) {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');
   const [genreId, setGenreId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [locationId, setLocationId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { genres, categories, locations } = useDataContext();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const data = {
-      name,
-      quantity,
-      description,
-      genre_id: genreId,
-      category_id: categoryId,
-      location_id: locationId,
+  useEffect(() => {
+    const fetchItemData = async () => {
+      if (item) {
+        setName(item.name);
+        setQuantity(item.quantity);
+        setGenreId(item.genre_id);
+        setCategoryId(item.category_id);
+        setLocationId(item.location_id);
+        setDescription(item.description || '');
+      }
     };
+    fetchItemData();
+  }, [open]);
 
-    try {
-      const response = await createItem(data);
-      // 結果をアラート表示
-      setSuccess(response.message);
-
-      // 入力フィールドをリセット
-      setName('');
-      setQuantity(1);
-      setDescription('');
-      setGenreId('');
-      setCategoryId('');
-      setLocationId('');
-      setErrors(null);
-    } catch (error) {
-      console.error('登録に失敗しました:', error);
-      setErrors('登録に失敗しました。');
-    } finally {
-      setLoading(false);
-    }
+  const handleClose = () => {
+    setOpen(false);
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const updatedItem = {
+      name,
+      quantity,
+      genreId,
+      categoryId,
+      locationId,
+      description,
+    };
+    console.log(updatedItem);
+    handleClose();
+  };
 
   return (
     <>
-      <AlertWithSuccess success={success} setSuccess={setSuccess} />
-      <AlertWithErrors errors={errors} setErrors={setErrors} />
-      <Paper
-        elevation={3}
-        sx={{
-          maxWidth: 600,
-          margin: '20px auto',
-          padding: 3,
-          textAlign: 'center',
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          component: 'form',
+          onSubmit: handleSubmit,
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          アイテム登録
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit}>
+        <DialogTitle>アイテム更新</DialogTitle>
+        <DialogContent>
           <TextField
             label="アイテム名"
             variant="outlined"
@@ -158,20 +145,12 @@ const ItemCreate: React.FC = () => {
             onChange={(e) => setDescription(e.target.value)}
             margin="normal"
           />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            disabled={loading}
-          >
-            登録
-          </Button>
-        </Box>
-      </Paper>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>閉じる</Button>
+          <Button type="submit">更新する</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
-};
-
-export default ItemCreate;
+}

@@ -1,4 +1,3 @@
-// contexts/LoadingContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { LoadingContextType } from 'types';
 
@@ -8,6 +7,8 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 // プロバイダーコンポーネント
 export const LoadingProvider: React.FC<{ children: ReactNode }> = ({
   children,
+}: {
+  children: ReactNode;
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
 

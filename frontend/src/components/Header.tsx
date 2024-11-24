@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
         <Button color="inherit" component={RouterLink} to="/">
           ホーム
         </Button>
-        <Button color="inherit" component={RouterLink} to="/item-create">
+        <Button color="inherit" component={RouterLink} to="/item/create">
           登録
         </Button>
         {user ? (

@@ -23,7 +23,6 @@ class AuthController extends Controller
         }
 
         $user = $request->user();
-        Log::debug($user);
         return response()->json($user);
     }
 
