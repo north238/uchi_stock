@@ -17,7 +17,10 @@ import ItemUpdateDialog from './ItemUpdateDialog';
 
 const ItemCard: React.FC<ItemCardProps> = ({
   item,
+  setItems,
   deleteItem,
+  setErrors,
+  setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
   const handleItemEdit = () => {
@@ -63,7 +66,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
           </IconButton>
         </CardActions>
       </Card>
-      <ItemUpdateDialog open={open} setOpen={setOpen} item={item} />
+      <ItemUpdateDialog
+        open={open}
+        setOpen={setOpen}
+        item={item}
+        setItems={setItems}
+        setErrors={setErrors}
+        setSuccess={setSuccess}
+      />
     </>
   );
 };

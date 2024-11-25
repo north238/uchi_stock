@@ -1,12 +1,5 @@
 import React from 'react';
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-}
-
 export interface LoginParams {
   email: string;
   password: string;
@@ -50,13 +43,26 @@ export interface UpdatedItemRequest {
 }
 
 export interface CreateItemResponse {
+  data: any;
   message: string;
   item: Item;
 }
 
 export interface ItemCardProps {
   item: Item;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   deleteItem: (id: number) => void;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface ItemUpdateDialogProps {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  item: Item;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface ErrorResponse {
@@ -89,6 +95,13 @@ export interface ItemListProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface HeaderProps {
   user: User | null;
 }
@@ -112,10 +125,4 @@ export interface DataContextType {
   setGenres: (genres: Genre[]) => void;
   setCategories: (categories: Category[]) => void;
   setLocations: (locations: Location[]) => void;
-}
-
-export interface ItemUpdateDialogProps {
-  open: boolean;
-  setOpen: (value: boolean) => void;
-  item: Item;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Typography from '@mui/material/Typography';
 import { Item, ItemListProps } from 'types';
 import Loader from './ui/Loader';
@@ -27,32 +27,36 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   };
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       const response = await getItems();
       setItems(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error('アイテムの取得に失敗しました。', error);
+      setErrors(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setItems, setLoading]);
 
-  const fetchApiAllData = async () => {
+  const fetchApiAllData = useCallback(async () => {
     try {
       const allData = await fetchAllData();
       setGenres(allData.genres);
       setCategories(allData.categories);
       setLocations(allData.locations);
-    } catch (error) {
+    } catch (error: any) {
       console.log('データ取得に失敗しました。', error);
+      setErrors(error.message);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [setGenres, setCategories, setLocations, setErrors]);
 
   useEffect(() => {
     fetchItems();
     fetchApiAllData();
-  }, []);
+  }, [fetchApiAllData]);
 
   if (loading) {
     return <Loader />;
@@ -62,7 +66,14 @@ const ItemList: React.FC<ItemListProps> = ({
     <Typography variant="h5" component="div">
       {items.length > 0 ? (
         items.map((item: Item) => (
-          <ItemCard key={item.id} item={item} deleteItem={deleteItemHandler} />
+          <ItemCard
+            key={item.id}
+            item={item}
+            setItems={setItems}
+            deleteItem={deleteItemHandler}
+            setErrors={setErrors}
+            setSuccess={setSuccess}
+          />
         ))
       ) : (
         <Typography variant="body2">アイテムがありません。</Typography>

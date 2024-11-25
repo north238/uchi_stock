@@ -17,6 +17,7 @@ import {
   Location,
   ItemUpdateDialogProps,
   UpdatedItemRequest,
+  Item,
 } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 import { EditItem } from 'api/ItemApi';
@@ -25,6 +26,9 @@ export default function ItemUpdateDialog({
   open,
   setOpen,
   item,
+  setItems,
+  setErrors,
+  setSuccess,
 }: ItemUpdateDialogProps) {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -46,7 +50,7 @@ export default function ItemUpdateDialog({
       }
     };
     fetchItemData();
-  }, [open]);
+  }, [open, item]);
 
   const handleClose = () => {
     setOpen(false);
@@ -65,9 +69,19 @@ export default function ItemUpdateDialog({
 
     try {
       const response = await EditItem(item.id, updatedItem);
-      console.log(response);
-    } catch (error) {
+
+      // 成功時に状態を更新する
+      setItems((prevItems: Item[]) =>
+        prevItems.map((prevItem) =>
+          prevItem.id === item.id
+            ? response.data // APIから返却されたデータに置き換える
+            : prevItem
+        )
+      );
+      setSuccess(response.message);
+    } catch (error: any) {
       console.log('アイテムの編集に失敗しました。', error);
+      setErrors(error.message);
     } finally {
       handleClose();
     }
