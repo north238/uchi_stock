@@ -55,10 +55,22 @@ class Item extends Model
      * @param string $userId ユーザーID
      * @return collection $result ユーザーに紐づいたアイテム
      */
-    public function getUserToItems($userId) {
+    public function getUserToItems($userId)
+    {
         $result = Item::query()
             ->where('user_id', $userId)
+            ->orderBy('id', 'DESC')
             ->get();
+
+        return $result;
+    }
+
+    public function getUserToItem($userId, $id)
+    {
+        $result = Item::query()
+            ->where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
 
         return $result;
     }

@@ -2,9 +2,10 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { HeaderProps } from 'types';
 
-const Header: React.FC = () => {
-  const { logout, user } = useAuth();
+const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
+  const { logout } = useAuth();
 
   return (
     <AppBar position="static">
@@ -13,19 +14,22 @@ const Header: React.FC = () => {
           うちStock
         </Typography>
         <Button color="inherit" component={RouterLink} to="/">
-          Home
+          ホーム
+        </Button>
+        <Button color="inherit" component={RouterLink} to="/item/create">
+          登録
         </Button>
         {user ? (
           <Button color="inherit" onClick={logout}>
-            Logout
+            ログアウト
           </Button>
         ) : (
           <>
             <Button color="inherit" component={RouterLink} to="/login">
-              Login
+              ログイン
             </Button>
             <Button color="inherit" component={RouterLink} to="/register">
-              Register
+              新規登録
             </Button>
           </>
         )}

@@ -3,6 +3,7 @@ import { login, logout, register, lineRedirect } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
+import { LoginParams, RegisterParams } from 'types';
 
 // 認証情報を管理するカスタムフック
 // TODO: errorの型を正確に指定する
@@ -14,9 +15,9 @@ export function useAuth() {
   const { setLoading } = useLoading();
 
   // ログイン関数
-  async function handleLogin(email: string, password: string) {
+  async function handleLogin(params: LoginParams) {
     try {
-      const loggedInUser = await login(email, password);
+      const loggedInUser = await login(params);
 
       setUser(loggedInUser);
       setIsAuthenticated(true);
@@ -51,19 +52,9 @@ export function useAuth() {
   }
 
   // ユーザー新規登録
-  async function handleRegister(
-    name: string,
-    email: string,
-    password: string,
-    password_confirmation: string
-  ) {
+  async function handleRegister(params: RegisterParams) {
     try {
-      const loggedInUser = await register(
-        name,
-        email,
-        password,
-        password_confirmation
-      );
+      const loggedInUser = await register(params);
       setUser(loggedInUser);
       setIsAuthenticated(true);
       setLoading(false);
