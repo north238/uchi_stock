@@ -28,18 +28,18 @@ const ItemList: React.FC<ItemListProps> = ({
   };
 
   const fetchItems = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await getItems();
       setItems(response);
     } catch (error: any) {
       console.error('アイテムの取得に失敗しました。', error);
       setErrors(error.message);
-    } finally {
-      setLoading(false);
     }
-  }, [setItems, setLoading]);
+  }, [setItems, setErrors]);
 
   const fetchApiAllData = useCallback(async () => {
+    setLoading(true);
     try {
       const allData = await fetchAllData();
       setGenres(allData.genres);
@@ -48,15 +48,16 @@ const ItemList: React.FC<ItemListProps> = ({
     } catch (error: any) {
       console.log('データ取得に失敗しました。', error);
       setErrors(error.message);
-    } finally {
-      setLoading(false);
     }
   }, [setGenres, setCategories, setLocations, setErrors]);
 
   useEffect(() => {
-    fetchItems();
-    fetchApiAllData();
-  }, [fetchApiAllData]);
+    const fetchAllData = async () => {
+      await Promise.all([fetchItems(), fetchApiAllData()]);
+      setLoading(false);
+    };
+    fetchAllData();
+  }, [fetchItems, fetchApiAllData]);
 
   if (loading) {
     return <Loader />;
