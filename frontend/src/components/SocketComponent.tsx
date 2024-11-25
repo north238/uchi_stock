@@ -10,8 +10,7 @@ const SocketComponent: React.FC = () => {
       socket.close();
     };
   }, []);
-
-  return <div>WebSocket Example</div>;
+  return null;
 };
 
 export default SocketComponent;

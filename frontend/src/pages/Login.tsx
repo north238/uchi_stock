@@ -115,10 +115,11 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
     const data = new FormData(event.currentTarget);
     const email = data.get('email') as string;
     const password = data.get('password') as string;
+    const params = { email, password };
     setLoading(true);
     setErrors(null);
 
-    await login(email, password);
+    await login(params);
   };
 
   return (

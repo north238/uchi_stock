@@ -55,6 +55,6 @@ RUN mkdir -p /var/log && chmod -R 777 /var/log
 
 # nginxからのアクセスを可能にするため
 RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 775 -R /var/www/html/storage/ /var/www/html/public/
+    chmod 775 -R /var/www/html/storage/ /var/www/html/public/ /var/www/html/bootstrap/cache/
 
 CMD ["php-fpm", "-F"]

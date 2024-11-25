@@ -1,49 +1,81 @@
-import React, { useEffect, useState } from 'react';
-import { api, initializeCsrfToken } from '../api/axios';
+import React, { useEffect, useState, useCallback } from 'react';
+import Typography from '@mui/material/Typography';
+import { Item, ItemListProps } from 'types';
 import Loader from './ui/Loader';
 import ItemCard from './mui/ItemCard';
-import Typography from '@mui/material/Typography';
+import { getItems, deleteItem, fetchAllData } from 'api/ItemApi';
+import { useDataContext } from 'contexts/DataContext';
 
-// Itemインターフェースを定義
-interface Item {
-  id: number;
-  name: string;
-  is_favorite: boolean;
-  description: string;
-}
-
-const ItemList: React.FC = () => {
+const ItemList: React.FC<ItemListProps> = ({
+  setErrors,
+  setSuccess,
+}: ItemListProps) => {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setGenres, setCategories, setLocations } = useDataContext();
+
+  const deleteItemHandler = async (id: number) => {
+    try {
+      const response = await deleteItem(id);
+      setSuccess(response.message);
+      setItems((prevItems: Item[]) =>
+        prevItems.filter((item) => item.id !== id)
+      );
+    } catch (error: any) {
+      console.log('アイテムの削除に失敗しました。', error);
+      setErrors(error.message);
+    }
+  };
+
+  const fetchItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getItems();
+      setItems(response);
+    } catch (error: any) {
+      console.error('アイテムの取得に失敗しました。', error);
+      setErrors(error.message);
+    }
+  }, [setItems, setErrors]);
+
+  const fetchApiAllData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const allData = await fetchAllData();
+      setGenres(allData.genres);
+      setCategories(allData.categories);
+      setLocations(allData.locations);
+    } catch (error: any) {
+      console.log('データ取得に失敗しました。', error);
+      setErrors(error.message);
+    }
+  }, [setGenres, setCategories, setLocations, setErrors]);
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        await initializeCsrfToken();
-        const response = await api.get('/items');
-        setItems(response.data);
-      } catch (error) {
-        console.error('アイテムの取得に失敗しました。', error);
-      } finally {
-        setLoading(false);
-      }
+    const fetchAllData = async () => {
+      await Promise.all([fetchItems(), fetchApiAllData()]);
+      setLoading(false);
     };
-
-    fetchItems();
-  }, []);
+    fetchAllData();
+  }, [fetchItems, fetchApiAllData]);
 
   if (loading) {
     return <Loader />;
   }
 
-  if (!items || items.length === 0) {
-    console.warn('No items provided'); // デバッグ用
-  }
-
   return (
     <Typography variant="h5" component="div">
       {items.length > 0 ? (
-        items.map((item) => <ItemCard key={item.id} item={item} />)
+        items.map((item: Item) => (
+          <ItemCard
+            key={item.id}
+            item={item}
+            setItems={setItems}
+            deleteItem={deleteItemHandler}
+            setErrors={setErrors}
+            setSuccess={setSuccess}
+          />
+        ))
       ) : (
         <Typography variant="body2">アイテムがありません。</Typography>
       )}

@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SocialAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,12 +25,23 @@ use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
 // ログイン関係の処理
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware(['web'])->group(
+  function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+  }
+);
 
-Route::middleware(['auth:sanctum'])->group(function() {
+Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::get('/user', [AuthController::class, 'getUser']);
+
+  // アイテムCRUD処理
+  Route::apiResource('items', ItemController::class);
+
+  Route::get('genres', [GenreController::class, 'index']);
+  Route::get('categories', [CategoryController::class, 'index']);
+  Route::get('locations', [LocationController::class, 'index']);
 });
 
 // LINE認証
@@ -35,6 +49,3 @@ Route::middleware(['web'])->group(function () {
   Route::get('/auth/line/redirect', [SocialAccountController::class, 'socialLogin']);
   Route::get('/auth/line/callback', [SocialAccountController::class, 'handleProviderCallback']);
 });
-
-// アイテム取得
-Route::get('/items', [ItemController::class, 'index']);
