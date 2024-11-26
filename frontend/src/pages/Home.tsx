@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchAuthenticatedUser } from 'api/auth';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
@@ -14,6 +14,7 @@ const Home: React.FC = () => {
   const { loading, setLoading } = useLoading();
   const [errors, setErrors] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,7 +22,8 @@ const Home: React.FC = () => {
         const response = await fetchAuthenticatedUser();
         setUser(response);
       } catch (error) {
-        console.error('アイテムの取得に失敗しました。', error);
+        console.error('認識ユーザー取得に失敗しました。', error);
+        navigate('/login');
       } finally {
         setLoading(false);
       }
@@ -30,14 +32,10 @@ const Home: React.FC = () => {
     console.log('ユーザー認証');
 
     fetchUser();
-  }, [setUser, setLoading]);
+  }, [setUser, setLoading, navigate]);
 
   if (loading) {
     return <Loader />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
   }
 
   return (

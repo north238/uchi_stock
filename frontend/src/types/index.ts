@@ -107,14 +107,6 @@ export interface User {
   password: string;
 }
 
-export interface HeaderProps {
-  user: User | null;
-}
-
-export interface ProfileProps {
-  logout: () => void;
-}
-
 export interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;

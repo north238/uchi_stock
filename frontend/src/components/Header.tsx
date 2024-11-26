@@ -1,10 +1,12 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { HeaderProps } from 'types';
 import ProfileMenu from './mui/ProfileMenu';
+import { useAuthContext } from 'contexts/AuthContext';
 
-const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
+const Header: React.FC = () => {
+  const { user } = useAuthContext();
+
   return (
     <AppBar position="static">
       <Toolbar>
