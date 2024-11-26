@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
-import ItemList from 'components/ItemList';
+import { Navigate } from 'react-router-dom';
+import { fetchAuthenticatedUser } from 'api/auth';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
 import AlertWithErrors from 'components/mui/AlertWithErrors';
 import AlertWithSuccess from 'components/mui/AlertWithSuccess';
-import { fetchAuthenticatedUser } from 'api/auth';
+import ItemList from 'components/ItemList';
 import Loader from 'components/ui/Loader';
 
 const Home: React.FC = () => {
@@ -26,11 +27,17 @@ const Home: React.FC = () => {
       }
     };
 
+    console.log('ユーザー認証');
+
     fetchUser();
   }, [setUser, setLoading]);
 
   if (loading) {
     return <Loader />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   return (

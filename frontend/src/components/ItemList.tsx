@@ -14,6 +14,7 @@ const ItemList: React.FC<ItemListProps> = ({
   const [loading, setLoading] = useState(true);
   const { setGenres, setCategories, setLocations } = useDataContext();
 
+  // 削除ボタンクリック
   const deleteItemHandler = async (id: number) => {
     try {
       const response = await deleteItem(id);
@@ -27,6 +28,7 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   };
 
+  // アイテム取得
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
@@ -38,6 +40,7 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   }, [setItems, setErrors]);
 
+  // 各種選択項目の取得
   const fetchApiAllData = useCallback(async () => {
     setLoading(true);
     try {
@@ -57,6 +60,7 @@ const ItemList: React.FC<ItemListProps> = ({
       setLoading(false);
     };
     fetchAllData();
+    console.log('アイテム取得');
   }, [fetchItems, fetchApiAllData]);
 
   if (loading) {

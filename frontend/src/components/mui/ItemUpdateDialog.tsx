@@ -50,6 +50,7 @@ export default function ItemUpdateDialog({
       }
     };
     fetchItemData();
+    console.log('ダイアログ');
   }, [open, item]);
 
   const handleClose = () => {

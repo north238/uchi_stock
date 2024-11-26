@@ -1,12 +1,10 @@
 import React from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { HeaderProps } from 'types';
+import ProfileMenu from './mui/ProfileMenu';
 
 const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
-  const { logout } = useAuth();
-
   return (
     <AppBar position="static">
       <Toolbar>
@@ -20,9 +18,7 @@ const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
           登録
         </Button>
         {user ? (
-          <Button color="inherit" onClick={logout}>
-            ログアウト
-          </Button>
+          <ProfileMenu />
         ) : (
           <>
             <Button color="inherit" component={RouterLink} to="/login">

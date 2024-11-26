@@ -90,6 +90,11 @@ export interface AlertWithSuccessProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+export interface AlertWithErrorsProps {
+  errors: string | null;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 export interface ItemListProps {
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
@@ -104,6 +109,10 @@ export interface User {
 
 export interface HeaderProps {
   user: User | null;
+}
+
+export interface ProfileProps {
+  logout: () => void;
 }
 
 export interface AuthContextType {

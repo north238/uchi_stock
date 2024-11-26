@@ -29,6 +29,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   if (!item) {
     console.error('item is undefined');
+    setErrors('アイテムが見つかりません。');
     return null;
   }
 
