@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from 'components/Layout';
 import Home from '../pages/Home';
-import ItemCreate from 'pages/ItemCreate';
 import NoMatch from '../pages/NoMatch';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -12,7 +11,6 @@ const AppRoutes: React.FC = () => (
   <Routes>
     <Route element={<Layout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/item/create" element={<ItemCreate />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
 

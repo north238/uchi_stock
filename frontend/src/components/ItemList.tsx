@@ -5,6 +5,7 @@ import Loader from './ui/Loader';
 import ItemCard from './mui/ItemCard';
 import { getItems, deleteItem, fetchAllData } from 'api/ItemApi';
 import { useDataContext } from 'contexts/DataContext';
+import AddItemCard from './mui/AddItemCard';
 
 const ItemList: React.FC<ItemListProps> = ({
   setErrors,
@@ -68,22 +69,25 @@ const ItemList: React.FC<ItemListProps> = ({
   }
 
   return (
-    <Typography variant="h5" component="div">
-      {items.length > 0 ? (
-        items.map((item: Item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            setItems={setItems}
-            deleteItem={deleteItemHandler}
-            setErrors={setErrors}
-            setSuccess={setSuccess}
-          />
-        ))
-      ) : (
-        <Typography variant="body2">アイテムがありません。</Typography>
-      )}
-    </Typography>
+    <>
+      <Typography variant="h5" component="div">
+        <AddItemCard />
+        {items.length > 0 ? (
+          items.map((item: Item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              setItems={setItems}
+              deleteItem={deleteItemHandler}
+              setErrors={setErrors}
+              setSuccess={setSuccess}
+            />
+          ))
+        ) : (
+          <Typography variant="body2">アイテムがありません。</Typography>
+        )}
+      </Typography>
+    </>
   );
 };
 

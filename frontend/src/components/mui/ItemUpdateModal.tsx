@@ -15,21 +15,21 @@ import {
   Category,
   Genre,
   Location,
-  ItemUpdateDialogProps,
+  ItemUpdateModalProps,
   UpdatedItemRequest,
   Item,
 } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 import { EditItem } from 'api/ItemApi';
 
-export default function ItemUpdateDialog({
+export default function ItemUpdateModal({
   open,
   setOpen,
   item,
   setItems,
   setErrors,
   setSuccess,
-}: ItemUpdateDialogProps) {
+}: ItemUpdateModalProps) {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');

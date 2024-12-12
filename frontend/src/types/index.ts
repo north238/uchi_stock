@@ -57,13 +57,22 @@ export interface ItemCardProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export interface ItemUpdateDialogProps {
+export interface ItemUpdateModalProps {
   open: boolean;
-  setOpen: (value: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   item: Item;
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface ItemCreateModalProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface ItemCreateProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface ErrorResponse {

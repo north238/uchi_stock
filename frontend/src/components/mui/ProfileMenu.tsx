@@ -24,7 +24,7 @@ const ProfileMenu: React.FC = () => {
 
   return (
     <Box sx={{ flexGrow: 0 }}>
-      <Tooltip title="Open settings">
+      <Tooltip title="プロフィール">
         <IconButton
           onClick={handleOpenUserMenu}
           color="inherit"

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { red } from './themePrimitives';
 import { ItemCardProps } from 'types';
-import ItemUpdateDialog from './ItemUpdateDialog';
+import ItemUpdateModal from './ItemUpdateModal';
 
 const ItemCard: React.FC<ItemCardProps> = ({
   item,
@@ -67,7 +67,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           </IconButton>
         </CardActions>
       </Card>
-      <ItemUpdateDialog
+      <ItemUpdateModal
         open={open}
         setOpen={setOpen}
         item={item}
