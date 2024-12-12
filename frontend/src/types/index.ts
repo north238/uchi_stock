@@ -3,6 +3,7 @@ import React from 'react';
 export interface LoginParams {
   email: string;
   password: string;
+  remember?: string | null;
 }
 
 export interface RegisterParams {

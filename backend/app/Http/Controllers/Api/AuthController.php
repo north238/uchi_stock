@@ -29,6 +29,7 @@ class AuthController extends Controller
     // ログイン
     public function login(Request $request)
     {
+        $remember = !empty($request->get('remember')) ? true : false;
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -39,6 +40,7 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        Auth::login($user, $remember);
         $request->session()->regenerate();
 
         return response()->json([
@@ -50,10 +52,12 @@ class AuthController extends Controller
     // ログアウト
     public function logout(Request $request)
     {
+        Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'ログアウト成功']);
+        return response()->json(['message' => 'ログアウト成功'])->withCookie(cookie()->forget('uchistock_session'));
     }
 
     /**
@@ -81,6 +85,10 @@ class AuthController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+
+        // セッションを生成
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => '新規会員登録成功',

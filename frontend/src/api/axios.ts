@@ -14,10 +14,13 @@ let isCSRFInitialized = false;
 
 // CSRFトークン取得
 const initializeCsrfToken = async (): Promise<void> => {
-  if (isCSRFInitialized) return;
+  // console.log(isCSRFInitialized);
+  // if (isCSRFInitialized) return;
 
   try {
+    console.log('initializeCsrfToken');
     await api.get('/sanctum/csrf-cookie');
+    console.log('initializeCsrfToken、後');
     isCSRFInitialized = true;
   } catch (error) {
     console.error('CSRFトークンの初期化に失敗しました', error);
