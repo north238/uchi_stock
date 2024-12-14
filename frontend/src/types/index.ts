@@ -66,13 +66,25 @@ export interface ItemUpdateModalProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+export interface AddItemCardProps {
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 export interface ItemCreateModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface ItemCreateProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface ErrorResponse {

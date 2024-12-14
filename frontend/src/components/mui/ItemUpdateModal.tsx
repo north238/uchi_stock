@@ -53,10 +53,12 @@ export default function ItemUpdateModal({
     console.log('ダイアログ');
   }, [open, item]);
 
+  // モーダルを閉じる
   const handleClose = () => {
     setOpen(false);
   };
 
+  // アイテム更新処理
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const updatedItem: UpdatedItemRequest = {

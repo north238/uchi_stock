@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Paper, Box, Typography } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ItemCreateModal from './ItemCreateModal';
+import { AddItemCardProps } from 'types';
 
-const AddItemCard: React.FC = () => {
+const AddItemCard: React.FC<AddItemCardProps> = ({
+  setItems,
+  setErrors,
+  setSuccess,
+}: AddItemCardProps) => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -43,7 +48,13 @@ const AddItemCard: React.FC = () => {
           </Typography>
         </Box>
       </Paper>
-      <ItemCreateModal open={open} setOpen={setOpen} />
+      <ItemCreateModal
+        open={open}
+        setOpen={setOpen}
+        setItems={setItems}
+        setErrors={setErrors}
+        setSuccess={setSuccess}
+      />
     </>
   );
 };

@@ -71,7 +71,11 @@ const ItemList: React.FC<ItemListProps> = ({
   return (
     <>
       <Typography variant="h5" component="div">
-        <AddItemCard />
+        <AddItemCard
+          setItems={setItems}
+          setErrors={setErrors}
+          setSuccess={setSuccess}
+        />
         {items.length > 0 ? (
           items.map((item: Item) => (
             <ItemCard

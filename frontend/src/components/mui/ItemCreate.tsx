@@ -10,11 +10,14 @@ import {
   FormControl,
 } from '@mui/material';
 import { createItem } from 'api/ItemApi';
-import { Genre, Category, Location, ItemCreateProps } from 'types';
+import { Genre, Category, Location, ItemCreateProps, Item } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 
 const ItemCreate: React.FC<ItemCreateProps> = ({
   setOpen,
+  setItems,
+  setErrors,
+  setSuccess,
 }: ItemCreateProps) => {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -22,8 +25,6 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
   const [genreId, setGenreId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [locationId, setLocationId] = useState('');
-  const [errors, setErrors] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { genres, categories, locations } = useDataContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +41,9 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
 
     try {
       const response = await createItem(data);
-      // 結果をアラート表示
+
+      // 登録したアイテムを配列の先頭に表示する
+      setItems((prevItems: Item[]) => [response.data, ...prevItems]);
       setSuccess(response.message);
 
       // 入力フィールドをリセット
@@ -61,7 +64,7 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
 
   return (
     <>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         アイテム登録
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>

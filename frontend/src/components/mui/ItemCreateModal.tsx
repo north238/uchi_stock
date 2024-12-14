@@ -6,6 +6,9 @@ import { ItemCreateModalProps } from 'types';
 const ItemCreateModal: React.FC<ItemCreateModalProps> = ({
   open,
   setOpen,
+  setItems,
+  setErrors,
+  setSuccess,
 }: ItemCreateModalProps) => {
   const handleClose = () => setOpen(false);
 
@@ -23,14 +26,19 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 400,
+            width: { lg: 600, xs: 370 },
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
             p: 4,
           }}
         >
-          <ItemCreate setOpen={setOpen} />
+          <ItemCreate
+            setOpen={setOpen}
+            setItems={setItems}
+            setErrors={setErrors}
+            setSuccess={setSuccess}
+          />
         </Box>
       </Modal>
     </>
