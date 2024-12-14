@@ -3,16 +3,12 @@ import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
-
-interface AlertWithErrorsProps {
-  errors: string | null;
-  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
-}
+import { AlertWithErrorsProps } from 'types';
 
 const AlertWithErrors: React.FC<AlertWithErrorsProps> = ({
   errors,
   setErrors,
-}) => {
+}: AlertWithErrorsProps) => {
   const [open, setOpen] = useState(true);
 
   // エラーメッセージがあれば開くようにする（状態を監視）
@@ -20,6 +16,7 @@ const AlertWithErrors: React.FC<AlertWithErrorsProps> = ({
     if (errors) {
       setOpen(true);
     }
+    console.log('errors');
   }, [errors]);
 
   if (!open || !errors) {

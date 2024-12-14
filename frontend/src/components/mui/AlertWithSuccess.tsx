@@ -16,6 +16,7 @@ const AlertWithSuccess: React.FC<AlertWithSuccessProps> = ({
     if (success) {
       setOpen(true);
     }
+    console.log('success');
   }, [success]);
 
   if (!open || !success) {

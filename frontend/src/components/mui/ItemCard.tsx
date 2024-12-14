@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { red } from './themePrimitives';
 import { ItemCardProps } from 'types';
-import ItemUpdateDialog from './ItemUpdateDialog';
+import ItemUpdateModal from './ItemUpdateModal';
 
 const ItemCard: React.FC<ItemCardProps> = ({
   item,
@@ -29,6 +29,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   if (!item) {
     console.error('item is undefined');
+    setErrors('アイテムが見つかりません。');
     return null;
   }
 
@@ -66,7 +67,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           </IconButton>
         </CardActions>
       </Card>
-      <ItemUpdateDialog
+      <ItemUpdateModal
         open={open}
         setOpen={setOpen}
         item={item}

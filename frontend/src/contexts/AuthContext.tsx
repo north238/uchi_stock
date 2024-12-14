@@ -10,6 +10,7 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  console.log('context', user);
 
   return (
     <AuthContext.Provider

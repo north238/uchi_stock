@@ -17,6 +17,7 @@ const LineLoginSuccess = () => {
       setUser(parsedUser);
       setIsAuthenticated(true);
     }
+    console.log('ラインログイン');
 
     navigate('/');
   }, [navigate, setIsAuthenticated, setUser]);

@@ -3,6 +3,7 @@ import React from 'react';
 export interface LoginParams {
   email: string;
   password: string;
+  remember?: string | null;
 }
 
 export interface RegisterParams {
@@ -56,10 +57,31 @@ export interface ItemCardProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export interface ItemUpdateDialogProps {
+export interface ItemUpdateModalProps {
   open: boolean;
-  setOpen: (value: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   item: Item;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface AddItemCardProps {
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface ItemCreateModalProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface ItemCreateProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
@@ -90,6 +112,11 @@ export interface AlertWithSuccessProps {
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+export interface AlertWithErrorsProps {
+  errors: string | null;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 export interface ItemListProps {
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
@@ -100,10 +127,6 @@ export interface User {
   name: string;
   email: string;
   password: string;
-}
-
-export interface HeaderProps {
-  user: User | null;
 }
 
 export interface AuthContextType {
