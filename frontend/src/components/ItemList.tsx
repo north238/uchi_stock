@@ -5,6 +5,7 @@ import Loader from './ui/Loader';
 import ItemCard from './mui/ItemCard';
 import { getItems, deleteItem, fetchAllData } from 'api/ItemApi';
 import { useDataContext } from 'contexts/DataContext';
+import AddItemCard from './mui/AddItemCard';
 
 const ItemList: React.FC<ItemListProps> = ({
   setErrors,
@@ -14,6 +15,7 @@ const ItemList: React.FC<ItemListProps> = ({
   const [loading, setLoading] = useState(true);
   const { setGenres, setCategories, setLocations } = useDataContext();
 
+  // 削除ボタンクリック
   const deleteItemHandler = async (id: number) => {
     try {
       const response = await deleteItem(id);
@@ -27,6 +29,7 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   };
 
+  // アイテム取得
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
@@ -38,6 +41,7 @@ const ItemList: React.FC<ItemListProps> = ({
     }
   }, [setItems, setErrors]);
 
+  // 各種選択項目の取得
   const fetchApiAllData = useCallback(async () => {
     setLoading(true);
     try {
@@ -57,6 +61,7 @@ const ItemList: React.FC<ItemListProps> = ({
       setLoading(false);
     };
     fetchAllData();
+    console.log('アイテム取得');
   }, [fetchItems, fetchApiAllData]);
 
   if (loading) {
@@ -64,22 +69,29 @@ const ItemList: React.FC<ItemListProps> = ({
   }
 
   return (
-    <Typography variant="h5" component="div">
-      {items.length > 0 ? (
-        items.map((item: Item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            setItems={setItems}
-            deleteItem={deleteItemHandler}
-            setErrors={setErrors}
-            setSuccess={setSuccess}
-          />
-        ))
-      ) : (
-        <Typography variant="body2">アイテムがありません。</Typography>
-      )}
-    </Typography>
+    <>
+      <Typography variant="h5" component="div">
+        <AddItemCard
+          setItems={setItems}
+          setErrors={setErrors}
+          setSuccess={setSuccess}
+        />
+        {items.length > 0 ? (
+          items.map((item: Item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              setItems={setItems}
+              deleteItem={deleteItemHandler}
+              setErrors={setErrors}
+              setSuccess={setSuccess}
+            />
+          ))
+        ) : (
+          <Typography variant="body2">アイテムがありません。</Typography>
+        )}
+      </Typography>
+    </>
   );
 };
 

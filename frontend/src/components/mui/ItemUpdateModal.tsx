@@ -15,21 +15,21 @@ import {
   Category,
   Genre,
   Location,
-  ItemUpdateDialogProps,
+  ItemUpdateModalProps,
   UpdatedItemRequest,
   Item,
 } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 import { EditItem } from 'api/ItemApi';
 
-export default function ItemUpdateDialog({
+export default function ItemUpdateModal({
   open,
   setOpen,
   item,
   setItems,
   setErrors,
   setSuccess,
-}: ItemUpdateDialogProps) {
+}: ItemUpdateModalProps) {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');
@@ -50,12 +50,15 @@ export default function ItemUpdateDialog({
       }
     };
     fetchItemData();
+    console.log('ダイアログ');
   }, [open, item]);
 
+  // モーダルを閉じる
   const handleClose = () => {
     setOpen(false);
   };
 
+  // アイテム更新処理
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const updatedItem: UpdatedItemRequest = {

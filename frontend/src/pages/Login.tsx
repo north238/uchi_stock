@@ -113,9 +113,11 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
       return;
     }
     const data = new FormData(event.currentTarget);
+
     const email = data.get('email') as string;
     const password = data.get('password') as string;
-    const params = { email, password };
+    const remember = data.get('remember') as string | null;
+    const params = { email, password, remember };
     setLoading(true);
     setErrors(null);
 
@@ -195,7 +197,9 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
               />
             </FormControl>
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={
+                <Checkbox name="remember" value="remember" color="primary" />
+              }
               label="ログイン情報を保存する"
             />
             <ForgotPassword modalOpen={modalOpen} handleClose={handleClose} />

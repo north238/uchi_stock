@@ -1,28 +1,32 @@
 import React from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { HeaderProps } from 'types';
+import ProfileMenu from './mui/ProfileMenu';
+import SearchArea from './mui/SearchArea';
+import { useAuthContext } from 'contexts/AuthContext';
 
-const Header: React.FC<HeaderProps> = (user: HeaderProps) => {
-  const { logout } = useAuth();
+const Header: React.FC = () => {
+  const { user } = useAuthContext();
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          component="a"
+          href="/"
+          sx={{
+            flexGrow: 1,
+            textDecoration: 'none',
+            color: 'inherit',
+            ml: '10px',
+          }}
+        >
           うちStock
         </Typography>
-        <Button color="inherit" component={RouterLink} to="/">
-          ホーム
-        </Button>
-        <Button color="inherit" component={RouterLink} to="/item/create">
-          登録
-        </Button>
+        <SearchArea />
         {user ? (
-          <Button color="inherit" onClick={logout}>
-            ログアウト
-          </Button>
+          <ProfileMenu />
         ) : (
           <>
             <Button color="inherit" component={RouterLink} to="/login">

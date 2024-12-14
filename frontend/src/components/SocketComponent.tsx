@@ -3,6 +3,8 @@ import connectWebSocket from '../util/websocket';
 
 const SocketComponent: React.FC = () => {
   useEffect(() => {
+    console.log('ソケット');
+
     const socket = connectWebSocket();
 
     // クリーンアップ関数でWebSocketを閉じる
