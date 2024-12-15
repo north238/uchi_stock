@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import ShareIcon from '@mui/icons-material/Share';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
@@ -11,9 +10,9 @@ import {
   CardHeader,
   Typography,
 } from '@mui/material';
-import { red } from './themePrimitives';
 import { ItemCardProps } from 'types';
 import ItemUpdateModal from './ItemUpdateModal';
+import FavoriteIconBtn from './FavoriteIconBtn';
 
 const ItemCard: React.FC<ItemCardProps> = ({
   item,
@@ -23,12 +22,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
   setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(
+    item.is_favorite ? true : false
+  );
   const handleItemEdit = () => {
     setOpen(true);
   };
 
   if (!item) {
-    console.error('item is undefined');
     setErrors('アイテムが見つかりません。');
     return null;
   }
@@ -54,11 +55,11 @@ const ItemCard: React.FC<ItemCardProps> = ({
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          <IconButton aria-label="add to favorites">
-            <FavoriteIcon
-              sx={{ color: item.is_favorite ? red[300] : undefined }}
-            />
-          </IconButton>
+          <FavoriteIconBtn
+            item={item}
+            isFavorite={isFavorite}
+            setIsFavorite={setIsFavorite}
+          />
           <IconButton aria-label="share">
             <ShareIcon />
           </IconButton>

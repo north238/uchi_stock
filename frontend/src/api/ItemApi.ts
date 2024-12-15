@@ -50,4 +50,19 @@ const fetchAllData = async () => {
   };
 };
 
-export { getItems, createItem, EditItem, deleteItem, fetchAllData };
+const changeColorFavoriteIcon = async (
+  id: number
+): Promise<CreateItemResponse> => {
+  await initializeCsrfToken();
+  const response = await api.post(`/favorites/${id}`);
+  return response.data;
+};
+
+export {
+  getItems,
+  createItem,
+  EditItem,
+  deleteItem,
+  fetchAllData,
+  changeColorFavoriteIcon,
+};
