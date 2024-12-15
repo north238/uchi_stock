@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -131,6 +132,24 @@ class ItemController extends Controller
             Log::error(["message" => $e->getMessage()]);
             return response()->json(['message' => 'アイテムの削除に失敗しました。'], 500);
         }
+    }
 
+    /**
+     * アイテムのお気に入り更新
+     */
+    public function changeColorFavoriteIcon($id)
+    {
+        $userId = Auth::user()->id;
+        $item = $this->item->getUserToItem($userId, $id);
+
+        try {
+            $item->is_favorite = $item->is_favorite ? 0 : 1;
+            $item->save();
+
+            return response()->json(['isFavorite' => $item->is_favorite]);
+        } catch (Exception $e) {
+            Log::error(["message" => $e->getMessage()]);
+            return response()->json(['message' => 'お気に入りアイコン更新に失敗しました。'], 500);
+        }
     }
 }

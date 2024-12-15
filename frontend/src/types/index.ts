@@ -47,6 +47,7 @@ export interface CreateItemResponse {
   data: any;
   message: string;
   item: Item;
+  isFavorite?: number;
 }
 
 export interface ItemCardProps {
@@ -148,4 +149,10 @@ export interface DataContextType {
   setGenres: (genres: Genre[]) => void;
   setCategories: (categories: Category[]) => void;
   setLocations: (locations: Location[]) => void;
+}
+
+export interface FavoriteBtnProps {
+  item: Item;
+  isFavorite: boolean;
+  setIsFavorite: (isFavorite: boolean) => void;
 }
