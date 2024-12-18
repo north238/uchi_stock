@@ -36,9 +36,10 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   return (
     <>
-      <Card sx={{ maxWidth: 345, mb: 2 }}>
-        <CardContent>
+      <Card sx={{ maxWidth: 345, mb: 1 }}>
+        <CardContent sx={{ p: 1 }}>
           <CardHeader
+            sx={{ p: 1 }}
             action={
               <IconButton aria-label="settings" onClick={handleItemEdit}>
                 <MoreVertIcon />
@@ -51,7 +52,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
             }
           />
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Description for {item.description}.
+            {item.description}
           </Typography>
         </CardContent>
         <CardActions disableSpacing>

@@ -40,6 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::apiResource('items', ItemController::class);
 
   Route::post('/favorites/{id}', [ItemController::class, 'changeColorFavoriteIcon']);
+  Route::get('/favorites', [ItemController::class, 'fetchFavoriteItemData']);
 
   Route::get('genres', [GenreController::class, 'index']);
   Route::get('categories', [CategoryController::class, 'index']);

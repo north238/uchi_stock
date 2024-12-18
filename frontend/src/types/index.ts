@@ -119,6 +119,17 @@ export interface AlertWithErrorsProps {
 }
 
 export interface ItemListProps {
+  items: Item[];
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  deleteItemHandler: (id: number) => void;
+  setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export interface ShoppingListProps {
+  favoriteItems: Item[];
+  setFavoriteItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  deleteItemHandler: (id: number) => void;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
