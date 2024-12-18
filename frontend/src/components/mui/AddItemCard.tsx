@@ -19,12 +19,12 @@ const AddItemCard: React.FC<AddItemCardProps> = ({
       <Paper
         sx={{
           maxWidth: 345,
-          mb: 2,
+          mb: 1,
           border: '2px dashed #ccc',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: 120,
+          height: 100,
           cursor: 'pointer',
           transition: 'background-color 0.3s ease',
           '&:hover': {
