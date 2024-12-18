@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Item extends Model
 {
@@ -65,12 +66,36 @@ class Item extends Model
         return $result;
     }
 
+    /**
+     * ユーザーに紐づいたアイテムを取得
+     *
+     * @param int $userId ユーザーID
+     * @param int $id アイテムID
+     * @return \App\Models\Item|null 取得したアイテムオブジェクト、該当なしの場合はnull
+     */
     public function getUserToItem($userId, $id)
     {
         $result = Item::query()
             ->where('id', $id)
             ->where('user_id', $userId)
             ->first();
+
+        return $result;
+    }
+
+    /**
+     * お気に入りされたアイテムリストを取得
+     *
+     * @param int $userId ユーザーID
+     * @return \App\Models\Item|null 取得したアイテムオブジェクト、該当なしの場合はnull
+     */
+    public function fetchFavoriteItemData($userId)
+    {
+        $result = Item::query()
+            ->where('user_id', $userId)
+            ->where('is_favorite', 1)
+            ->orderBy('id', 'DESC')
+            ->get();
 
         return $result;
     }

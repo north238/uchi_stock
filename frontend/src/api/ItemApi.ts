@@ -58,6 +58,13 @@ const changeColorFavoriteIcon = async (
   return response.data;
 };
 
+const fetchFavoriteItems = async (): Promise<Item[]> => {
+  await initializeCsrfToken();
+  const response = await api.get('/favorites');
+
+  return response.data;
+};
+
 export {
   getItems,
   createItem,
@@ -65,4 +72,5 @@ export {
   deleteItem,
   fetchAllData,
   changeColorFavoriteIcon,
+  fetchFavoriteItems,
 };

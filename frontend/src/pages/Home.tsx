@@ -1,40 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Paper, Typography, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthenticatedUser } from 'api/auth';
+import {
+  getItems,
+  fetchAllData,
+  fetchFavoriteItems,
+  deleteItem,
+} from 'api/ItemApi';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
 import AlertWithErrors from 'components/mui/AlertWithErrors';
 import AlertWithSuccess from 'components/mui/AlertWithSuccess';
 import ItemList from 'components/ItemList';
 import Loader from 'components/ui/Loader';
+import ShoppingList from 'components/mui/ShoppingList';
+import { Item } from 'types';
+import { useDataContext } from 'contexts/DataContext';
 
 const Home: React.FC = () => {
   const { user, setUser } = useAuthContext();
   const { loading, setLoading } = useLoading();
+  const { setGenres, setCategories, setLocations } = useDataContext();
   const [errors, setErrors] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetchAuthenticatedUser();
-        setUser(response);
-      } catch (error) {
-        console.error('認識ユーザー取得に失敗しました。', error);
+  // エラー設定の共通処理
+  const handleError = (error: any, message: string) => {
+    console.error(message, error);
+    setErrors(error.message || 'エラーが発生しました');
+  };
+
+  // ユーザー認証取得
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await fetchAuthenticatedUser();
+      setUser(response);
+    } catch (error: any) {
+      if (error.status === 401) {
         navigate('/login');
-      } finally {
-        setLoading(false);
       }
-    };
+      handleError(error, '認識ユーザー取得に失敗しました。');
+    }
+  }, [navigate, setUser]);
 
-    console.log('ユーザー認証');
+  // アイテムの取得
+  const fetchItemsData = useCallback(async () => {
+    try {
+      const response = await getItems();
+      setItems(response);
+    } catch (error) {
+      handleError(error, 'アイテムの取得に失敗しました。');
+    }
+  }, [setItems]);
 
-    fetchUser();
-  }, [setUser, setLoading, navigate]);
+  // お気に入りアイテムの取得
+  const fetchFavoriteItemData = useCallback(async () => {
+    try {
+      const response = await fetchFavoriteItems();
+      setFavoriteItems(response);
+    } catch (error) {
+      handleError(error, 'お気に入りアイテムの取得に失敗しました。');
+    }
+  }, [setFavoriteItems]);
 
-  if (loading) {
+  // 各種データの取得
+  const fetchAdditionalData = useCallback(async () => {
+    try {
+      const { genres, categories, locations } = await fetchAllData();
+      setGenres(genres);
+      setCategories(categories);
+      setLocations(locations);
+    } catch (error) {
+      handleError(error, '選択データの取得に失敗しました。');
+    }
+  }, [setGenres, setCategories, setLocations]);
+
+  // データ一括取得
+  const fetchItemsWithDetails = useCallback(async () => {
+    setLoading(true);
+    try {
+      await fetchUser();
+      await fetchItemsData();
+      await fetchFavoriteItemData();
+      await fetchAdditionalData();
+    } catch (error: any) {
+      handleError(error, '選択データの取得に失敗しました。');
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    fetchUser,
+    fetchItemsData,
+    fetchFavoriteItemData,
+    fetchAdditionalData,
+    setLoading,
+  ]);
+
+  // 初期データ取得
+  useEffect(() => {
+    fetchItemsWithDetails();
+  }, [fetchItemsWithDetails]);
+
+  // アイテム削除
+  const deleteItemHandler = useCallback(
+    async (id: number) => {
+      try {
+        const response = await deleteItem(id);
+        setSuccess(response.message);
+        setItems((prevItems: Item[]) =>
+          prevItems.filter((item) => item.id !== id)
+        );
+      } catch (error) {
+        handleError(error, 'アイテムの削除に失敗しました。');
+      }
+    },
+    [setItems, setSuccess]
+  );
+
+  if (loading || !user) {
     return <Loader />;
   }
 
@@ -42,14 +129,40 @@ const Home: React.FC = () => {
     <>
       <AlertWithErrors errors={errors} setErrors={setErrors} />
       <AlertWithSuccess success={success} setSuccess={setSuccess} />
-      <Card sx={{ p: '10px', mt: '10px' }}>
-        <CardContent>
-          <Typography variant="h5" component="div">
-            アイテム一覧
-          </Typography>
-        </CardContent>
-        {user && <ItemList setErrors={setErrors} setSuccess={setSuccess} />}
-      </Card>
+      <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+        <Typography variant="h5" component="div">
+          アイテムと買い物リスト
+        </Typography>
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+          {/* アイテム一覧 */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" component="div">
+              アイテム一覧
+            </Typography>
+            <ItemList
+              items={items}
+              setItems={setItems}
+              deleteItemHandler={deleteItemHandler}
+              setErrors={setErrors}
+              setSuccess={setSuccess}
+            />
+          </Grid>
+
+          {/* 買い物リスト */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" component="div">
+              買い物リスト
+            </Typography>
+            <ShoppingList
+              favoriteItems={favoriteItems}
+              setFavoriteItems={setFavoriteItems}
+              deleteItemHandler={deleteItemHandler}
+              setErrors={setErrors}
+              setSuccess={setSuccess}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
     </>
   );
 };

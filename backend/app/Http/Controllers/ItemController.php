@@ -152,4 +152,16 @@ class ItemController extends Controller
             return response()->json(['message' => 'お気に入りアイコン更新に失敗しました。'], 500);
         }
     }
+
+    /**
+     * お気に入りされたアイテムを取得
+     */
+    public function fetchFavoriteItemData()
+    {
+        $userId = Auth::user()->id;
+        $items = $this->item->fetchFavoriteItemData($userId);
+        Log::debug($items);
+
+        return response()->json($items, 200);
+    }
 }
