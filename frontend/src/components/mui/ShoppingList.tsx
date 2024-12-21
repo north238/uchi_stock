@@ -7,6 +7,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
   favoriteItems,
   setFavoriteItems,
   deleteItemHandler,
+  handleFavoriteToggle,
   setErrors,
   setSuccess,
 }: ShoppingListProps) => {
@@ -18,7 +19,9 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
             key={item.id}
             item={item}
             setItems={setFavoriteItems}
+            isFavorite={item.is_favorite ?? 0}
             deleteItem={deleteItemHandler}
+            handleFavoriteToggle={handleFavoriteToggle}
             setErrors={setErrors}
             setSuccess={setSuccess}
           />

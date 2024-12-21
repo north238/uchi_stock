@@ -7,6 +7,7 @@ import {
   fetchAllData,
   fetchFavoriteItems,
   deleteItem,
+  changeColorFavoriteIcon,
 } from 'api/ItemApi';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useLoading } from 'contexts/LoadingContext';
@@ -26,6 +27,7 @@ const Home: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
+  const [isFavorite, setIsFavorite] = useState<number>(0);
   const navigate = useNavigate();
 
   // エラー設定の共通処理
@@ -55,7 +57,7 @@ const Home: React.FC = () => {
     } catch (error) {
       handleError(error, 'アイテムの取得に失敗しました。');
     }
-  }, [setItems]);
+  }, [setItems, isFavorite]);
 
   // お気に入りアイテムの取得
   const fetchFavoriteItemData = useCallback(async () => {
@@ -114,11 +116,43 @@ const Home: React.FC = () => {
         setItems((prevItems: Item[]) =>
           prevItems.filter((item) => item.id !== id)
         );
+        setFavoriteItems((prevFavoriteItems: Item[]) =>
+          prevFavoriteItems.filter((item) => item.id !== id)
+        );
       } catch (error) {
         handleError(error, 'アイテムの削除に失敗しました。');
       }
     },
-    [setItems, setSuccess]
+    [setItems, setFavoriteItems, setSuccess]
+  );
+
+  // お気に入りボタンクリック時の挙動
+  const handleFavoriteToggle = useCallback(
+    async (id: number, isFavorite: number) => {
+      try {
+        // お気に入りを反転
+        isFavorite = 1 - isFavorite;
+        const response = await changeColorFavoriteIcon(id, isFavorite);
+        if (response.isFavorite !== undefined) {
+          setIsFavorite(response.isFavorite);
+        }
+
+        // お気に入りリストの更新（1: リスト追加, 0: リスト削除）
+        if (response.isFavorite === 1) {
+          setFavoriteItems((prevFavoriteItems: Item[]) => [
+            ...prevFavoriteItems,
+            { ...response.item },
+          ]);
+        } else {
+          setFavoriteItems((prevFavoriteItems: Item[]) =>
+            prevFavoriteItems.filter((item) => item.id !== id)
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [setIsFavorite, setFavoriteItems]
   );
 
   if (loading || !user) {
@@ -143,6 +177,7 @@ const Home: React.FC = () => {
               items={items}
               setItems={setItems}
               deleteItemHandler={deleteItemHandler}
+              handleFavoriteToggle={handleFavoriteToggle}
               setErrors={setErrors}
               setSuccess={setSuccess}
             />
@@ -157,6 +192,7 @@ const Home: React.FC = () => {
               favoriteItems={favoriteItems}
               setFavoriteItems={setFavoriteItems}
               deleteItemHandler={deleteItemHandler}
+              handleFavoriteToggle={handleFavoriteToggle}
               setErrors={setErrors}
               setSuccess={setSuccess}
             />
