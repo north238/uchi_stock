@@ -8,6 +8,7 @@ const ItemList: React.FC<ItemListProps> = ({
   items,
   setItems,
   deleteItemHandler,
+  handleFavoriteToggle,
   setErrors,
   setSuccess,
 }: ItemListProps) => {
@@ -25,7 +26,9 @@ const ItemList: React.FC<ItemListProps> = ({
               key={item.id}
               item={item}
               setItems={setItems}
+              isFavorite={item.is_favorite ?? 0}
               deleteItem={deleteItemHandler}
+              handleFavoriteToggle={handleFavoriteToggle}
               setErrors={setErrors}
               setSuccess={setSuccess}
             />

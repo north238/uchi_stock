@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-use function Laravel\Prompts\error;
-
 class ItemController extends Controller
 {
 
@@ -58,7 +56,7 @@ class ItemController extends Controller
         return response()->json([
             'message' => 'アイテムの登録に成功しました。',
             'data' => $item
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -72,7 +70,7 @@ class ItemController extends Controller
         return response()->json([
             'message' => 'アイテムの取得に成功しました。',
             'data' => $item
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -109,7 +107,7 @@ class ItemController extends Controller
             Log::error(["message" => $e->getMessage()]);
             return response()->json([
                 'message' => $e->getMessage(),
-            ], 500);
+            ], 401);
         }
     }
 
@@ -122,7 +120,7 @@ class ItemController extends Controller
         $item = $this->item->getUserToItem($userId, $id);
 
         if (!$item) {
-            return response()->json(['message' => 'アイテムが見つからないか、削除権限がありません。'], 404);
+            return response()->json(['message' => 'アイテムが見つからないか、削除権限がありません。'], 401);
         }
 
         try {
@@ -130,26 +128,26 @@ class ItemController extends Controller
             return response()->json(['message' => 'アイテムの削除に成功しました。']);
         } catch (\Exception $e) {
             Log::error(["message" => $e->getMessage()]);
-            return response()->json(['message' => 'アイテムの削除に失敗しました。'], 500);
+            return response()->json(['message' => 'アイテムの削除に失敗しました。'], 401);
         }
     }
 
     /**
      * アイテムのお気に入り更新
      */
-    public function changeColorFavoriteIcon($id)
+    public function changeColorFavoriteIcon(Request $request)
     {
         $userId = Auth::user()->id;
-        $item = $this->item->getUserToItem($userId, $id);
+        $id = $request->id;
+        $isFavorite = $request->isFavorite;
 
         try {
-            $item->is_favorite = $item->is_favorite ? 0 : 1;
-            $item->save();
+            $updatedItem = $this->item->updateFavorite($id, $userId, $isFavorite);
 
-            return response()->json(['isFavorite' => $item->is_favorite]);
+            return response()->json(['item' => $updatedItem, 'isFavorite' => $updatedItem->is_favorite ?? 0]);
         } catch (Exception $e) {
             Log::error(["message" => $e->getMessage()]);
-            return response()->json(['message' => 'お気に入りアイコン更新に失敗しました。'], 500);
+            return response()->json(['message' => 'お気に入りアイコン更新に失敗しました。'], 401);
         }
     }
 
@@ -160,7 +158,6 @@ class ItemController extends Controller
     {
         $userId = Auth::user()->id;
         $items = $this->item->fetchFavoriteItemData($userId);
-        Log::debug($items);
 
         return response()->json($items, 200);
     }
