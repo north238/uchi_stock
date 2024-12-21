@@ -51,10 +51,11 @@ const fetchAllData = async () => {
 };
 
 const changeColorFavoriteIcon = async (
-  id: number
+  id: number,
+  isFavorite: number
 ): Promise<CreateItemResponse> => {
   await initializeCsrfToken();
-  const response = await api.post(`/favorites/${id}`);
+  const response = await api.post(`/favorites/${id}`, { id, isFavorite });
   return response.data;
 };
 

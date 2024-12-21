@@ -76,8 +76,8 @@ class Item extends Model
     public function getUserToItem($userId, $id)
     {
         $result = Item::query()
-            ->where('id', $id)
             ->where('user_id', $userId)
+            ->where('id', $id)
             ->first();
 
         return $result;
@@ -98,5 +98,24 @@ class Item extends Model
             ->get();
 
         return $result;
+    }
+
+    /**
+     * お気に入りの更新
+     *
+     * @param string $id アイテムID
+     * @param integer $userId ユーザーID
+     * @param integer $isFavorite お気に入り状態
+     *
+     * @return object $item 更新されたアイテム
+     */
+    public function updateFavorite($id, $userId, $isFavorite)
+    {
+        $item = $this->getUserToItem($userId, $id);
+
+        $item->is_favorite = $isFavorite;
+        $item->save();
+
+        return $item;
     }
 }

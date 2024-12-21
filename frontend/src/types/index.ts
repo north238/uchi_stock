@@ -21,7 +21,7 @@ export interface Item {
   genre_id: string;
   category_id: string;
   location_id: string;
-  is_favorite?: boolean;
+  is_favorite?: number;
 }
 
 export interface CreateItemRequest {
@@ -31,7 +31,7 @@ export interface CreateItemRequest {
   genre_id: string;
   category_id: string;
   location_id: string;
-  is_favorite?: boolean;
+  is_favorite?: number;
 }
 
 export interface UpdatedItemRequest {
@@ -53,7 +53,9 @@ export interface CreateItemResponse {
 export interface ItemCardProps {
   item: Item;
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  isFavorite: number;
   deleteItem: (id: number) => void;
+  handleFavoriteToggle: (id: number, isFavorite: number) => void;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -122,6 +124,7 @@ export interface ItemListProps {
   items: Item[];
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   deleteItemHandler: (id: number) => void;
+  handleFavoriteToggle: (id: number, isFavorite: number) => void;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -130,6 +133,7 @@ export interface ShoppingListProps {
   favoriteItems: Item[];
   setFavoriteItems: React.Dispatch<React.SetStateAction<Item[]>>;
   deleteItemHandler: (id: number) => void;
+  handleFavoriteToggle: (id: number, isFavorite: number) => void;
   setErrors: React.Dispatch<React.SetStateAction<string | null>>;
   setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -164,6 +168,6 @@ export interface DataContextType {
 
 export interface FavoriteBtnProps {
   item: Item;
-  isFavorite: boolean;
-  setIsFavorite: (isFavorite: boolean) => void;
+  isFavorite: number;
+  handleFavoriteToggle: (id: number, isFavorite: number) => void;
 }

@@ -17,14 +17,14 @@ import FavoriteIconBtn from './FavoriteIconBtn';
 const ItemCard: React.FC<ItemCardProps> = ({
   item,
   setItems,
+  isFavorite,
   deleteItem,
+  handleFavoriteToggle,
   setErrors,
   setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
-  const [isFavorite, setIsFavorite] = useState<boolean>(
-    item.is_favorite ? true : false
-  );
+
   const handleItemEdit = () => {
     setOpen(true);
   };
@@ -59,7 +59,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <FavoriteIconBtn
             item={item}
             isFavorite={isFavorite}
-            setIsFavorite={setIsFavorite}
+            handleFavoriteToggle={handleFavoriteToggle}
           />
           <IconButton aria-label="share">
             <ShareIcon />
