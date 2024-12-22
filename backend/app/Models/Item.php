@@ -26,41 +26,63 @@ class Item extends Model
         'updated_at'
     ];
 
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function genre() {
+    public function genre()
+    {
         return $this->belongsTo(Genre::class);
     }
 
-    public function location() {
+    public function location()
+    {
         return $this->belongsTo(Location::class);
     }
 
-    public function groups() {
+    public function groups()
+    {
         return $this->belongsToMany(Group::class, 'group_item');
     }
 
-    public function tags() {
+    public function tags()
+    {
         return $this->belongsToMany(Tag::class, 'item_tag');
     }
 
     /**
      * ユーザーに紐づくアイテムの取得
      *
-     * @param string $userId ユーザーID
+     * @param integer $userId ユーザーID
+     *
      * @return collection $result ユーザーに紐づいたアイテム
      */
     public function getUserToItems($userId)
     {
-        $result = Item::query()
-            ->where('user_id', $userId)
-            ->orderBy('id', 'DESC')
+        // $result = Item::query()
+        //     ->with(['genre.color'])
+        //     ->where('user_id', $userId)
+        //     ->orderBy('created_at', 'DESC')
+        //     ->orderBy('genre_id', 'DESC')
+        //     ->get();
+
+        // return $result;
+        $subQuery = Item::query()
+            ->selectRaw('MAX(created_at) as latest_created_at')
+            ->whereColumn('genre_id', 'genres.id')
+            ->toSql();
+
+        $result = Genre::query()
+            ->with(['color', 'items' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }])
+            ->selectRaw("genres.*, ($subQuery) as latest_created_at")
             ->get();
 
         return $result;
@@ -69,13 +91,15 @@ class Item extends Model
     /**
      * ユーザーに紐づいたアイテムを取得
      *
-     * @param int $userId ユーザーID
-     * @param int $id アイテムID
+     * @param integer $userId ユーザーID
+     * @param integer $id アイテムID
+     *
      * @return \App\Models\Item|null 取得したアイテムオブジェクト、該当なしの場合はnull
      */
     public function getUserToItem($userId, $id)
     {
         $result = Item::query()
+            ->with(['genre.color'])
             ->where('user_id', $userId)
             ->where('id', $id)
             ->first();
@@ -86,15 +110,17 @@ class Item extends Model
     /**
      * お気に入りされたアイテムリストを取得
      *
-     * @param int $userId ユーザーID
+     * @param integer $userId ユーザーID
+     *
      * @return \App\Models\Item|null 取得したアイテムオブジェクト、該当なしの場合はnull
      */
     public function fetchFavoriteItemData($userId)
     {
         $result = Item::query()
+            ->with(['genre.color'])
             ->where('user_id', $userId)
             ->where('is_favorite', 1)
-            ->orderBy('id', 'DESC')
+            ->orderBy('created_at', 'DESC')
             ->get();
 
         return $result;

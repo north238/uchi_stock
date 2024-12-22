@@ -27,6 +27,7 @@ class ItemController extends Controller
     {
         $userId = Auth::user()->id;
         $items = $this->item->getUserToItems($userId);
+        Log::debug($items);
 
         if (empty($items)) {
             return response()->json(['error' => 'アイテムが見つからないか、アクセス権限がありません。'], 403);

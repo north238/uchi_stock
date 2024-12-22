@@ -53,6 +53,8 @@ const Home: React.FC = () => {
   const fetchItemsData = useCallback(async () => {
     try {
       const response = await getItems();
+      console.log(response);
+
       setItems(response);
     } catch (error) {
       handleError(error, 'アイテムの取得に失敗しました。');

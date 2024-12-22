@@ -24,6 +24,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
   setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
+  // const hexCode = item?.genre?.color?.hex_code ?? 'rgb(0, 0, 0)';
+  // console.log(hexCode);
 
   const handleItemEdit = () => {
     setOpen(true);
@@ -46,7 +48,17 @@ const ItemCard: React.FC<ItemCardProps> = ({
               </IconButton>
             }
             title={
-              <Typography gutterBottom variant="h5" component="div">
+              <Typography
+                gutterBottom
+                variant="h5"
+                component="div"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 200,
+                }}
+              >
                 {item.name}
               </Typography>
             }
