@@ -113,9 +113,8 @@ const Home: React.FC = () => {
       try {
         const response = await deleteItem(id);
         setSuccess(response.message);
-        console.log(items);
 
-        setItems(response.items);
+        setItems((prevItems: Item[]) => [...response.items]);
         setFavoriteItems((prevFavoriteItems: Item[]) =>
           prevFavoriteItems.filter((item) => item.id !== id)
         );

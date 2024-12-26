@@ -22,6 +22,10 @@ export interface Item {
   category_id: string;
   location_id: string;
   is_favorite?: number;
+  items?: Item[];
+  color: {
+    hex_code: string;
+  };
 }
 
 export interface CreateItemRequest {
@@ -46,7 +50,7 @@ export interface UpdatedItemRequest {
 export interface CreateItemResponse {
   message: string;
   item: Item;
-  items: Item;
+  items: Item[];
   isFavorite?: number;
 }
 

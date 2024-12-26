@@ -43,7 +43,7 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
       const response = await createItem(data);
 
       // 最新のアイテムデータに更新
-      setItems(response.items);
+      setItems((prevItems) => [...response.items]);
       setSuccess(response.message);
 
       // 入力フィールドをリセット

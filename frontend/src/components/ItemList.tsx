@@ -33,6 +33,7 @@ const ItemList: React.FC<ItemListProps> = ({
         />
         {items.map(
           (genre) =>
+            genre.items &&
             genre.items.length > 0 && (
               <Paper
                 key={genre.id}
