@@ -9,7 +9,7 @@ const Header: React.FC = () => {
   const { user } = useAuthContext();
 
   return (
-    <AppBar position="sticky">
+    <AppBar position="fixed">
       <Toolbar>
         <Typography
           variant="h6"

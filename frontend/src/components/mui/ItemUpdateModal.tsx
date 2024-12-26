@@ -77,7 +77,7 @@ export default function ItemUpdateModal({
       setItems((prevItems: Item[]) =>
         prevItems.map((prevItem) =>
           prevItem.id === item.id
-            ? response.data // APIから返却されたデータに置き換える
+            ? response.item // APIから返却されたデータに置き換える
             : prevItem
         )
       );

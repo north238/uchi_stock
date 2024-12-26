@@ -7,10 +7,20 @@ use Illuminate\Http\Request;
 
 class GenreController extends Controller
 {
+    /**
+     * @var Genre $genres
+     */
+    protected $genres;
+
+    public function __construct(Genre $genres)
+    {
+        $this->genres = $genres;
+    }
+
     public function index()
     {
-        // 全ジャンルを取得
-        $genres = Genre::all();
+        $genres = $this->genres->getGenresWithRelations();
+
         return response()->json($genres);
     }
 }
