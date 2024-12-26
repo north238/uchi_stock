@@ -100,7 +100,6 @@ class ItemController extends Controller
                 'message' => 'アイテムの更新に成功しました。',
                 'item' => $item
             ], 201);
-
         } catch (\Exception $e) {
             Log::error(["message" => $e->getMessage()]);
             return response()->json([
@@ -142,8 +141,9 @@ class ItemController extends Controller
 
         try {
             $updatedItem = $this->item->updateFavorite($id, $userId, $isFavorite);
+            $items = $this->item->getUserToItems($userId);
 
-            return response()->json(['item' => $updatedItem, 'isFavorite' => $updatedItem->is_favorite ?? 0], 200);
+            return response()->json(['item' => $updatedItem, 'items' => $items, 'isFavorite' => $updatedItem->is_favorite ?? 0], 200);
         } catch (Exception $e) {
             Log::error(["message" => $e->getMessage()]);
             return response()->json(['message' => 'お気に入りの更新に失敗しました。'], 401);

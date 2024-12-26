@@ -57,7 +57,7 @@ const Home: React.FC = () => {
     } catch (error) {
       handleError(error, 'アイテムの取得に失敗しました。');
     }
-  }, [setItems, isFavorite]);
+  }, [setItems]);
 
   // お気に入りアイテムの取得
   const fetchFavoriteItemData = useCallback(async () => {
@@ -130,11 +130,14 @@ const Home: React.FC = () => {
     async (id: number, isFavorite: number) => {
       try {
         // お気に入りを反転
-        isFavorite = 1 - isFavorite;
-        const response = await changeColorFavoriteIcon(id, isFavorite);
+        const newIsFavorite = 1 - isFavorite;
+        const response = await changeColorFavoriteIcon(id, newIsFavorite);
+
         if (response.isFavorite !== undefined) {
           setIsFavorite(response.isFavorite);
         }
+
+        setItems((prevItems: Item[]) => [...response.items]);
 
         // お気に入りリストの更新（1: リスト追加, 0: リスト削除）
         if (response.isFavorite === 1) {
