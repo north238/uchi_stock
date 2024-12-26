@@ -20,19 +20,33 @@ class Genre extends Model
         'updated_at'
     ];
 
-    public function items() {
+    public function items()
+    {
         return $this->hasMany(Item::class);
     }
 
-    public function categories() {
+    public function categories()
+    {
         return $this->hasMany(Category::class);
     }
 
-    public function color() {
+    public function color()
+    {
         return $this->belongsTo(Color::class);
     }
 
-    public function icon() {
+    public function icon()
+    {
         return $this->belongsTo(Icon::class);
+    }
+
+    /**
+     * ジャンルに紐づくカテゴリー、カラー、アイコンを取得
+     *
+     * @return collection $result ジャンルに紐づくカテゴリー、カラー、アイコン
+     */
+    public function getGenresWithRelations()
+    {
+        return Genre::with(['categories', 'color', 'icon'])->get();
     }
 }

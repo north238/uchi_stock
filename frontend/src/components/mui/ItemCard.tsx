@@ -24,6 +24,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
   setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
+  // const hexCode = item?.genre?.color?.hex_code ?? 'rgb(0, 0, 0)';
+  // console.log(hexCode);
 
   const handleItemEdit = () => {
     setOpen(true);
@@ -36,7 +38,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   return (
     <>
-      <Card sx={{ maxWidth: 345, mb: 1 }}>
+      <Card sx={{ maxWidth: 260, mb: 1, borderRadius: 2 }}>
         <CardContent sx={{ p: 1 }}>
           <CardHeader
             sx={{ p: 1 }}
@@ -46,7 +48,18 @@ const ItemCard: React.FC<ItemCardProps> = ({
               </IconButton>
             }
             title={
-              <Typography gutterBottom variant="h5" component="div">
+              <Typography
+                gutterBottom
+                variant="subtitle1"
+                component="div"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 200,
+                  fontWeight: 'bold',
+                }}
+              >
                 {item.name}
               </Typography>
             }
@@ -64,7 +77,11 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <IconButton aria-label="share">
             <ShareIcon />
           </IconButton>
-          <IconButton aria-label="delete" onClick={() => deleteItem(item.id)}>
+          <IconButton
+            aria-label="delete"
+            color="error"
+            onClick={() => deleteItem(item.id)}
+          >
             <DeleteOutlineIcon />
           </IconButton>
         </CardActions>

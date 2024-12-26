@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Paper, Typography, Grid } from '@mui/material';
+import { Paper, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthenticatedUser } from 'api/auth';
 import {
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
     } catch (error) {
       handleError(error, 'アイテムの取得に失敗しました。');
     }
-  }, [setItems, isFavorite]);
+  }, [setItems]);
 
   // お気に入りアイテムの取得
   const fetchFavoriteItemData = useCallback(async () => {
@@ -113,9 +113,8 @@ const Home: React.FC = () => {
       try {
         const response = await deleteItem(id);
         setSuccess(response.message);
-        setItems((prevItems: Item[]) =>
-          prevItems.filter((item) => item.id !== id)
-        );
+
+        setItems((prevItems: Item[]) => [...response.items]);
         setFavoriteItems((prevFavoriteItems: Item[]) =>
           prevFavoriteItems.filter((item) => item.id !== id)
         );
@@ -131,11 +130,14 @@ const Home: React.FC = () => {
     async (id: number, isFavorite: number) => {
       try {
         // お気に入りを反転
-        isFavorite = 1 - isFavorite;
-        const response = await changeColorFavoriteIcon(id, isFavorite);
+        const newIsFavorite = 1 - isFavorite;
+        const response = await changeColorFavoriteIcon(id, newIsFavorite);
+
         if (response.isFavorite !== undefined) {
           setIsFavorite(response.isFavorite);
         }
+
+        setItems((prevItems: Item[]) => [...response.items]);
 
         // お気に入りリストの更新（1: リスト追加, 0: リスト削除）
         if (response.isFavorite === 1) {
@@ -164,15 +166,9 @@ const Home: React.FC = () => {
       <AlertWithErrors errors={errors} setErrors={setErrors} />
       <AlertWithSuccess success={success} setSuccess={setSuccess} />
       <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
-        <Typography variant="h5" component="div">
-          アイテムと買い物リスト
-        </Typography>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid container spacing={3}>
           {/* アイテム一覧 */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" component="div">
-              アイテム一覧
-            </Typography>
+          <Grid item xs={12} md={9}>
             <ItemList
               items={items}
               setItems={setItems}
@@ -184,10 +180,7 @@ const Home: React.FC = () => {
           </Grid>
 
           {/* 買い物リスト */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" component="div">
-              買い物リスト
-            </Typography>
+          <Grid item xs={12} md={3}>
             <ShoppingList
               favoriteItems={favoriteItems}
               setFavoriteItems={setFavoriteItems}

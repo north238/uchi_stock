@@ -5,10 +5,17 @@ import Header from './Header';
 
 const Layout: React.FC = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
-      <Box component="main" sx={{ flexGrow: 1, py: 4 }}>
-        <Container maxWidth="lg">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        maxWidth: '100%',
+      }}
+    >
+      <Box component="main" sx={{ flexGrow: 1, pt: '64px' }}>
+        <Header />
+        <Container maxWidth="xl" sx={{ mt: 2 }}>
           <Outlet />
         </Container>
       </Box>

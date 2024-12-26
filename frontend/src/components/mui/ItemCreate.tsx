@@ -10,7 +10,7 @@ import {
   FormControl,
 } from '@mui/material';
 import { createItem } from 'api/ItemApi';
-import { Genre, Category, Location, ItemCreateProps, Item } from 'types';
+import { Genre, Category, Location, ItemCreateProps } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 
 const ItemCreate: React.FC<ItemCreateProps> = ({
@@ -42,8 +42,8 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
     try {
       const response = await createItem(data);
 
-      // 登録したアイテムを配列の先頭に表示する
-      setItems((prevItems: Item[]) => [response.data, ...prevItems]);
+      // 最新のアイテムデータに更新
+      setItems((prevItems) => [...response.items]);
       setSuccess(response.message);
 
       // 入力フィールドをリセット
