@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Paper, Typography, Grid } from '@mui/material';
+import { Paper, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthenticatedUser } from 'api/auth';
 import {
@@ -53,8 +53,6 @@ const Home: React.FC = () => {
   const fetchItemsData = useCallback(async () => {
     try {
       const response = await getItems();
-      console.log(response);
-
       setItems(response);
     } catch (error) {
       handleError(error, 'アイテムの取得に失敗しました。');
@@ -115,9 +113,9 @@ const Home: React.FC = () => {
       try {
         const response = await deleteItem(id);
         setSuccess(response.message);
-        setItems((prevItems: Item[]) =>
-          prevItems.filter((item) => item.id !== id)
-        );
+        console.log(items);
+
+        setItems(response.items);
         setFavoriteItems((prevFavoriteItems: Item[]) =>
           prevFavoriteItems.filter((item) => item.id !== id)
         );
@@ -166,15 +164,9 @@ const Home: React.FC = () => {
       <AlertWithErrors errors={errors} setErrors={setErrors} />
       <AlertWithSuccess success={success} setSuccess={setSuccess} />
       <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
-        <Typography variant="h5" component="div">
-          アイテムと買い物リスト
-        </Typography>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid container spacing={3}>
           {/* アイテム一覧 */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" component="div">
-              アイテム一覧
-            </Typography>
+          <Grid item xs={12} md={9}>
             <ItemList
               items={items}
               setItems={setItems}
@@ -186,10 +178,7 @@ const Home: React.FC = () => {
           </Grid>
 
           {/* 買い物リスト */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" component="div">
-              買い物リスト
-            </Typography>
+          <Grid item xs={12} md={3}>
             <ShoppingList
               favoriteItems={favoriteItems}
               setFavoriteItems={setFavoriteItems}

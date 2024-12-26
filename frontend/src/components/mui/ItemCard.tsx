@@ -38,7 +38,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   return (
     <>
-      <Card sx={{ maxWidth: 345, mb: 1 }}>
+      <Card sx={{ maxWidth: 260, mb: 1, borderRadius: 2 }}>
         <CardContent sx={{ p: 1 }}>
           <CardHeader
             sx={{ p: 1 }}
@@ -50,13 +50,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
             title={
               <Typography
                 gutterBottom
-                variant="h5"
+                variant="subtitle1"
                 component="div"
                 sx={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   maxWidth: 200,
+                  fontWeight: 'bold',
                 }}
               >
                 {item.name}
@@ -76,7 +77,11 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <IconButton aria-label="share">
             <ShareIcon />
           </IconButton>
-          <IconButton aria-label="delete" onClick={() => deleteItem(item.id)}>
+          <IconButton
+            aria-label="delete"
+            color="error"
+            onClick={() => deleteItem(item.id)}
+          >
             <DeleteOutlineIcon />
           </IconButton>
         </CardActions>

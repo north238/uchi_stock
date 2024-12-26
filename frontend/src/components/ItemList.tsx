@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  Card,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Typography, Paper } from '@mui/material';
 import { Item, ItemListProps } from 'types';
 import ItemCard from './mui/ItemCard';
-import AddItemCard from './mui/AddItemCard';
+import AddItemButton from './mui/AddItemButton';
 
 const ItemList: React.FC<ItemListProps> = ({
   items,
@@ -21,8 +14,19 @@ const ItemList: React.FC<ItemListProps> = ({
 }: ItemListProps) => {
   return (
     <>
-      <Typography variant="h5" component="div">
-        <AddItemCard
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+          gap: 1,
+          overflowX: 'scroll',
+          overflowY: 'auto',
+          border: '2px solid #ccc',
+          borderRadius: 2,
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        <AddItemButton
           setItems={setItems}
           setErrors={setErrors}
           setSuccess={setSuccess}
@@ -30,42 +34,42 @@ const ItemList: React.FC<ItemListProps> = ({
         {items.map(
           (genre) =>
             genre.items.length > 0 && (
-              <Accordion
+              <Paper
                 key={genre.id}
+                elevation={0}
+                variant="outlined"
                 sx={{
-                  maxWidth: 345,
-                  borderColor: genre.color?.hex_code || '#ccc',
-                  borderWidth: 2,
-                  borderStyle: 'solid',
+                  p: 2,
+                  mb: 1,
+                  minWidth: 295,
+                  height: 'fit-content',
+                  backgroundColor: genre.color.hex_code ?? '#f5f5f5',
+                  borderRadius: 2,
                 }}
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1-content"
-                  id={`${genre.id}-header`}
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  sx={{ fontWeight: 'bold', mb: 1 }}
                 >
-                  <Typography variant="body1" component="span">
-                    {genre.name} ({genre.items.length})
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {genre.items.map((item: Item) => (
-                    <ItemCard
-                      key={item.id}
-                      item={item}
-                      setItems={setItems}
-                      isFavorite={item.is_favorite ?? 0}
-                      deleteItem={deleteItemHandler}
-                      handleFavoriteToggle={handleFavoriteToggle}
-                      setErrors={setErrors}
-                      setSuccess={setSuccess}
-                    />
-                  ))}
-                </AccordionDetails>
-              </Accordion>
+                  {genre.name} ({genre.items.length})
+                </Typography>
+                {genre.items.map((item: Item) => (
+                  <ItemCard
+                    key={item.id}
+                    item={item}
+                    setItems={setItems}
+                    isFavorite={item.is_favorite ?? 0}
+                    deleteItem={deleteItemHandler}
+                    handleFavoriteToggle={handleFavoriteToggle}
+                    setErrors={setErrors}
+                    setSuccess={setSuccess}
+                  />
+                ))}
+              </Paper>
             )
         )}
-      </Typography>
+      </Box>
     </>
   );
 };

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ItemRequest;
 use App\Models\Item;
 use Exception;
 use Illuminate\Http\Request;
@@ -27,7 +28,6 @@ class ItemController extends Controller
     {
         $userId = Auth::user()->id;
         $items = $this->item->getUserToItems($userId);
-        Log::debug($items);
 
         if (empty($items)) {
             return response()->json(['error' => 'アイテムが見つからないか、アクセス権限がありません。'], 403);
@@ -39,25 +39,28 @@ class ItemController extends Controller
     /**
      * データベースへの登録
      */
-    public function store(Request $request)
+    public function store(ItemRequest $request)
     {
         $userId = Auth::user()->id;
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'quantity' => 'required|integer',
-            'genre_id' => 'required|exists:genres,id',
-            'category_id' => 'required|exists:categories,id',
-            'location_id' => 'required|exists:locations,id',
-        ]);
 
+        $validated = $request->validated();
         $validated['user_id'] = $userId;
 
-        $item = Item::create($validated);
-        return response()->json([
-            'message' => 'アイテムの登録に成功しました。',
-            'data' => $item
-        ], 200);
+        try {
+            $item = $this->item->create($validated);
+            Log::info(["message" => "アイテムの登録に成功しました。", "item" => $item]);
+            $items = $this->item->getUserToItems($userId);
+
+            return response()->json([
+                'message' => 'アイテムの登録に成功しました。',
+                'items' => $items
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error(["message" => $e->getMessage()]);
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 401);
+        }
     }
 
     /**
@@ -70,24 +73,17 @@ class ItemController extends Controller
 
         return response()->json([
             'message' => 'アイテムの取得に成功しました。',
-            'data' => $item
+            'item' => $item
         ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Item $item)
+    public function update(ItemRequest $request, Item $item)
     {
         $userId = Auth::user()->id;
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'genre_id' => 'required|exists:genres,id',
-            'category_id' => 'required|exists:categories,id',
-            'location_id' => 'required|exists:locations,id',
-        ]);
+        $validated = $request->validated();
 
         try {
             $item->update([
@@ -99,10 +95,11 @@ class ItemController extends Controller
                 'location_id' => $validated['location_id'],
                 'user_id' => $userId,
             ]);
+
             return response()->json([
                 'message' => 'アイテムの更新に成功しました。',
-                'data' => $item
-            ], 200);
+                'item' => $item
+            ], 201);
 
         } catch (\Exception $e) {
             Log::error(["message" => $e->getMessage()]);
@@ -126,7 +123,8 @@ class ItemController extends Controller
 
         try {
             $item->delete();
-            return response()->json(['message' => 'アイテムの削除に成功しました。']);
+            $items = $this->item->getUserToItems($userId);
+            return response()->json(['items' => $items, 'item' => $item, 'message' => 'アイテムの削除に成功しました。'], 200);
         } catch (\Exception $e) {
             Log::error(["message" => $e->getMessage()]);
             return response()->json(['message' => 'アイテムの削除に失敗しました。'], 401);
@@ -145,10 +143,10 @@ class ItemController extends Controller
         try {
             $updatedItem = $this->item->updateFavorite($id, $userId, $isFavorite);
 
-            return response()->json(['item' => $updatedItem, 'isFavorite' => $updatedItem->is_favorite ?? 0]);
+            return response()->json(['item' => $updatedItem, 'isFavorite' => $updatedItem->is_favorite ?? 0], 200);
         } catch (Exception $e) {
             Log::error(["message" => $e->getMessage()]);
-            return response()->json(['message' => 'お気に入りアイコン更新に失敗しました。'], 401);
+            return response()->json(['message' => 'お気に入りの更新に失敗しました。'], 401);
         }
     }
 

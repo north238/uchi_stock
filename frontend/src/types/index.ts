@@ -44,9 +44,9 @@ export interface UpdatedItemRequest {
 }
 
 export interface CreateItemResponse {
-  data: any;
   message: string;
   item: Item;
+  items: Item;
   isFavorite?: number;
 }
 
