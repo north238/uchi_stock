@@ -19,7 +19,8 @@ const ItemList: React.FC<ItemListProps> = ({
           display: 'flex',
           flexWrap: 'nowrap',
           gap: 1,
-          overflowX: 'scroll',
+          minHeight: 90,
+          overflowX: 'auto',
           overflowY: 'auto',
           border: '2px solid #ccc',
           borderRadius: 2,
@@ -31,44 +32,60 @@ const ItemList: React.FC<ItemListProps> = ({
           setErrors={setErrors}
           setSuccess={setSuccess}
         />
-        {items.map(
-          (genre) =>
-            genre.items &&
-            genre.items.length > 0 && (
-              <Paper
-                key={genre.id}
-                elevation={0}
-                variant="outlined"
-                sx={{
-                  p: 2,
-                  mb: 1,
-                  minWidth: 295,
-                  height: 'fit-content',
-                  backgroundColor: genre.color.hex_code ?? '#f5f5f5',
-                  borderRadius: 2,
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  component="div"
-                  sx={{ fontWeight: 'bold', mb: 1 }}
+        {items.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              p: 2,
+            }}
+          >
+            <Typography variant="body1" color="text.secondary">
+              アイテムがありません。「＋」ボタンから追加してください。
+            </Typography>
+          </Box>
+        ) : (
+          items.map(
+            (genre) =>
+              genre.items &&
+              genre.items.length > 0 && (
+                <Paper
+                  key={genre.id}
+                  elevation={0}
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    mb: 1,
+                    minWidth: 295,
+                    height: 'fit-content',
+                    backgroundColor: genre.color.hex_code ?? '#f5f5f5',
+                    borderRadius: 2,
+                  }}
                 >
-                  {genre.name} ({genre.items.length})
-                </Typography>
-                {genre.items.map((item: Item) => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    setItems={setItems}
-                    isFavorite={item.is_favorite ?? 0}
-                    deleteItem={deleteItemHandler}
-                    handleFavoriteToggle={handleFavoriteToggle}
-                    setErrors={setErrors}
-                    setSuccess={setSuccess}
-                  />
-                ))}
-              </Paper>
-            )
+                  <Typography
+                    variant="subtitle1"
+                    component="div"
+                    sx={{ fontWeight: 'bold', mb: 1 }}
+                  >
+                    {genre.name} ({genre.items.length})
+                  </Typography>
+                  {genre.items.map((item: Item) => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      setItems={setItems}
+                      isFavorite={item.is_favorite ?? 0}
+                      deleteItem={deleteItemHandler}
+                      handleFavoriteToggle={handleFavoriteToggle}
+                      setErrors={setErrors}
+                      setSuccess={setSuccess}
+                    />
+                  ))}
+                </Paper>
+              )
+          )
         )}
       </Box>
     </>

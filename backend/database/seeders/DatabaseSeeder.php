@@ -14,12 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            TagSeeder::class,
             LocationSeeder::class,
             ColorSeeder::class,
-            IconSeeder::class,
             GenreSeeder::class,
-            CategorySeeder::class,
             GroupSeeder::class,
             ItemSeeder::class,
             NotificationSeeder::class,

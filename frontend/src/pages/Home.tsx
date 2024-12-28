@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAuthenticatedUser } from 'api/auth';
 import {
   getItems,
-  fetchAllData,
+  fetchGenreData,
   fetchFavoriteItems,
   deleteItem,
   changeColorFavoriteIcon,
@@ -22,7 +22,7 @@ import { useDataContext } from 'contexts/DataContext';
 const Home: React.FC = () => {
   const { user, setUser } = useAuthContext();
   const { loading, setLoading } = useLoading();
-  const { setGenres, setCategories, setLocations } = useDataContext();
+  const { genres, setGenres } = useDataContext();
   const [errors, setErrors] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -70,16 +70,14 @@ const Home: React.FC = () => {
   }, [setFavoriteItems]);
 
   // 各種データの取得
-  const fetchAdditionalData = useCallback(async () => {
+  const genreData = useCallback(async () => {
     try {
-      const { genres, categories, locations } = await fetchAllData();
-      setGenres(genres);
-      setCategories(categories);
-      setLocations(locations);
+      const response = await fetchGenreData();
+      setGenres(response);
     } catch (error) {
       handleError(error, '選択データの取得に失敗しました。');
     }
-  }, [setGenres, setCategories, setLocations]);
+  }, [setGenres]);
 
   // データ一括取得
   const fetchItemsWithDetails = useCallback(async () => {
@@ -88,19 +86,13 @@ const Home: React.FC = () => {
       await fetchUser();
       await fetchItemsData();
       await fetchFavoriteItemData();
-      await fetchAdditionalData();
+      await genreData();
     } catch (error: any) {
       handleError(error, '選択データの取得に失敗しました。');
     } finally {
       setLoading(false);
     }
-  }, [
-    fetchUser,
-    fetchItemsData,
-    fetchFavoriteItemData,
-    fetchAdditionalData,
-    setLoading,
-  ]);
+  }, [fetchUser, fetchItemsData, fetchFavoriteItemData, genreData, setLoading]);
 
   // 初期データ取得
   useEffect(() => {

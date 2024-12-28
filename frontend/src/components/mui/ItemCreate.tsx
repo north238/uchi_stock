@@ -10,7 +10,7 @@ import {
   FormControl,
 } from '@mui/material';
 import { createItem } from 'api/ItemApi';
-import { Genre, Category, Location, ItemCreateProps } from 'types';
+import { Genre, ItemCreateProps } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 
 const ItemCreate: React.FC<ItemCreateProps> = ({
@@ -21,11 +21,9 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
 }: ItemCreateProps) => {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [description, setDescription] = useState('');
   const [genreId, setGenreId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const { genres, categories, locations } = useDataContext();
+  const [description, setDescription] = useState('');
+  const { genres } = useDataContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +31,8 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
     const data = {
       name,
       quantity,
-      description,
       genre_id: genreId,
-      category_id: categoryId,
-      location_id: locationId,
+      description,
     };
 
     try {
@@ -49,10 +45,8 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
       // 入力フィールドをリセット
       setName('');
       setQuantity(1);
-      setDescription('');
       setGenreId('');
-      setCategoryId('');
-      setLocationId('');
+      setDescription('');
       setErrors(null);
     } catch (error) {
       console.error('登録に失敗しました:', error);
@@ -95,41 +89,12 @@ const ItemCreate: React.FC<ItemCreateProps> = ({
             onChange={(e) => setGenreId(e.target.value)}
             required
           >
-            {genres.map((genre: Genre) => (
-              <MenuItem key={genre.id} value={genre.id}>
-                {genre.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="category-select-label">カテゴリ名</InputLabel>
-          <Select
-            labelId="category-select-label"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            required
-          >
-            {categories.map((category: Category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="location-select-label">保管場所</InputLabel>
-          <Select
-            labelId="location-select-label"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-            required
-          >
-            {locations.map((location: Location) => (
-              <MenuItem key={location.id} value={location.id}>
-                {location.name}
-              </MenuItem>
-            ))}
+            {genres &&
+              genres.map((genre: Genre) => (
+                <MenuItem key={genre.genre_id} value={genre.genre_id}>
+                  {genre.genre_name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         <TextField

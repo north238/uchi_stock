@@ -4,6 +4,7 @@ import {
   CreateItemRequest,
   CreateItemResponse,
   UpdatedItemRequest,
+  GenreResponse,
 } from 'types';
 
 const getItems = async (): Promise<Item[]> => {
@@ -35,19 +36,10 @@ const deleteItem = async (id: number): Promise<CreateItemResponse> => {
   return response.data;
 };
 
-const fetchAllData = async () => {
+const fetchGenreData = async (): Promise<GenreResponse> => {
   await initializeCsrfToken();
-  const [genreRes, categoryRes, locationRes] = await Promise.all([
-    api.get('/genres'),
-    api.get('/categories'),
-    api.get('/locations'),
-  ]);
-
-  return {
-    genres: genreRes.data,
-    categories: categoryRes.data,
-    locations: locationRes.data,
-  };
+  const response = await api.get('/genres');
+  return response.data;
 };
 
 const changeColorFavoriteIcon = async (
@@ -71,7 +63,7 @@ export {
   createItem,
   EditItem,
   deleteItem,
-  fetchAllData,
+  fetchGenreData,
   changeColorFavoriteIcon,
   fetchFavoriteItems,
 };

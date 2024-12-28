@@ -19,8 +19,6 @@ export interface Item {
   quantity: number;
   description?: string;
   genre_id: string;
-  category_id: string;
-  location_id: string;
   is_favorite?: number;
   items?: Item[];
   color: {
@@ -33,8 +31,6 @@ export interface CreateItemRequest {
   quantity: number;
   description?: string;
   genre_id: string;
-  category_id: string;
-  location_id: string;
   is_favorite?: number;
 }
 
@@ -42,8 +38,6 @@ export interface UpdatedItemRequest {
   name: string;
   quantity: number;
   genre_id: string;
-  category_id: string;
-  location_id: string;
   description: string;
 }
 
@@ -100,18 +94,15 @@ export interface ErrorResponse {
 }
 
 export interface Genre {
-  id: number;
-  name: string;
+  genre_id: number;
+  genre_name: string;
+  color_name: string;
+  hex_code: string;
 }
 
-export interface Category {
-  id: number;
-  name: string;
-}
-
-export interface Location {
-  id: number;
-  name: string;
+export interface GenreResponse {
+  message?: string;
+  genres: Genre[];
 }
 
 export interface AlertWithSuccessProps {
@@ -163,11 +154,7 @@ export interface LoadingContextType {
 
 export interface DataContextType {
   genres: Genre[];
-  categories: Category[];
-  locations: Location[];
-  setGenres: (genres: Genre[]) => void;
-  setCategories: (categories: Category[]) => void;
-  setLocations: (locations: Location[]) => void;
+  setGenres: React.Dispatch<React.SetStateAction<Genre[]>>;
 }
 
 export interface FavoriteBtnProps {

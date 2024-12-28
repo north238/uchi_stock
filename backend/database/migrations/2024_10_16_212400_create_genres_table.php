@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('ジャンル名');
             $table->foreignId('color_id')->default(1)->constrained('colors')->comment('色ID_デフォルト値を設定');
-            $table->foreignId('icon_id')->default(1)->constrained('icons')->comment('アイコンID_デフォルト値を設定');
             $table->timestamps();
         });
     }
