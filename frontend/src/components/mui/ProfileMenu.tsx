@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from 'hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const ProfileMenu: React.FC = () => {
   const { logout } = useAuth();
@@ -49,8 +50,13 @@ const ProfileMenu: React.FC = () => {
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >
-        <MenuItem>
-          <Typography sx={{ textAlign: 'center' }}>プロフィール</Typography>
+        <MenuItem onClick={handleCloseUserMenu}>
+          <Link
+            to="/profile"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <Typography sx={{ textAlign: 'center' }}>プロフィール</Typography>
+          </Link>
         </MenuItem>
         <MenuItem onClick={logout}>
           <Typography sx={{ textAlign: 'center' }}>ログアウト</Typography>

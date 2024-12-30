@@ -6,11 +6,13 @@ import NoMatch from '../pages/NoMatch';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import LineLoginSuccess from 'pages/LineLoginSuccess';
+import Profile from '../pages/Profile';
 
 const AppRoutes: React.FC = () => (
   <Routes>
     <Route element={<Layout />}>
       <Route path="/" element={<Home />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
 

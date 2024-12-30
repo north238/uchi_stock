@@ -67,7 +67,10 @@ const ItemList: React.FC<ItemListProps> = ({
                   <Typography
                     variant="subtitle1"
                     component="div"
-                    sx={{ fontWeight: 'bold', mb: 1 }}
+                    sx={{
+                      fontWeight: 'bold',
+                      mb: 1,
+                    }}
                   >
                     {genre.name} ({genre.items.length})
                   </Typography>

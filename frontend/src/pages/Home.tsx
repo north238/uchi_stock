@@ -83,10 +83,12 @@ const Home: React.FC = () => {
   const fetchItemsWithDetails = useCallback(async () => {
     setLoading(true);
     try {
-      await fetchUser();
-      await fetchItemsData();
-      await fetchFavoriteItemData();
-      await genreData();
+      await Promise.all([
+        fetchUser(),
+        fetchItemsData(),
+        fetchFavoriteItemData(),
+        genreData(),
+      ]);
     } catch (error: any) {
       handleError(error, '選択データの取得に失敗しました。');
     } finally {
@@ -97,6 +99,7 @@ const Home: React.FC = () => {
   // 初期データ取得
   useEffect(() => {
     fetchItemsWithDetails();
+    console.log('fetchItemsWithDetails()');
   }, [fetchItemsWithDetails]);
 
   // アイテム削除
