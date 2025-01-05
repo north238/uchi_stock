@@ -12,9 +12,23 @@ import {
 } from '@mui/material';
 import { useAuthContext } from 'contexts/AuthContext';
 import Loader from 'components/ui/Loader';
+import GroupCreateModal from 'components/mui/GroupCreateModal';
 
 const Profile = () => {
   const { user } = useAuthContext();
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
+
+  const handleGroupSubmit = (groupData: {
+    name: string;
+    description: string;
+    approvalMessage: string;
+  }) => {
+    console.log('登録するグループデータ:', groupData);
+    // APIに送信する処理をここに追加
+  };
 
   if (!user) {
     return <Loader />;
@@ -90,15 +104,19 @@ const Profile = () => {
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={() => {
-                  /* パスワード変更処理 */
-                }}
+                onClick={handleModalOpen}
               >
-                パスワード変更
+                グループを追加
               </Button>
             </Box>
           </Paper>
         </Box>
+        {/* モーダルを設置 */}
+        <GroupCreateModal
+          open={isModalOpen}
+          onClose={handleModalClose}
+          onSubmit={handleGroupSubmit}
+        />
       </Container>
     </>
   );
