@@ -22,6 +22,7 @@ const Profile = () => {
   const handleModalClose = () => setModalOpen(false);
 
   const handleGroupSubmit = (groupData: {
+    users: number[];
     name: string;
     description: string;
     approvalMessage: string;
