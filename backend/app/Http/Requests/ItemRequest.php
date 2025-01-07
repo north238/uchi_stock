@@ -17,11 +17,9 @@ class ItemRequest extends FormRequest
   {
     return [
       'name' => ['required', 'string', 'max:255'],
-      'description' => ['nullable', 'string', 'max:255'],
       'quantity' => ['required', 'integer'],
       'genre_id' => ['required', 'exists:genres,id'],
-      'category_id' => ['required', 'exists:categories,id'],
-      'location_id' => ['required', 'exists:locations,id'],
+      'description' => ['nullable', 'string', 'max:255'],
     ];
   }
 }

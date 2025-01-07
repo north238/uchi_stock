@@ -88,11 +88,9 @@ class ItemController extends Controller
         try {
             $item->update([
                 'name' => $validated['name'],
-                'description' => $validated['description'],
                 'quantity' => $validated['quantity'],
                 'genre_id' => $validated['genre_id'],
-                'category_id' => $validated['category_id'],
-                'location_id' => $validated['location_id'],
+                'description' => $validated['description'],
                 'user_id' => $userId,
             ]);
 

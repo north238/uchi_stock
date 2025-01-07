@@ -11,14 +11,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import {
-  Category,
-  Genre,
-  Location,
-  ItemUpdateModalProps,
-  UpdatedItemRequest,
-  Item,
-} from 'types';
+import { Genre, ItemUpdateModalProps, UpdatedItemRequest, Item } from 'types';
 import { useDataContext } from 'contexts/DataContext';
 import { EditItem } from 'api/ItemApi';
 
@@ -34,9 +27,7 @@ export default function ItemUpdateModal({
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');
   const [genreId, setGenreId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const { genres, categories, locations } = useDataContext();
+  const { genres } = useDataContext();
 
   useEffect(() => {
     const fetchItemData = async () => {
@@ -44,8 +35,6 @@ export default function ItemUpdateModal({
         setName(item.name);
         setQuantity(item.quantity);
         setGenreId(item.genre_id);
-        setCategoryId(item.category_id);
-        setLocationId(item.location_id);
         setDescription(item.description || '');
       }
     };
@@ -65,8 +54,6 @@ export default function ItemUpdateModal({
       name,
       quantity,
       genre_id: genreId,
-      category_id: categoryId,
-      location_id: locationId,
       description,
     };
 
@@ -129,41 +116,12 @@ export default function ItemUpdateModal({
               onChange={(e) => setGenreId(e.target.value)}
               required
             >
-              {genres.map((genre: Genre) => (
-                <MenuItem key={genre.id} value={genre.id}>
-                  {genre.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="category-select-label">カテゴリ名</InputLabel>
-            <Select
-              labelId="category-select-label"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              required
-            >
-              {categories.map((category: Category) => (
-                <MenuItem key={category.id} value={category.id}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="location-select-label">保管場所</InputLabel>
-            <Select
-              labelId="location-select-label"
-              value={locationId}
-              onChange={(e) => setLocationId(e.target.value)}
-              required
-            >
-              {locations.map((location: Location) => (
-                <MenuItem key={location.id} value={location.id}>
-                  {location.name}
-                </MenuItem>
-              ))}
+              {genres &&
+                genres.map((genre: Genre) => (
+                  <MenuItem key={genre.genre_id} value={genre.genre_id}>
+                    {genre.genre_name}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
           <TextField

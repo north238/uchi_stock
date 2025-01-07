@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GenreController extends Controller
 {
@@ -20,7 +21,6 @@ class GenreController extends Controller
     public function index()
     {
         $genres = $this->genres->getGenresWithRelations();
-
         return response()->json($genres);
     }
 }
