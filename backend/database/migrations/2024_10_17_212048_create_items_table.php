@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->comment('ユーザーID');
             $table->unsignedBigInteger('genre_id')->comment('ジャンルID');
             $table->integer('quantity')->default(1)->comment('数量_デフォルト値は1');
-            $table->boolean('is_favorite')->default(false)->comment('お気に入りフラグ_デフォルト値はfalse');
+            $table->integer('is_favorite')->default(0)->comment('お気に入りフラグ, 0:お気に入りにしていない, 1:お気に入りにしている');
             $table->string('description')->nullable()->comment('アイテムの説明');
             $table->timestamps();
 

@@ -24,8 +24,6 @@ const ItemCard: React.FC<ItemCardProps> = ({
   setSuccess,
 }: ItemCardProps) => {
   const [open, setOpen] = useState(false);
-  // const hexCode = item?.genre?.color?.hex_code ?? 'rgb(0, 0, 0)';
-  // console.log(hexCode);
 
   const handleItemEdit = () => {
     setOpen(true);
