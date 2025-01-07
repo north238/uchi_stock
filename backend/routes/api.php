@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SocialAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('/favorites', [ItemController::class, 'fetchFavoriteItemData']);
 
   Route::get('/genres', [GenreController::class, 'index']);
+
+
+  // 通知関係の処理
+  Route::get('/notifications', [NotificationController::class, 'index']);
+  Route::post('/notifications', [NotificationController::class, 'store']);
+  Route::post('/notifications/{notification}/approve', [NotificationController::class, 'approve']);
 });
 
 // LINE認証

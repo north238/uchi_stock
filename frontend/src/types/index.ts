@@ -162,3 +162,13 @@ export interface FavoriteBtnProps {
   isFavorite: number;
   handleFavoriteToggle: (id: number, isFavorite: number) => void;
 }
+
+export interface NotificationsData {
+  user_id: number;
+  item_id: number;
+  message: string;
+  status: number;
+  type: number;
+  priority: number;
+  sent_at: string;
+}

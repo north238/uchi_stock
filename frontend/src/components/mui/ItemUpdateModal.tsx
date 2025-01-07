@@ -30,16 +30,13 @@ export default function ItemUpdateModal({
   const { genres } = useDataContext();
 
   useEffect(() => {
-    const fetchItemData = async () => {
-      if (item) {
-        setName(item.name);
-        setQuantity(item.quantity);
-        setGenreId(item.genre_id);
-        setDescription(item.description || '');
-      }
-    };
-    fetchItemData();
-    console.log('ダイアログ');
+    if (open && item) {
+      setName(item.name);
+      setQuantity(item.quantity);
+      setGenreId(item.genre_id);
+      setDescription(item.description || '');
+      console.log('ダイアログが開きました');
+    }
   }, [open, item]);
 
   // モーダルを閉じる
@@ -59,6 +56,8 @@ export default function ItemUpdateModal({
 
     try {
       const response = await EditItem(item.id, updatedItem);
+
+      console.log(response);
 
       // 成功時に状態を更新する
       setItems((prevItems: Item[]) =>
