@@ -46,12 +46,12 @@ ENV PATH $PATH:/composer/vendor/bin
 
 WORKDIR /var/www/html
 
-COPY ./backend .
+COPY ./backend ./
 COPY ./docker/laravel/php.ini /usr/local/etc/php/
 COPY ./docker/laravel/www.conf /usr/local/etc/php-fpm.d/www-custom.conf
 
 # xdebugを稼働させるために必要
-RUN mkdir -p /var/log && chmod -R 777 /var/log
+RUN mkdir -p /var/log && chmod -R 775 /var/log
 
 # nginxからのアクセスを可能にするため
 RUN chown -R www-data:www-data /var/www/html/ && \

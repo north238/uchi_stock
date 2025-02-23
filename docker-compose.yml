@@ -45,8 +45,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/laravel/Dockerfile
-    ports:
-      - '9000:9000'
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
@@ -74,7 +72,7 @@ services:
     ports:
       - '8080:80'
     volumes:
-      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     working_dir: /var/www/html
     depends_on:
       - backend
