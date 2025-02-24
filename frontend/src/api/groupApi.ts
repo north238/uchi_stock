@@ -7,7 +7,7 @@ const getGroup = async () => {
   return response.data;
 };
 
-const createGroup = async (groupData: GroupData) => {
+const createGroup = async (groupData: any) => {
   await initializeCsrfToken();
   const response = await api.post('/group', groupData);
   return response.data;

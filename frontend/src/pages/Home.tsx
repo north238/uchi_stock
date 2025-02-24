@@ -73,7 +73,7 @@ const Home: React.FC = () => {
   const genreData = useCallback(async () => {
     try {
       const response = await fetchGenreData();
-      setGenres(response);
+      setGenres(response.genres);
     } catch (error) {
       handleError(error, '選択データの取得に失敗しました。');
     }

@@ -138,6 +138,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  created_at: string | number;
 }
 
 export interface AuthContextType {
