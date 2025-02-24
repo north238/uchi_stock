@@ -1,5 +1,5 @@
 const connectWebSocket = (): WebSocket => {
-  const socket = new WebSocket('ws://localhost:3001/ws');
+  const socket = new WebSocket('ws://localhost:3000/ws');
 
   socket.onopen = () => {
     console.log('WebSocket connected');

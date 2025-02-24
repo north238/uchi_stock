@@ -5,6 +5,7 @@ COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
 COPY ./backend /var/www/html
+# COPY ./frontend/build /usr/share/nginx/html
 
 # Laravelの権限設定（Nginxユーザーでアクセス可能に）
 RUN adduser -s /bin/sh -D -G www-data www-data \
