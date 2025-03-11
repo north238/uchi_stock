@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: stockers_db
+    container_name: uchistock-db
     build:
       context: .
       dockerfile: ./docker/mysql/Dockerfile
@@ -16,74 +16,69 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./docker/mysql/logs:/var/log/mysql
     networks:
-      - stockers_network
+      - uchistock_network
     env_file:
       - .env
 
-  frontend:
-    container_name: stockers_frontend
-    build:
-      context: .
-      dockerfile: ./docker/react/Dockerfile
+  redis:
+    container_name: uchistock-redis
+    image: redis:6.2.14
     ports:
-      - '3001:3000'
+      - '6579:6379'
     volumes:
-      - ./frontend:/usr/src/app
-      - react-data:/usr/src/app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - redis_data:/data
     networks:
-      - stockers_network
-    env_file:
-      - .env
+      - uchistock_network
 
-  backend:
-    container_name: stockers_backend
+  app:
+    container_name: uchistock-app
     build:
       context: .
-      dockerfile: ./docker/laravel/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - NODE_ENV=DEVELOPMENT
+      - NODE_ENV=${NODE_ENV}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
     volumes:
-      - ./backend:/var/www/html
+      - ./php:/var/www/html
     working_dir: /var/www/html
     tty: true
     depends_on:
       - db
+      - redis
     networks:
-      - stockers_network
+      - uchistock_network
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file:
       - .env
 
   web:
-    container_name: stockers_web
+    container_name: uchistock-web
     build:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     ports:
       - '8080:80'
     volumes:
+      - ./htdocs:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     working_dir: /var/www/html
     depends_on:
-      - backend
-      - frontend
+      - app
+      - redis
     networks:
-      - stockers_network
+      - uchistock_network
 
 networks:
-  stockers_network:
+  uchistock_network:
     driver: bridge
 
 volumes:
   mysql_data:
-  react-data:
+  redis_data:
