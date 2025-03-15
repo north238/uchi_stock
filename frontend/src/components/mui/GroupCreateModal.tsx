@@ -12,6 +12,7 @@ import {
   MenuItem,
   Checkbox,
   ListItemText,
+  SelectChangeEvent,
 } from '@mui/material';
 import { User } from 'types';
 
@@ -36,8 +37,18 @@ const GroupCreateModal: React.FC<GroupCreateModalProps> = ({
   const [groupDescription, setGroupDescription] = useState('');
   const [approvalMessage, setApprovalMessage] = useState('');
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedUsers(event.target.value as number[]);
+  const handleChange = (
+    event: SelectChangeEvent<number[]>,
+    child: React.ReactNode
+  ): void => {
+    const value = event.target.value;
+
+    // stringの場合はnumberに変換する
+    const newSelectedUsers = Array.isArray(value)
+      ? value
+      : [parseInt(value, 10)];
+
+    setSelectedUsers(newSelectedUsers);
   };
 
   interface User {
@@ -78,7 +89,7 @@ const GroupCreateModal: React.FC<GroupCreateModalProps> = ({
             required
             value={selectedUsers}
             onChange={handleChange}
-            renderValue={(selected) =>
+            renderValue={(selected: any) =>
               (selected as number[])
                 .map((id) => users.find((user) => user.id === id)?.name)
                 .join(', ')

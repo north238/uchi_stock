@@ -24,12 +24,12 @@ const NotificationCreate: React.FC = () => {
     e.preventDefault();
 
     const notificationData = {
-      user_id: userId,
-      item_id: itemId,
-      message,
-      status,
-      type,
-      priority,
+      user_id: parseInt(userId, 10), // stringをnumberに変換
+      item_id: parseInt(itemId, 10),
+      message: message,
+      status: status || 0, // 空文字の場合は0をデフォルトにする
+      type: type || 0, // 空文字の場合は0をデフォルトにする
+      priority: priority || 0, // 空文字の場合は0をデフォルトにする
       sent_at: sentAt,
     };
     console.log(notificationData);

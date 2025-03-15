@@ -92,9 +92,9 @@ const Notification = () => {
       </Button>
       <List>
         {notifications &&
-          notifications.map((notification) => (
+          notifications.map((notification: any) => (
             <ListItem
-              button="true"
+              component="a"
               key={notification.id}
               onClick={() => handleNotificationClick(notification)}
             >
