@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
@@ -30,5 +31,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
+
+Route::get('/counter', Counter::class);
 
 require __DIR__.'/auth.php';
