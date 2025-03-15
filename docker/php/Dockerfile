@@ -16,7 +16,9 @@ RUN apk add --no-cache \
     php-mysqli \
     mysql-client \
     linux-headers \
-    bash
+    bash \
+    nodejs \
+    npm
 
 # PHP拡張機能をインストール
 RUN pecl install redis xdebug && \
@@ -37,17 +39,6 @@ RUN pecl install redis xdebug && \
 # 不要なパッケージを削除
 RUN apk del $PHPIZE_DEPS
 
-# nodejsをマルチステージビルドでインストール
-FROM node:20-alpine AS node-build
-
-WORKDIR /var/www/html
-
-COPY ./htdocs/package.json ./htdocs/package-lock.json ./
-
-RUN npm install
-
-FROM php-fpm AS final
-
 # Composer install 2.7.2
 COPY --from=composer:2.7.2 /usr/bin/composer /usr/local/bin/composer
 
@@ -55,12 +46,12 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
 ENV PATH $PATH:/composer/vendor/bin
 
-# Node.jsのビルド成果物をコピー
-COPY --from=node-build /var/www/html/public /var/www/html/public
-
 COPY ./htdocs ./
 COPY ./docker/php/php.ini /usr/local/etc/php/
 COPY ./docker/php/www.conf /usr/local/etc/php-fpm.d/www-custom.conf
+
+# node_modulesをインストール
+RUN npm install
 
 # xdebugを稼働させるために必要
 RUN mkdir -p /var/log && chmod -R 777 /var/log
