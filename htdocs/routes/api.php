@@ -1,15 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\GenreController;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SocialAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,38 +14,6 @@ use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 |
 */
 
-// 認証用
-Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
-
-// ログイン関係の処理
-Route::middleware(['web'])->group(
-  function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-  }
-);
-
-Route::middleware(['auth:sanctum'])->group(function () {
-  Route::get('/user', [AuthController::class, 'getUser']);
-
-  // アイテムCRUD処理
-  Route::apiResource('items', ItemController::class);
-
-  Route::post('/favorites/{id}', [ItemController::class, 'changeColorFavoriteIcon']);
-  Route::get('/favorites', [ItemController::class, 'fetchFavoriteItemData']);
-
-  Route::get('/genres', [GenreController::class, 'index']);
-
-
-  // 通知関係の処理
-  Route::get('/notifications', [NotificationController::class, 'index']);
-  Route::post('/notifications', [NotificationController::class, 'store']);
-  Route::post('/notifications/{notification}/approve', [NotificationController::class, 'approve']);
-});
-
-// LINE認証
-Route::middleware(['web'])->group(function () {
-  Route::get('/auth/line/redirect', [SocialAccountController::class, 'socialLogin']);
-  Route::get('/auth/line/callback', [SocialAccountController::class, 'handleProviderCallback']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });
