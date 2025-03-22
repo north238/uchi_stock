@@ -13,7 +13,9 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
+        "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.8",
+        "socialiteproviders/line": "^4.1",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

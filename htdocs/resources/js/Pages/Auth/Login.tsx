@@ -1,4 +1,9 @@
-import { useEffect, FormEventHandler } from "react";
+import {
+    useEffect,
+    FormEventHandler,
+    MouseEventHandler,
+    useState,
+} from "react";
 import Checkbox from "@/Components/Checkbox";
 import Divider from "@/Components/Divider";
 import GuestLayout from "@/Layouts/GuestLayout";
@@ -21,6 +26,7 @@ export default function Login({
         password: "",
         remember: false,
     });
+    const [disabled, setDisabled] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -34,6 +40,14 @@ export default function Login({
         post(route("login"));
     };
 
+    const lineLoginClick: MouseEventHandler = (e) => {
+        e.preventDefault();
+        setDisabled(true);
+
+        console.log("line login clicked");
+        post(route("line.login"));
+    };
+
     return (
         <GuestLayout>
             <Head title="ログイン" />
@@ -44,7 +58,9 @@ export default function Login({
                 </div>
             )}
             <div>
-                <LineLogin>Log in</LineLogin>
+                <LineLogin onClick={lineLoginClick} disabled={disabled}>
+                    Log in
+                </LineLogin>
             </div>
             <Divider />
 

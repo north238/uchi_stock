@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'line_id'
     ];
 
     /**
@@ -42,4 +43,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * LINE ID からユーザーを取得
+     */
+    public function getBylineId(string $lineId)
+    {
+        return $this->where('line_id', $lineId)->first();
+    }
 }

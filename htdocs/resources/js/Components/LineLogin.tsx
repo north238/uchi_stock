@@ -15,6 +15,7 @@ export default function LineLogin({
                 } ` + className
             }
             disabled={disabled}
+            id="lineLoginBtn"
         >
             <img src="/icon/icons8-line.svg" alt="LINE LOGO" />
             {children}
