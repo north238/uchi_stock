@@ -1,117 +1,158 @@
-import { useEffect, FormEventHandler } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import {
+    useEffect,
+    useState,
+    FormEventHandler,
+    MouseEventHandler,
+} from "react";
+import GuestLayout from "@/Layouts/GuestLayout";
+import Divider from "@/Components/Divider";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import LineLogin from "@/Components/LineLogin";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
+    const { data, setData, post, processing, errors, clearErrors, reset } =
+        useForm({
+            name: "",
+            email: "",
+            password: "",
+            password_confirmation: "",
+        });
+    const [disabled, setDisabled] = useState(false);
 
     useEffect(() => {
         return () => {
-            reset('password', 'password_confirmation');
+            reset("password", "password_confirmation");
         };
     }, []);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('register'));
+        post(route("register"));
+    };
+
+    const lineLoginClick: MouseEventHandler = (e) => {
+        e.preventDefault();
+        setDisabled(true);
+
+        const baseUrl = import.meta.env.VITE_APP_URL || "http://localhost:8080";
+        window.location.href = `${baseUrl}/login/line/redirect`;
     };
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title="新規登録" />
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="お名前" />
 
                     <TextInput
                         id="name"
                         name="name"
                         value={data.name}
+                        error={!!errors.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        onChange={(e) => {
+                            setData("name", e.target.value);
+                            clearErrors("name");
+                        }}
                     />
 
                     <InputError message={errors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス" />
 
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
+                        error={!!errors.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        onChange={(e) => {
+                            setData("email", e.target.value);
+                            clearErrors("email");
+                        }}
                     />
 
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="パスワード" />
 
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
+                        error={!!errors.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
+                        onChange={(e) => {
+                            setData("password", e.target.value);
+                            clearErrors("password");
+                        }}
                     />
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+                    <InputLabel
+                        htmlFor="password_confirmation"
+                        value="パスワード確認"
+                    />
 
                     <TextInput
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
+                        error={!!errors.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        required
+                        onChange={(e) => {
+                            setData("password_confirmation", e.target.value);
+                            clearErrors("password_confirmation");
+                        }}
                     />
 
-                    <InputError message={errors.password_confirmation} className="mt-2" />
+                    <InputError
+                        message={errors.password_confirmation}
+                        className="mt-2"
+                    />
                 </div>
 
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href={route('login')}
-                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                <div className="flex flex-col items-center justify-center gap-2 mt-4">
+                    <PrimaryButton className="" disabled={processing}>
+                        新規登録する
                     </PrimaryButton>
+                    <Link
+                        href={route("login")}
+                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    >
+                        登録済みの方はこちら
+                    </Link>
                 </div>
             </form>
+
+            <Divider />
+            <div>
+                <LineLogin onClick={lineLoginClick} disabled={disabled}>
+                    LINEログイン
+                </LineLogin>
+            </div>
         </GuestLayout>
     );
 }
