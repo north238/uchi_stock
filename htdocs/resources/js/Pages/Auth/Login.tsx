@@ -21,11 +21,12 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
-    const { data, setData, get, post, processing, errors, reset } = useForm({
-        email: "",
-        password: "",
-        remember: false,
-    });
+    const { data, setData, get, post, processing, errors, clearErrors, reset } =
+        useForm({
+            email: "",
+            password: "",
+            remember: false,
+        });
     const [disabled, setDisabled] = useState(false);
 
     useEffect(() => {
@@ -67,10 +68,14 @@ export default function Login({
                         name="email"
                         placeholder="mail@example.com"
                         value={data.email}
+                        error={!!errors.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={(e) => setData("email", e.target.value)}
+                        onChange={(e) => {
+                            setData("email", e.target.value);
+                            clearErrors("email");
+                        }}
                     />
 
                     <InputError message={errors.email} className="mt-2" />
@@ -82,7 +87,7 @@ export default function Login({
                         {canResetPassword && (
                             <Link
                                 href={route("password.request")}
-                                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                             >
                                 パスワードを忘れた場合
                             </Link>
@@ -95,9 +100,13 @@ export default function Login({
                         name="password"
                         placeholder="••••••••"
                         value={data.password}
+                        error={!!errors.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={(e) => setData("password", e.target.value)}
+                        onChange={(e) => {
+                            setData("password", e.target.value);
+                            clearErrors("password");
+                        }}
                     />
 
                     <InputError message={errors.password} className="mt-2" />
