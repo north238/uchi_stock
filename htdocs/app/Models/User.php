@@ -21,7 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'line_id'
+        'line_id',
+        'line_access_token',
+        'line_refresh_token',
     ];
 
     /**
@@ -50,5 +52,13 @@ class User extends Authenticatable
     public function getBylineId(string $lineId)
     {
         return $this->where('line_id', $lineId)->first();
+    }
+
+    /**
+     * ユーザー登録
+     */
+    public function registerUser(array $userData)
+    {
+        return $this->create($userData);
     }
 }

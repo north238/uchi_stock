@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteLoginController extends Controller
@@ -36,17 +37,29 @@ class SocialiteLoginController extends Controller
     {
         $user = Socialite::driver('line')->user();
 
-        $lineUser = $this->users->getBylineId($user->getId());
-        dd($lineUser);
+        $userId = $user->getId();
+        $lineUser = $this->users->getBylineId($userId);
         if ($lineUser) {
+            $userData = [
+                'line_access_token' => $user->token,
+                'line_refresh_token' => $user->refreshToken,
+            ];
+            $lineUser->update($userData);
+
             Auth::login($lineUser, true);
             return redirect()->intended(RouteServiceProvider::HOME);
         } else {
-            $newUser = new User();
-            $newUser->name = $user->getName();
-            $newUser->email = $user->getEmail();
-            $newUser->line_id = $user->getId();
-            $newUser->save();
+            $newUserData = [
+                'name' => $user->getName(),
+                'email' => $user->getEmail(),
+                'line_id' => $userId,
+                'line_access_token' => $user->token,
+                'line_refresh_token' => $user->refreshToken,
+            ];
+
+            $newUser = $this->users->registerUser($newUserData);
+
+            Log::info('新規ユーザー登録', ['user' => $newUser]);
             Auth::login($newUser, true);
             return redirect()->intended(RouteServiceProvider::HOME);
         }

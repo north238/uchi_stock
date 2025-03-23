@@ -21,7 +21,7 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, get, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
         remember: false,
@@ -44,8 +44,8 @@ export default function Login({
         e.preventDefault();
         setDisabled(true);
 
-        console.log("line login clicked");
-        post(route("line.login"));
+        const baseUrl = import.meta.env.VITE_APP_URL || "http://localhost:8080";
+        window.location.href = `${baseUrl}/login/line/redirect`;
     };
 
     return (
@@ -57,13 +57,6 @@ export default function Login({
                     {status}
                 </div>
             )}
-            <div>
-                <LineLogin onClick={lineLoginClick} disabled={disabled}>
-                    Log in
-                </LineLogin>
-            </div>
-            <Divider />
-
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="メールアドレス" />
@@ -84,7 +77,17 @@ export default function Login({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="パスワード" />
+                    <div className="flex justify-between">
+                        <InputLabel htmlFor="password" value="パスワード" />
+                        {canResetPassword && (
+                            <Link
+                                href={route("password.request")}
+                                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                            >
+                                パスワードを忘れた場合
+                            </Link>
+                        )}
+                    </div>
 
                     <TextInput
                         id="password"
@@ -115,21 +118,24 @@ export default function Login({
                     </label>
                 </div>
 
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={route("password.request")}
-                            className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                        >
-                            パスワードを忘れた場合
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                <div className="flex flex-col items-center justify-center gap-2 mt-4">
+                    <PrimaryButton disabled={processing}>
                         ログイン
                     </PrimaryButton>
+                    <Link
+                        href={route("register")}
+                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md"
+                    >
+                        新規登録はお済みですか？
+                    </Link>
                 </div>
             </form>
+            <Divider />
+            <div>
+                <LineLogin onClick={lineLoginClick} disabled={disabled}>
+                    LINEログイン
+                </LineLogin>
+            </div>
         </GuestLayout>
     );
 }
