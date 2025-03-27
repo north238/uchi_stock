@@ -47,7 +47,8 @@ class SocialiteLoginController extends Controller
             $lineUser->update($userData);
 
             Auth::login($lineUser, true);
-            return redirect()->intended(RouteServiceProvider::HOME);
+            return redirect()->intended(RouteServiceProvider::HOME)
+                ->with('success', 'ログインに成功しました');
         } else {
             $newUserData = [
                 'name' => $user->getName(),
@@ -61,7 +62,9 @@ class SocialiteLoginController extends Controller
 
             Log::info('新規ユーザー登録', ['user' => $newUser]);
             Auth::login($newUser, true);
-            return redirect()->intended(RouteServiceProvider::HOME);
+
+            return redirect()->intended(RouteServiceProvider::HOME)
+                ->with('success', 'アカウント登録が完了しました');
         }
     }
 }

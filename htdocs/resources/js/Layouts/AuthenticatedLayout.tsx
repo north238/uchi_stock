@@ -5,10 +5,11 @@ import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { User } from "@/types";
-import { toast } from "react-toastify";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 
 type FlashMessage = {
-    message?: string;
+    success?: string;
+    error?: string;
 };
 
 type CustomPageProps = {
@@ -25,11 +26,11 @@ export default function Authenticated({
     const { flash } = usePage<CustomPageProps>().props;
 
     useEffect(() => {
-        if (flash?.message) {
-            toast.success(flash.message, {
-                position: "top-center",
-                autoClose: 3000,
-            });
+        if (flash?.success) {
+            showSuccessToast(flash.success);
+        }
+        if (flash?.error) {
+            showErrorToast(flash.error);
         }
     }, [flash]);
 
