@@ -21,7 +21,7 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
-    const { data, setData, get, post, processing, errors, clearErrors, reset } =
+    const { data, setData, post, processing, errors, clearErrors, reset } =
         useForm({
             email: "",
             password: "",
@@ -52,7 +52,6 @@ export default function Login({
     return (
         <GuestLayout>
             <Head title="ログイン" />
-
             {status && (
                 <div className="mb-4 font-medium text-sm text-green-600">
                     {status}
@@ -87,7 +86,7 @@ export default function Login({
                         {canResetPassword && (
                             <Link
                                 href={route("password.request")}
-                                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                                className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
                             >
                                 パスワードを忘れた場合
                             </Link>
@@ -133,7 +132,7 @@ export default function Login({
                     </PrimaryButton>
                     <Link
                         href={route("register")}
-                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md"
+                        className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
                     >
                         新規登録はお済みですか？
                     </Link>

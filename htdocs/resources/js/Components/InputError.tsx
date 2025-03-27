@@ -9,7 +9,7 @@ export default function InputError({
         <p
             {...props}
             className={
-                "text-sm text-red-500 dark:text-red-400 visible h-4 " +
+                "text-sm text-red-500 dark:text-red-400 visible min-h-4 " +
                 className
             }
         >

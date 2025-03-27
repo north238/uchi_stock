@@ -55,6 +55,7 @@ export default function Register() {
                         id="name"
                         name="name"
                         value={data.name}
+                        placeholder="山田 太郎"
                         error={!!errors.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
@@ -75,6 +76,7 @@ export default function Register() {
                         id="email"
                         type="email"
                         name="email"
+                        placeholder="mail@example.com"
                         value={data.email}
                         error={!!errors.email}
                         className="mt-1 block w-full"
@@ -95,6 +97,7 @@ export default function Register() {
                         id="password"
                         type="password"
                         name="password"
+                        placeholder="••••••••"
                         value={data.password}
                         error={!!errors.password}
                         className="mt-1 block w-full"
@@ -118,6 +121,7 @@ export default function Register() {
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
+                        placeholder="••••••••"
                         value={data.password_confirmation}
                         error={!!errors.password_confirmation}
                         className="mt-1 block w-full"
@@ -140,7 +144,7 @@ export default function Register() {
                     </PrimaryButton>
                     <Link
                         href={route("login")}
-                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                        className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
                     >
                         登録済みの方はこちら
                     </Link>
