@@ -18,12 +18,11 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage<PageProps>().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email ?? null,
-            lineId: user.line_id ?? null,
-        });
+    const { data, setData, patch, errors, processing } = useForm({
+        name: user.name,
+        email: user.email ?? null,
+        lineId: user.line_id ?? null,
+    });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -85,7 +84,7 @@ export default function UpdateProfileInformation({
 
                         <TextInput
                             id="line_id"
-                            className="mt-1 mb-8 block w-full"
+                            className="mt-1 mb-6 block w-full"
                             value={user.line_id}
                             disabled
                         />
@@ -112,7 +111,7 @@ export default function UpdateProfileInformation({
                         )}
                     </div>
                 )}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center">
                     <PrimaryButton disabled={processing}>
                         更新する
                     </PrimaryButton>

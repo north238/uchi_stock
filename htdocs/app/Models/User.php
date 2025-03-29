@@ -46,6 +46,18 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = ['is_password_set'];
+
+    /**
+     * パスワードが設定されているか
+     *
+     * @return bool
+     */
+    public function getIsPasswordSetAttribute()
+    {
+        return !is_null($this->password);
+    }
+
     /**
      * LINE ID からユーザーを取得
      */

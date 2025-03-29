@@ -6,6 +6,7 @@ export interface User {
     email: string;
     email_verified_at: string;
     line_id?: string;
+    is_password_set?: boolean;
 }
 
 export type PageProps<

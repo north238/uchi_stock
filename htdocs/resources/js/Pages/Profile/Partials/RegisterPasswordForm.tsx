@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
 
-export default function UpdatePasswordForm({
+export default function RegisterPasswordForm({
     className = "",
 }: {
     className?: string;
@@ -13,27 +13,21 @@ export default function UpdatePasswordForm({
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
-    const { data, setData, errors, put, reset, processing } = useForm({
-        current_password: "",
+    const { data, setData, errors, post, reset, processing } = useForm({
         password: "",
         password_confirmation: "",
     });
 
-    const updatePassword: FormEventHandler = (e) => {
+    const registerPassword: FormEventHandler = (e) => {
         e.preventDefault();
 
-        put(route("password.update"), {
+        post(route("password.register"), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {
                 if (errors.password) {
                     reset("password", "password_confirmation");
                     passwordInput.current?.focus();
-                }
-
-                if (errors.current_password) {
-                    reset("current_password");
-                    currentPasswordInput.current?.focus();
                 }
             },
         });
@@ -43,54 +37,28 @@ export default function UpdatePasswordForm({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    パスワード更新
+                    パスワード登録
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    パスワードを更新するには、現在のパスワードと新しいパスワードを入力してください。
+                    パスワードを入力してください。
                     <br />
-                    新しいパスワードは、8文字以上である必要があります。
+                    パスワードは、8文字以上である必要があります。
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-2">
+            <form onSubmit={registerPassword} className="mt-6 space-y-2">
                 <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value="現在のパスワード"
-                    />
-
-                    <TextInput
-                        id="current_password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={data.current_password}
-                        error={!!errors.current_password}
-                        onChange={(e) =>
-                            setData("current_password", e.target.value)
-                        }
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        ref={currentPasswordInput}
-                    />
-
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="新しいパスワード" />
+                    <InputLabel htmlFor="password" value="パスワード" />
 
                     <TextInput
                         id="password"
                         type="password"
-                        value={data.password}
                         placeholder="••••••••"
+                        value={data.password}
                         error={!!errors.password}
-                        onChange={(e) => setData("password", e.target.value)}
                         className="mt-1 block w-full"
+                        onChange={(e) => setData("password", e.target.value)}
                         autoComplete="new-password"
                         ref={passwordInput}
                     />
@@ -101,18 +69,18 @@ export default function UpdatePasswordForm({
                 <div>
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="新しいパスワード確認"
+                        value="パスワード確認"
                     />
 
                     <TextInput
                         id="password_confirmation"
                         type="password"
-                        placeholder="••••••••"
                         value={data.password_confirmation}
+                        placeholder="••••••••"
+                        className="mt-1 block w-full"
                         onChange={(e) =>
                             setData("password_confirmation", e.target.value)
                         }
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
 
@@ -124,7 +92,7 @@ export default function UpdatePasswordForm({
 
                 <div className="flex items-center">
                     <PrimaryButton disabled={processing}>
-                        更新する
+                        登録する
                     </PrimaryButton>
                 </div>
             </form>
