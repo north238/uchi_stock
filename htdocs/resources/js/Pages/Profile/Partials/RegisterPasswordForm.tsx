@@ -11,7 +11,6 @@ export default function RegisterPasswordForm({
     className?: string;
 }) {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     const { data, setData, errors, post, reset, processing } = useForm({
         password: "",
