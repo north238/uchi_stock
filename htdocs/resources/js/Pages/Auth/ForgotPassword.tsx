@@ -37,7 +37,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     id="email"
                     type="email"
                     name="email"
-                    placeholder="••••••••"
+                    placeholder="mail@example.com"
                     value={data.email}
                     error={!!errors.email}
                     className="mt-1 block w-full"

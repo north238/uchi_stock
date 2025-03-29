@@ -96,7 +96,7 @@ return [
     'password'             => ':attributeが間違っています',
     'present'              => ':attributeが存在している必要があります。',
     'regex'                => ':attributeには、有効な正規表現を指定してください。',
-    'required'             => ':attributeは、必ずご記入ください。',
+    'required'             => ':attributeは、必ずご入力ください。',
     'required_if'          => ':otherが:valueの場合、:attributeを指定してください。',
     'required_unless'      => ':otherが:values以外の場合、:attributeを指定してください。',
     'required_with'        => ':valuesが指定されている場合、:attributeも指定してください。',
