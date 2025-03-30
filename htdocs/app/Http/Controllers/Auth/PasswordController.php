@@ -11,6 +11,22 @@ use Illuminate\Validation\Rules\Password;
 class PasswordController extends Controller
 {
     /**
+     * パスワード登録
+     */
+    public function register(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'password' => ['required', Password::defaults(), 'confirmed'],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'パスワードが登録されました');
+    }
+
+    /**
      * Update the user's password.
      */
     public function update(Request $request): RedirectResponse
@@ -24,6 +40,6 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back();
+        return back()->with('success', 'パスワードが更新されました');
     }
 }

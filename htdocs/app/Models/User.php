@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'line_id',
+        'line_access_token',
+        'line_refresh_token',
     ];
 
     /**
@@ -42,4 +45,32 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected $appends = ['is_password_set'];
+
+    /**
+     * パスワードが設定されているか
+     *
+     * @return bool
+     */
+    public function getIsPasswordSetAttribute()
+    {
+        return !is_null($this->password);
+    }
+
+    /**
+     * LINE ID からユーザーを取得
+     */
+    public function getBylineId(string $lineId)
+    {
+        return $this->where('line_id', $lineId)->first();
+    }
+
+    /**
+     * ユーザー登録
+     */
+    public function registerUser(array $userData)
+    {
+        return $this->create($userData);
+    }
 }

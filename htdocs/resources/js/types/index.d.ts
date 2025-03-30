@@ -1,13 +1,17 @@
-import { Config } from 'ziggy-js';
+import { Config } from "ziggy-js";
 
 export interface User {
     id: number;
     name: string;
     email: string;
     email_verified_at: string;
+    line_id?: string;
+    is_password_set?: boolean;
 }
 
-export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = T & {
     auth: {
         user: User;
     };

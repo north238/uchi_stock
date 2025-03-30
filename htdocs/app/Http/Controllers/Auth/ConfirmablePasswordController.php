@@ -26,7 +26,15 @@ class ConfirmablePasswordController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (! Auth::guard('web')->validate([
+        $user = $request->user();
+
+        // LINEログインユーザーはパスワード確認をスキップ
+        if (!empty($user->line_id)) {
+            $request->session()->put('auth.password_confirmed_at', time());
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
+
+        if (!Auth::guard('web')->validate([
             'email' => $request->user()->email,
             'password' => $request->password,
         ])) {
