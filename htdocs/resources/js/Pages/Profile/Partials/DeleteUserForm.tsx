@@ -6,11 +6,16 @@ import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
+import { User } from "@/types";
 
 export default function DeleteUserForm({
     className = "",
+    auth,
 }: {
     className?: string;
+    auth: {
+        user: User;
+    };
 }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -63,7 +68,15 @@ export default function DeleteUserForm({
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>削除する</DangerButton>
+            {auth.user.is_password_set === false ? (
+                <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
+                    アカウントを削除するには、まずパスワードを設定してください。
+                </p>
+            ) : (
+                <DangerButton onClick={confirmUserDeletion}>
+                    削除する
+                </DangerButton>
+            )}
 
             <Modal
                 show={confirmingUserDeletion}

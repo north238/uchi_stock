@@ -45,7 +45,7 @@ export default function Edit({
                     )}
 
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 border-2 border-red-500 shadow sm:rounded-lg">
-                        <DeleteUserForm className="max-w-xl" />
+                        <DeleteUserForm className="max-w-xl" auth={auth} />
                     </div>
                 </div>
             </div>
