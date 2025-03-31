@@ -34,7 +34,7 @@ export default function ResetPassword({
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="パスワードリセット" />
 
             <form onSubmit={submit}>
                 <div>
@@ -100,7 +100,7 @@ export default function ResetPassword({
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="" disabled={processing}>
                         パスワードリセット
                     </PrimaryButton>
                 </div>
