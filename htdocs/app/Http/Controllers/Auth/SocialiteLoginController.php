@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\LineMessengerService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -16,10 +19,15 @@ class SocialiteLoginController extends Controller
      * @var User $users
      */
     protected $users;
+    /**
+     * @var LineMessengerService $lineMessengerService
+     */
+    protected $lineMessengerService;
 
-    public function __construct(User $users)
+    public function __construct(User $users, LineMessengerService $lineMessengerService)
     {
         $this->users = $users;
+        $this->lineMessengerService = $lineMessengerService;
     }
 
     /**
@@ -27,7 +35,9 @@ class SocialiteLoginController extends Controller
      */
     public function lineRedirect()
     {
-        return Socialite::driver('line')->redirect();
+        return Socialite::driver('line')
+            ->with(['bot_prompt' => 'aggressive'])
+            ->redirect();
     }
 
     /**
@@ -39,32 +49,45 @@ class SocialiteLoginController extends Controller
 
         $userId = $user->getId();
         $lineUser = $this->users->getBylineId($userId);
-        if ($lineUser) {
-            $userData = [
-                'line_access_token' => $user->token,
-                'line_refresh_token' => $user->refreshToken,
-            ];
-            $lineUser->update($userData);
 
-            Auth::login($lineUser, true);
+        DB::beginTransaction();
+        try {
+            if ($lineUser) {
+                $userData = [
+                    'line_access_token' => $user->token,
+                    'line_refresh_token' => $user->refreshToken,
+                ];
+                $lineUser->update($userData);
+
+                Auth::login($lineUser, true);
+                return redirect()->intended(RouteServiceProvider::HOME)
+                    ->with('success', 'ログインに成功しました');
+            } else {
+                $newUserData = [
+                    'name' => $user->getName(),
+                    'email' => $user->getEmail(),
+                    'line_id' => $userId,
+                    'line_access_token' => $user->token,
+                    'line_refresh_token' => $user->refreshToken,
+                ];
+
+                $newUser = $this->users->registerUser($newUserData);
+
+                Log::info('新規ユーザー登録', ['user' => $newUser]);
+                Auth::login($newUser, true);
+                $text = 'アカウント登録が完了しました';
+                $this->lineMessengerService->sendMessage($userId, $text);
+
+                DB::commit();
+                return redirect()->intended(RouteServiceProvider::HOME)
+                    ->with('success', 'アカウント登録が完了しました');
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('アカウント登録に失敗', ['error' => $e->getMessage()]);
+
             return redirect()->intended(RouteServiceProvider::HOME)
-                ->with('success', 'ログインに成功しました');
-        } else {
-            $newUserData = [
-                'name' => $user->getName(),
-                'email' => $user->getEmail(),
-                'line_id' => $userId,
-                'line_access_token' => $user->token,
-                'line_refresh_token' => $user->refreshToken,
-            ];
-
-            $newUser = $this->users->registerUser($newUserData);
-
-            Log::info('新規ユーザー登録', ['user' => $newUser]);
-            Auth::login($newUser, true);
-
-            return redirect()->intended(RouteServiceProvider::HOME)
-                ->with('success', 'アカウント登録が完了しました');
+                    ->with('error', 'アカウント登録に失敗しました');
         }
     }
 }

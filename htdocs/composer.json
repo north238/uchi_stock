@@ -15,6 +15,7 @@
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.8",
+        "linecorp/line-bot-sdk": "^11.0",
         "socialiteproviders/line": "^4.1",
         "tightenco/ziggy": "^2.0"
     },
