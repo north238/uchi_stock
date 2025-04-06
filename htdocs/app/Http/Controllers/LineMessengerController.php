@@ -61,23 +61,23 @@ class LineMessengerController extends Controller
                 case 'message':
                     $messageType = $event['message']['type'];
                     if ($messageType === 'text') {
-                        $text = 'ご質問がある場合は、こちらからお問い合わせください。';
+                        $text = 'お問い合わせありがとうございます。自動返信機能は現在開発中です。';
                         $response = $this->lineMessengerService->SendReplyMessage($replyToken, $text);
                     } else {
                         $text = '申し訳ありませんが、そのメッセージには対応していません。';
                         $response = $this->lineMessengerService->SendReplyMessage($replyToken, $text);
                     }
-                    Log::debug($response);
+                    Log::info('LINEお問い合わせ', $response);
                     break;
                 case 'follow':
-                    $text = '友達登録ありがとうございます。ご質問がある場合は、こちらからお問い合わせください。';
+                    $text = 'お友達登録ありがとうございます。ご質問がある場合は、こちらからお問い合わせください。';
                     $response = $this->lineMessengerService->SendReplyMessage($replyToken, $text);
-                    Log::debug($response);
+                    Log::info('LINEお友達登録', $response);
                     break;
                 default:
                     break;
             }
         }
-        return;
+        return response()->json(['status' => 'success'], 200);
     }
 }
