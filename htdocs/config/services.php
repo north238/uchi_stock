@@ -36,6 +36,10 @@ return [
         'client_secret' => env('LINE_CLIENT_SECRET'),
         'redirect' => env('LINE_REDIRECT_URI'),
         'line_access_token' => env('LINE_BOT_CHANNEL_ACCESS_TOKEN'),
+        'additionalProviderConfig' => [
+            'prompt'        => 'consent',
+            'bot_prompt' => 'aggressive',
+        ],
     ],
 
 ];
