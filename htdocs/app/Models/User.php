@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'group_id',
         'line_id',
         'line_access_token',
         'line_refresh_token',
@@ -49,6 +50,9 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * 実行ユーザーのパスワードチェックに使用
+     */
     protected $appends = ['is_password_set'];
 
     /**

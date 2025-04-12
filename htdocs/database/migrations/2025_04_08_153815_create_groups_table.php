@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('グループ名');
-            // $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete()->comment('作成者ID');
+            $table->integer('created_by')->default(0)->comment('作成者ID：デフォルトは未設定');
 
             $table->softDeletes()->comment('削除日時');
             $table->timestamps();
