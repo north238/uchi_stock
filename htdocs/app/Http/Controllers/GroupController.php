@@ -2,22 +2,101 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GroupCreateRequest;
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
     /**
-     * グループ設定画面を表示する
+     * @var Group $group
      */
-    public function setup(Request $request)
-    {
-        // ユーザーが所属しているグループを取得
-        $user = $request->user();
-        $groups = $user->groups;
+    protected $group;
 
+    public function __construct(Group $group)
+    {
+        $this->group = $group;
+    }
+
+    /**
+     * グループ作成画面を表示する
+     */
+    public function create()
+    {
         // グループ設定画面を表示
-        return inertia('Group/Setup', [
-            'groups' => $groups,
+        return inertia('Group/Create');
+    }
+
+    /**
+     * グループ設定を保存する
+     *
+     * @param GroupCreateRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(GroupCreateRequest $request)
+    {
+        // バリデーション
+        $requestData = $request->validated();
+
+        $userId = $request->user()->id;
+        $saveData=[
+            'name' => $requestData['name'],
+            'description' => $requestData['description'],
+            'status' => $requestData['status'],
+            'created_by' => $userId,
+        ];
+        // グループ設定を保存
+        $group = $this->group->saveGroupData($saveData);
+        if (!$group) {
+            return redirect()->back()->with(['error' => 'グループ設定の保存に失敗しました。']);
+        }
+
+        // 成功メッセージを表示
+        return redirect()->route('group.edit', $group->id)->with('success', 'グループ設定が保存されました。');
+    }
+
+    /**
+     * グループ編集画面を表示する
+     *
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse|\Inertia\Response
+     */
+    public function edit($id)
+    {
+        // グループ情報を取得
+        $group = $this->group->find($id);
+        if (!$group) {
+            return redirect()->back()->with('error', 'グループが見つかりません。');
+        }
+
+        // グループ編集画面を表示
+        return inertia('Group/Edit', [
+            'group' => $group,
         ]);
+    }
+
+    /**
+     * グループ情報を更新する
+     *
+     * @param GroupCreateRequest $request
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(GroupCreateRequest $request, $id)
+    {
+        // バリデーション
+        $requestData = $request->validated();
+
+        // グループ情報を取得
+        $group = $this->group->find($id);
+        if (!$group) {
+            return redirect()->back()->with('error', 'グループが見つかりません。');
+        }
+
+        // グループ情報を更新
+        $group->update($requestData);
+
+        // 成功メッセージを表示
+        return redirect()->route('group.edit', $group->id)->with('success', 'グループ情報が更新されました。');
     }
 }

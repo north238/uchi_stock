@@ -37,4 +37,23 @@ class Group extends Model
     {
         return $this->hasMany(GroupRequest::class, 'group_id');
     }
+    public function users()
+    {
+        return $this->hasMany(User::class, 'group_id');
+    }
+
+    /**
+     * グループデータ保存処理
+     */
+    public function saveGroupData($data)
+    {
+        $group = $this->create([
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'status' => $data['status'],
+            'created_by' => $data['created_by'],
+        ]);
+
+        return $group;
+    }
 }

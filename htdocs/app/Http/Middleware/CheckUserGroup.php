@@ -24,7 +24,7 @@ class CheckUserGroup
 
         // グループ未設定ならリダイレクト
         if (is_null($user->group_id)) {
-            return redirect()->route('group.setup'); // グループ作成 or 参加ページ
+            return redirect()->route('group.create'); // グループ作成 or 参加ページ
         }
 
         return $next($request);

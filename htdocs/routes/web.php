@@ -37,7 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // グループ関連のルーティング
-    Route::get('/group/setup', [GroupController::class, 'setup'])->name('group.setup');
+    Route::get('/group', [GroupController::class, 'create'])->name('group.create');
+    Route::post('/group', [GroupController::class, 'store'])->name('group.store');
+    Route::get('/group/{id}/edit', [GroupController::class, 'edit'])->name('group.edit');
+    Route::put('/group/{id}', [GroupController::class, 'update'])->name('group.update');
 });
 
 //LINEメッセージングAPIのルーティング

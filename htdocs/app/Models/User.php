@@ -55,6 +55,11 @@ class User extends Authenticatable
      */
     protected $appends = ['is_password_set'];
 
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
     /**
      * パスワードが設定されているか
      *

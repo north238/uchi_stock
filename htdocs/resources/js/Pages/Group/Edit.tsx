@@ -7,23 +7,37 @@ import TextInput from "@/Components/TextInput";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
 import { Head, useForm } from "@inertiajs/react";
+import { useEffect } from "react";
 
-export default function Setup({ auth }: PageProps) {
-    const { data, setData, post, processing, errors, clearErrors, reset } =
-        useForm({
-            groupName: "",
-            description: "",
-            status: 0,
-        });
+type Group = {
+    id: number;
+    name: string;
+    description: string;
+    status: number;
+};
+
+export default function Edit({ auth, group }: PageProps & { group: Group }) {
+    const { data, setData, put, processing, errors, clearErrors } = useForm({
+        name: group.name || "",
+        description: group.description || "",
+        status: group.status || 0,
+    });
+
+    // group の変更を監視し、フォームに反映
+    useEffect(() => {
+        if (group) {
+            setData({
+                name: group.name || "",
+                description: group.description || "",
+                status: group.status || 0,
+            });
+        }
+    }, [group]);
 
     // 保存処理
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("group.setup"), {
-            onSuccess: () => {
-                reset("groupName", "description", "status");
-            },
-        });
+        put(route("group.update", group.id));
     };
 
     return (
@@ -31,40 +45,37 @@ export default function Setup({ auth }: PageProps) {
             user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    グループ設定
+                    グループ編集
                 </h2>
             }
         >
-            <Head title="グループ設定" />
+            <Head title="グループ編集" />
             <div className="py-12">
                 <div className="bg-white max-w-3xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-gray-200 shadow-md sm:rounded-lg">
                     <form className="space-y-4" onSubmit={submit}>
                         <div>
-                            <InputLabel
-                                htmlFor="groupName"
-                                value="グループ名"
-                            />
+                            <InputLabel htmlFor="name" value="グループ名" />
                             <TextInput
-                                id="groupName"
+                                id="name"
                                 type="text"
-                                name="groupName"
-                                placeholder="〇〇家族"
-                                value={data.groupName}
-                                error={!!errors.groupName}
+                                name="name"
+                                placeholder="〇〇グループ"
+                                value={data.name}
+                                error={!!errors.name}
                                 className="mt-1 block w-full"
                                 isFocused={true}
                                 onChange={(e) => {
-                                    setData("groupName", e.target.value);
-                                    clearErrors("groupName");
+                                    setData("name", e.target.value);
+                                    clearErrors("name");
                                 }}
                             />
                             <InputError
-                                message={errors.groupName}
+                                message={errors.name}
                                 className="mt-2"
                             />
                         </div>
                         <div>
-                            <InputLabel htmlFor="email" value="説明" />
+                            <InputLabel htmlFor="description" value="説明" />
                             <TextArea
                                 id="description"
                                 name="description"
@@ -102,7 +113,7 @@ export default function Setup({ auth }: PageProps) {
                         </div>
                         <div className="mt-8">
                             <PrimaryButton disabled={processing}>
-                                保存
+                                更新
                             </PrimaryButton>
                         </div>
                     </form>
