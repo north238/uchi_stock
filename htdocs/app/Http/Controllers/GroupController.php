@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GroupCreateRequest;
 use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -12,10 +13,15 @@ class GroupController extends Controller
      * @var Group $group
      */
     protected $group;
+    /**
+     * @var User $user
+     */
+    protected $user;
 
-    public function __construct(Group $group)
+    public function __construct(Group $group, User $user)
     {
         $this->group = $group;
+        $this->user = $user;
     }
 
     /**
@@ -50,6 +56,9 @@ class GroupController extends Controller
         if (!$group) {
             return redirect()->back()->with(['error' => 'グループ設定の保存に失敗しました。']);
         }
+
+        // ユーザーのグループIDを更新
+        $this->user->updateGroupId($userId, $group->id);
 
         // 成功メッセージを表示
         return redirect()->route('group.edit', $group->id)->with('success', 'グループ設定が保存されました。');

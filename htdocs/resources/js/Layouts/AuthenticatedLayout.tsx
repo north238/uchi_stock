@@ -34,6 +34,8 @@ export default function Authenticated({
         }
     }, [flash]);
 
+    console.log(user);
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
@@ -57,6 +59,7 @@ export default function Authenticated({
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">
+                            <div>アカウントimg</div>
                             <div className="ms-3 relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -65,7 +68,14 @@ export default function Authenticated({
                                                 type="button"
                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
                                             >
-                                                {user.name}
+                                                <div className="flex flex-col items-start gap-2">
+                                                <span>
+                                                    {user.group?.name}
+                                                </span>
+                                                <span>
+                                                    {user.name}
+                                                </span>
+                                                </div>
 
                                                 <svg
                                                     className="ms-2 -me-0.5 h-4 w-4"
@@ -88,6 +98,14 @@ export default function Authenticated({
                                             href={route("profile.edit")}
                                         >
                                             プロフィール
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route(
+                                                "group.edit",
+                                                user.group_id
+                                            )}
+                                        >
+                                            グループ
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("logout")}

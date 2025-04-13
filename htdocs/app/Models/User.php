@@ -38,6 +38,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'line_access_token',
+        'line_refresh_token',
     ];
 
     /**
@@ -84,6 +86,14 @@ class User extends Authenticatable
     public function registerUser(array $userData)
     {
         return $this->create($userData);
+    }
+
+    /**
+     * グループIDを更新
+     */
+    public function updateGroupId(int $userId, int $groupId)
+    {
+        return $this->where('id', $userId)->update(['group_id' => $groupId]);
     }
 
     /**
