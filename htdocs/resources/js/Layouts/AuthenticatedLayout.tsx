@@ -68,13 +68,15 @@ export default function Authenticated({
                                                 type="button"
                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
                                             >
-                                                <div className="flex flex-col items-start gap-2">
-                                                <span>
-                                                    {user.group?.name}
-                                                </span>
-                                                <span>
-                                                    {user.name}
-                                                </span>
+                                                <div className="flex flex-col items-start gap-2 max-w-40">
+                                                    <span className="block max-w-40 truncate">
+                                                        {user.group
+                                                            ? user.group?.name
+                                                            : "グループ未所属"}
+                                                    </span>
+                                                    <span className="block max-w-40 truncate">
+                                                        {user.name}
+                                                    </span>
                                                 </div>
 
                                                 <svg
@@ -99,14 +101,22 @@ export default function Authenticated({
                                         >
                                             プロフィール
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route(
-                                                "group.edit",
-                                                user.group_id
-                                            )}
-                                        >
-                                            グループ
-                                        </Dropdown.Link>
+                                        {user.group_id ? (
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "group.edit",
+                                                    user.group_id
+                                                )}
+                                            >
+                                                グループ編集
+                                            </Dropdown.Link>
+                                        ) : (
+                                            <Dropdown.Link
+                                                href={route("group.create")}
+                                            >
+                                                グループ作成
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href={route("logout")}
                                             method="post"

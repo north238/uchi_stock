@@ -28,5 +28,6 @@ export type PageProps<
     auth: {
         user: User;
     };
+    group: Group;
     ziggy: Config & { location: string };
 };

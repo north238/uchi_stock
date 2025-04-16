@@ -37,13 +37,20 @@ export default function Create({ auth }: PageProps) {
         >
             <Head title="グループ設定" />
             <div className="py-12">
-                <div className="bg-white max-w-3xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-gray-200 shadow-md sm:rounded-lg">
-                    <form className="space-y-4" onSubmit={submit}>
+                <div className="bg-white max-w-xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-gray-200 shadow-md sm:rounded-lg">
+                    <header>
+                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                            グループ設定
+                        </h2>
+
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            グループ名、説明、公開設定を設定できます。
+                            <br />
+                        </p>
+                    </header>
+                    <form className="mt-6 space-y-2" onSubmit={submit}>
                         <div>
-                            <InputLabel
-                                htmlFor="name"
-                                value="グループ名"
-                            />
+                            <InputLabel htmlFor="name" value="グループ名" />
                             <TextInput
                                 id="name"
                                 type="text"
