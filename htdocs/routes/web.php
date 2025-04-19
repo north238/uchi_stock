@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/group', [GroupController::class, 'store'])->name('group.store');
     Route::get('/group/{id}/edit', [GroupController::class, 'edit'])->name('group.edit');
     Route::put('/group/{id}', [GroupController::class, 'update'])->name('group.update');
+    Route::patch('/group/{id}', [GroupController::class, 'leaveGroup'])->name('group.leave');
+    Route::delete('/group/{id}', [GroupController::class, 'destroy'])->name('group.destroy');
 });
 
 //LINEメッセージングAPIのルーティング

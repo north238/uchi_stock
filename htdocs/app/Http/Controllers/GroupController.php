@@ -108,4 +108,41 @@ class GroupController extends Controller
         // 成功メッセージを表示
         return redirect()->route('group.edit', $group->id)->with('success', 'グループ情報が更新されました。');
     }
+
+    /**
+     * グループの脱退処理
+     */
+    public function leaveGroup($id)
+    {
+        // グループ情報を取得
+        $group = $this->group->find($id);
+        if (!$group) {
+            return redirect()->back()->with('error', 'グループが見つかりません。');
+        }
+
+        // ユーザーのグループIDをnullに更新
+        $userId = auth()->user()->id;
+        $this->user->updateGroupId($userId, null);
+
+        // 成功メッセージを表示
+        return redirect()->route('dashboard')->with('success', 'グループから脱退しました。');
+    }
+
+    /**
+     * グループを削除する
+     */
+    public function destroy($id)
+    {
+        // グループ情報を取得
+        $group = $this->group->find($id);
+        if (!$group) {
+            return redirect()->back()->with('error', 'グループが見つかりません。');
+        }
+
+        // グループを削除
+        $group->delete();
+
+        // 成功メッセージを表示
+        return redirect()->route('dashboard')->with('success', 'グループが削除されました。');
+    }
 }

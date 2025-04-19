@@ -90,8 +90,12 @@ class User extends Authenticatable
 
     /**
      * グループIDを更新
+     *
+     * @param int $userId
+     * @param int|null $groupId
+     * @return int
      */
-    public function updateGroupId(int $userId, int $groupId)
+    public function updateGroupId(int $userId, ?int $groupId)
     {
         return $this->where('id', $userId)->update(['group_id' => $groupId]);
     }

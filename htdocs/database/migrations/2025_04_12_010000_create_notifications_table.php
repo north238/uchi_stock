@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title')->comment('通知タイトル');
             $table->string('message')->comment('通知メッセージ');
-            $table->integer('type')->comment('通知タイプ：1:お知らせ, 2:メッセージ, 3:アラート');
+            $table->integer('type')->comment('通知タイプ：1=お知らせ 2=メッセージ 3=アラート');
             $table->boolean('is_read')->default(false)->comment('既読フラグ');
             $table->timestamp('read_at')->nullable()->comment('既読日時');
 

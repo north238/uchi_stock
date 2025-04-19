@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('group_requests', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)->comment('申請の状態 0:依頼中 1:承認 2:非承認');
+            $table->integer('status')->default(0)->comment('申請の状態：0=依頼中 1=承認 2=非承認');
             $table->foreignId('group_id')->constrained('groups')->onDelete('cascade')->comment('参加申請先のグループ');
             $table->foreignId('requester_id')->nullable()->constrained('users')->nullOnDelete()->comment('申請を送ったユーザー');
             $table->foreignId('approver_id')->nullable()->constrained('users')->nullOnDelete()->comment('申請を承認するユーザー');

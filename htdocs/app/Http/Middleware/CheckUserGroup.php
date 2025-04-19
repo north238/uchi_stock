@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Group;
 use App\Models\User;
+use App\Services\GroupService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,11 +19,16 @@ class CheckUserGroup
      * @var User $user
      */
     protected $user;
+    /**
+     * @var GroupService $groupService
+     */
+    protected $groupService;
 
-    public function __construct(Group $group, User $user)
+    public function __construct(Group $group, User $user, GroupService $groupService)
     {
         $this->group = $group;
         $this->user = $user;
+        $this->groupService = $groupService;
     }
 
     /**
@@ -41,22 +47,7 @@ class CheckUserGroup
 
         // グループ未設定なら初期設定のグループを作成
         if (is_null($user->group_id)) {
-            $saveData = [
-                'name' => $user->name . 'さんのグループ',
-                'description' => '初期設定のグループ',
-                'status' => 0,
-                'created_by' => $user->id,
-            ];
-            // グループ設定を保存
-            $group = $this->group->saveGroupData($saveData);
-            if (!$group) {
-                return redirect()->back()->with(['error' => 'グループ設定の保存に失敗しました。']);
-            }
-
-            // ユーザーのグループIDを更新
-            $this->user->updateGroupId($user->id, $group->id);
-
-            return redirect()->route('dashboard')->with('success', 'グループの初期設定が保存されました。いつでもグループ設定を変更できます。');
+            $this->groupService->initializeGroup($user);
         }
 
         return $next($request);

@@ -3,6 +3,7 @@ import { PageProps } from "@/types";
 import { Head } from "@inertiajs/react";
 import UpdateGroupForm from "./Partials/UpdateGroupForm";
 import DeleteGroupForm from "./Partials/DeleteGroupForm";
+import LeaveGroupForm from "./Partials/LeaveGroupForm";
 
 export default function Edit({ auth, group }: PageProps) {
     return (
@@ -19,6 +20,10 @@ export default function Edit({ auth, group }: PageProps) {
                 <div className="max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                         <UpdateGroupForm group={group} className="max-w-xl" />
+                    </div>
+
+                    <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                        <LeaveGroupForm auth={auth} className="max-w-xl"/>
                     </div>
 
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 border-2 border-red-500 shadow sm:rounded-lg">

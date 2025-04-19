@@ -101,7 +101,7 @@ export default function UpdateGroupForm({
                     <InputError message={errors.status} className="mt-2" />
                 </div>
                 <div className="mt-8">
-                    <PrimaryButton disabled={processing}>更新</PrimaryButton>
+                    <PrimaryButton disabled={processing}>更新する</PrimaryButton>
                 </div>
             </form>
         </section>

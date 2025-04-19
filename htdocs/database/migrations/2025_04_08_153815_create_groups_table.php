@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable()->comment('グループ説明');
             $table->integer('status')->default(0)->comment('グループステータス：0=非公開、1=公開、2=非表示');
             $table->integer('created_by')->default(0)->comment('作成者ID：デフォルトは未設定');
+            $table->integer('is_temporary')->default(0)->comment('一時的なグループ：0=通常、1=一時的');
 
             $table->softDeletes()->comment('削除日時');
             $table->timestamps();
