@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete(); // グループ削除時 NULL にする
+            $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete();
+            $table->foreignId('role_id')->nullable()->constrained('roles')->cascadeOnDelete();
             $table->string('line_id')->unique()->nullable();
             $table->string('line_access_token')->nullable();
             $table->string('line_refresh_token')->nullable();
