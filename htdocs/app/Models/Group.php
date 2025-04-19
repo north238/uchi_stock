@@ -44,13 +44,34 @@ class Group extends Model
 
     /**
      * グループデータ保存処理
+     *
+     * @param array $data 登録データの配列
+     * @return \App\Models\Group 登録したグループデータ
      */
-    public function saveGroupData($data)
+    public function saveGroupData(array $data): Group
+    {
+        // バリデーションを行う
+        // $validatedData = $this->validateGroupData($data);
+
+        // グループデータを保存する
+        $group = $this->createGroup($data);
+
+        return $group;
+    }
+
+    /**
+     * グループデータの作成
+     *
+     * @param array $data 登録データの配列
+     * @return \App\Models\Group 登録したグループデータ
+     */
+    private function createGroup(array $data): Group
     {
         $group = $this->create([
             'name' => $data['name'],
             'description' => $data['description'],
             'status' => $data['status'],
+            'is_temporary' => $data['is_temporary'],
             'created_by' => $data['created_by'],
         ]);
 

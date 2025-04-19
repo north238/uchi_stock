@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'group_id',
+        'role_id',
         'line_id',
         'line_access_token',
         'line_refresh_token',
@@ -57,9 +58,16 @@ class User extends Authenticatable
      */
     protected $appends = ['is_password_set'];
 
+    /**
+     * リレーション設定
+     */
     public function group()
     {
-        return $this->belongsTo(Group::class);
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     /**
