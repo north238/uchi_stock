@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('ユーザーID');
             $table->foreignId('group_id')->constrained('groups')->onDelete('cascade')->comment('グループID');
-            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade')->comment('役割ID');
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade')->comment('役割ID'); // グループ内の役割
             $table->integer('status')->default(0)->comment('状態：0=申請中 1=承認 2=拒否 9=退会');
             $table->timestamp('approved_at')->nullable()->comment('承認日時');
             $table->timestamp('rejected_at')->nullable()->comment('拒否日時');

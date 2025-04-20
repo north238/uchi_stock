@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique()->comment('役割名');
             $table->string('description')->nullable()->comment('役割の説明');
-            $table->integer('level')->default(0)->comment('役割レベル：0=管理者 1=一般 9=退会');
+            $table->integer('type')->default(0)->comment('役割の種類：0=システム 1=グループ');
+            $table->integer('level')->default(0)->comment('役割レベル：100=管理者 10=一般 0=退会');
             $table->timestamps();
         });
     }
