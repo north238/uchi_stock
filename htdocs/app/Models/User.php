@@ -97,6 +97,14 @@ class User extends Authenticatable
     }
 
     /**
+     * ユーザー情報更新
+     */
+    public function updateUser(string $lineId, array $userData)
+    {
+        return $this->where('line_id', $lineId)->update($userData);
+    }
+
+    /**
      * グループIDを更新
      *
      * @param int $userId

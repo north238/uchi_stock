@@ -41,6 +41,8 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'group_id' => null, // グループは未設定
+            'role_id' => 2, // 一般ユーザー
         ]);
 
         event(new Registered($user));
