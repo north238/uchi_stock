@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App\Models\Group;
 use App\Models\User;
-use App\Services\GroupService;
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
