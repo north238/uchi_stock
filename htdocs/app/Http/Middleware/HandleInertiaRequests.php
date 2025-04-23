@@ -33,7 +33,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? $request->user()->load('group') : null, // グループがない場合を考慮
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

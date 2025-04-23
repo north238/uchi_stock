@@ -47,36 +47,28 @@ class SocialiteLoginController extends Controller
     {
         $user = Socialite::driver('line')->user();
 
-        $userId = $user->getId();
-        $lineUser = $this->users->getBylineId($userId);
+        $LineId = $user->getId();
+        $lineUser = $this->users->getBylineId($LineId);
 
         DB::beginTransaction();
         try {
             if ($lineUser) {
-                $userData = [
-                    'line_access_token' => $user->token,
-                    'line_refresh_token' => $user->refreshToken,
-                ];
-                $lineUser->update($userData);
+                // 既存ユーザーの場合はトークンを更新
+                $this->updateLineUser($user);
 
                 Auth::login($lineUser, true);
+                DB::commit();
                 return redirect()->intended(RouteServiceProvider::HOME)
                     ->with('success', 'ログインに成功しました');
             } else {
-                $newUserData = [
-                    'name' => $user->getName(),
-                    'email' => $user->getEmail(),
-                    'line_id' => $userId,
-                    'line_access_token' => $user->token,
-                    'line_refresh_token' => $user->refreshToken,
-                ];
+                // 新規ユーザーの場合は登録処理
+                $newUser = $this->createNewUser($user);
 
-                $newUser = $this->users->registerUser($newUserData);
-
-                Log::info('新規ユーザー登録', ['user' => $newUser]);
                 Auth::login($newUser, true);
-                $text = 'アカウント登録が完了しました';
-                $this->lineMessengerService->sendMessage($userId, $text);
+
+                // LINEにメッセージを送信
+                $text = 'ご登録いただきありがとうございます！アカウント登録が完了しました。これからもよろしくお願いいたします。';
+                $this->lineMessengerService->sendMessage($LineId, $text);
 
                 DB::commit();
                 return redirect()->intended(RouteServiceProvider::HOME)
@@ -84,10 +76,57 @@ class SocialiteLoginController extends Controller
             }
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('アカウント登録に失敗', ['error' => $e->getMessage()]);
+            Log::error('【LINE】アカウント登録に失敗', ['error' => $e->getMessage()]);
 
             return redirect()->intended(RouteServiceProvider::HOME)
-                    ->with('error', 'アカウント登録に失敗しました');
+                ->with('error', 'アカウント登録に失敗しました');
         }
+    }
+
+    /**
+     * 新規ユーザー登録
+     *
+     * @param \Laravel\Socialite\Two\User $user
+     * @return \App\Models\User
+     */
+    private function createNewUser($user)
+    {
+        $newUserData = [
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'password' => null, // パスワードは不要
+            'group_id' => null, // グループは未設定
+            'role_id' => 2, // 一般ユーザー
+            'line_id' => $user->getId(),
+            'line_access_token' => $user->token,
+            'line_refresh_token' => $user->refreshToken,
+        ];
+
+        $newUser = $this->users->registerUser($newUserData);
+
+        Log::info('【LINE】新規ユーザー登録', ['user' => $newUser]);
+
+        return $newUser;
+    }
+
+    /**
+     * LINEユーザーの更新
+     *
+     * @param \Laravel\Socialite\Two\User $user
+     * @param int $userId
+     * @return \App\Models\User
+     */
+    private function updateLineUser($user)
+    {
+        $userData = [
+            'line_access_token' => $user->token,
+            'line_refresh_token' => $user->refreshToken,
+        ];
+
+        $this->users->updateUser($user->getId(), $userData);
+
+        Log::info('【LINE】ユーザー情報更新', ['user' => $user]);
+
+        return true;
     }
 }

@@ -24,6 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'group_id',
+        'role_id',
         'line_id',
         'line_access_token',
         'line_refresh_token',
@@ -37,6 +39,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'line_access_token',
+        'line_refresh_token',
     ];
 
     /**
@@ -49,7 +53,22 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * 実行ユーザーのパスワードチェックに使用
+     */
     protected $appends = ['is_password_set'];
+
+    /**
+     * リレーション設定
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
 
     /**
      * パスワードが設定されているか
@@ -75,6 +94,26 @@ class User extends Authenticatable
     public function registerUser(array $userData)
     {
         return $this->create($userData);
+    }
+
+    /**
+     * ユーザー情報更新
+     */
+    public function updateUser(string $lineId, array $userData)
+    {
+        return $this->where('line_id', $lineId)->update($userData);
+    }
+
+    /**
+     * グループIDを更新
+     *
+     * @param int $userId
+     * @param int|null $groupId
+     * @return int
+     */
+    public function updateGroupId(int $userId, ?int $groupId)
+    {
+        return $this->where('id', $userId)->update(['group_id' => $groupId]);
     }
 
     /**

@@ -22,6 +22,9 @@ export default defineConfig({
         }),
         react(),
     ],
+    optimizeDeps: {
+        include: ['react-icons'],
+    },
     define: {
         "process.env": process.env,
     },

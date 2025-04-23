@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete();
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete(); // システム内の役割
             $table->string('line_id')->unique()->nullable();
             $table->string('line_access_token')->nullable();
             $table->string('line_refresh_token')->nullable();
