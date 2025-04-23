@@ -37,12 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // グループ関連のルーティング
-    Route::get('/group', [GroupController::class, 'create'])->name('group.create');
-    Route::post('/group', [GroupController::class, 'store'])->name('group.store');
-    Route::get('/group/{id}/edit', [GroupController::class, 'edit'])->name('group.edit');
-    Route::put('/group/{id}', [GroupController::class, 'update'])->name('group.update');
-    Route::patch('/group/{id}', [GroupController::class, 'leaveGroup'])->name('group.leave');
-    Route::delete('/group/{id}', [GroupController::class, 'destroy'])->name('group.destroy');
+    Route::get('/groups', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/default', [GroupController::class, 'createDefaultGroup'])->name('groups.default.create');
+    Route::get('/groups/{id}/edit', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::put('/groups/{id}', [GroupController::class, 'update'])->name('groups.update');
+    Route::patch('/groups/{id}', [GroupController::class, 'leaveGroup'])->name('groups.leave');
+    Route::delete('/groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 
 //LINEメッセージングAPIのルーティング

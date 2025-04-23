@@ -5,7 +5,7 @@ import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import TextInput from "@/Components/TextInput";
-import { useForm } from "@inertiajs/react";
+import { useForm, Link } from "@inertiajs/react";
 import { User } from "@/types";
 
 export default function DeleteGroupForm({
@@ -17,7 +17,8 @@ export default function DeleteGroupForm({
         user: User;
     };
 }) {
-    const [confirmingGroupDeletion, setConfirmingGroupDeletion] = useState(false);
+    const [confirmingGroupDeletion, setConfirmingGroupDeletion] =
+        useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
 
     const {
@@ -38,7 +39,9 @@ export default function DeleteGroupForm({
     const deleteGroup: FormEventHandler = (e) => {
         e.preventDefault();
 
-        destroy(route("group.destroy"), {
+        const groupId = auth.user.group_id;
+
+        destroy(route("groups.destroy", groupId), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onError: () => passwordInput.current?.focus(),
@@ -69,9 +72,17 @@ export default function DeleteGroupForm({
             </header>
 
             {auth.user.is_password_set === false ? (
-                <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                    グループを削除するには、まずパスワードを設定してください。
-                </p>
+                <div>
+                    <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
+                        グループを削除するには、パスワードを下記リンクより設定してください。
+                    </p>
+                    <Link
+                        href={route("profile.edit")}
+                        className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+                    >
+                        パスワード設定
+                    </Link>
+                </div>
             ) : (
                 <DangerButton onClick={confirmGroupDeletion}>
                     削除する

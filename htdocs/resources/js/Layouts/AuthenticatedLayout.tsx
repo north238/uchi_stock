@@ -6,6 +6,8 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { User } from "@/types";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
+import Modal from "@/Components/Modal";
+import { MdErrorOutline } from "react-icons/md";
 
 type FlashMessage = {
     success?: string;
@@ -14,6 +16,7 @@ type FlashMessage = {
 
 type CustomPageProps = {
     flash?: FlashMessage;
+    showGroupModal?: boolean;
 };
 
 export default function Authenticated({
@@ -23,7 +26,8 @@ export default function Authenticated({
 }: PropsWithChildren<{ user: User; header?: ReactNode }>) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
-    const { flash } = usePage<CustomPageProps>().props;
+    const [forceModal, setForceModal] = useState(false);
+    const { flash, showGroupModal } = usePage<CustomPageProps>().props;
 
     useEffect(() => {
         if (flash?.success) {
@@ -34,7 +38,11 @@ export default function Authenticated({
         }
     }, [flash]);
 
-    console.log(user);
+    useEffect(() => {
+        if (showGroupModal) {
+            setForceModal(true);
+        }
+    }, [user]);
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -104,7 +112,7 @@ export default function Authenticated({
                                         {user.group_id ? (
                                             <Dropdown.Link
                                                 href={route(
-                                                    "group.edit",
+                                                    "groups.edit",
                                                     user.group_id
                                                 )}
                                             >
@@ -112,7 +120,7 @@ export default function Authenticated({
                                             </Dropdown.Link>
                                         ) : (
                                             <Dropdown.Link
-                                                href={route("group.create")}
+                                                href={route("groups.create")}
                                             >
                                                 グループ作成
                                             </Dropdown.Link>
@@ -222,6 +230,49 @@ export default function Authenticated({
             )}
 
             <main>{children}</main>
+
+            {forceModal && (
+                <Modal
+                    show={forceModal}
+                    closeable={false}
+                    onClose={() => setForceModal(false)}
+                    maxWidth="sm"
+                >
+                    <div className="flex flex-col justify-center items-center gap-4 p-6">
+                        <div className="flex flex-col items-center gap-4">
+                            <MdErrorOutline className="w-12 h-12 text-red-500"/>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                グループに未所属です
+                            </h2>
+
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                グループに参加またはグループを作成することで、すべての機能を利用できます。
+                                <br />
+                                「スキップ」を選ぶと、仮のグループが自動で作成されます。あとから編集・変更も可能です。
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col justify-center gap-2">
+                            <Link
+                                href={route("groups.create")}
+                                className="primary-link-btn"
+                                as="button"
+                                onClick={() => setForceModal(false)}
+                            >
+                                グループを作成する
+                            </Link>
+                            <Link
+                                href={route("groups.default.create")}
+                                className="secondary-link-btn"
+                                as="button"
+                                onClick={() => setForceModal(false)}
+                            >
+                                スキップ
+                            </Link>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

@@ -19,7 +19,7 @@ export default function Create({ auth }: PageProps) {
     // 保存処理
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("group.create"), {
+        post(route("groups.create"), {
             onSuccess: () => {
                 reset("name", "description", "status");
             },

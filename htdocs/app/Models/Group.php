@@ -71,7 +71,7 @@ class Group extends Model
             'name' => $data['name'],
             'description' => $data['description'],
             'status' => $data['status'],
-            'is_temporary' => $data['is_temporary'],
+            'is_temporary' => 0,
             'created_by' => $data['created_by'],
         ]);
 

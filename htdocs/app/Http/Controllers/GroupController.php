@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GroupCreateRequest;
 use App\Models\Group;
 use App\Models\User;
+use App\Notifications\GroupJoinRequestNotification;
+use App\Services\GroupService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
 {
@@ -17,11 +20,16 @@ class GroupController extends Controller
      * @var User $user
      */
     protected $user;
+    /**
+     * @var GroupService $groupService
+     */
+    protected $groupService;
 
-    public function __construct(Group $group, User $user)
+    public function __construct(Group $group, User $user, GroupService $groupService)
     {
         $this->group = $group;
         $this->user = $user;
+        $this->groupService = $groupService;
     }
 
     /**
@@ -45,7 +53,7 @@ class GroupController extends Controller
         $requestData = $request->validated();
 
         $userId = $request->user()->id;
-        $saveData=[
+        $saveData = [
             'name' => $requestData['name'],
             'description' => $requestData['description'],
             'status' => $requestData['status'],
@@ -61,7 +69,7 @@ class GroupController extends Controller
         $this->user->updateGroupId($userId, $group->id);
 
         // 成功メッセージを表示
-        return redirect()->route('group.edit', $group->id)->with('success', 'グループ設定が保存されました。');
+        return redirect()->route('groups.edit', $group->id)->with('success', 'グループ設定が保存されました。');
     }
 
     /**
@@ -106,7 +114,46 @@ class GroupController extends Controller
         $group->update($requestData);
 
         // 成功メッセージを表示
-        return redirect()->route('group.edit', $group->id)->with('success', 'グループ情報が更新されました。');
+        return redirect()->route('groups.edit', $group->id)->with('success', 'グループ情報が更新されました。');
+    }
+
+    /**
+     * グループを削除する
+     */
+    public function destroy($id)
+    {
+        // グループ情報を取得
+        $group = $this->group->find($id);
+        if (!$group) {
+            return redirect()->back()->with('error', 'グループが見つかりません。');
+        }
+
+        // グループを削除
+        $group->delete();
+
+        // ユーザーのグループIDをnullに更新
+        $user = Auth::user();
+        $this->user->updateGroupId($user->id, null);
+
+        // 成功メッセージを表示
+        return redirect()->route('dashboard')->with('success', 'グループが削除されました。');
+    }
+
+    /**
+     * グループの自動生成
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function createDefaultGroup(Request $request)
+    {
+        $user = $request->user();
+        $status = $this->groupService->initializeGroup($user);
+        if ($status === false) {
+            return redirect()->back()->with(['error' => 'グループ設定の保存に失敗しました。']);
+        }
+
+        redirect()->route('dashboard')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
     }
 
     /**
@@ -129,9 +176,13 @@ class GroupController extends Controller
     }
 
     /**
-     * グループを削除する
+     * グループへの参加を申請する
+     *
+     * @param Request $request
+     * @param int $id グループID
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function requestToJoin(Request $request, $id)
     {
         // グループ情報を取得
         $group = $this->group->find($id);
@@ -139,10 +190,19 @@ class GroupController extends Controller
             return redirect()->back()->with('error', 'グループが見つかりません。');
         }
 
-        // グループを削除
-        $group->delete();
+        // 申請者のメールアドレスを取得
+        $applicantEmail = $request->user()->email;
+
+        // グループ管理者のメールアドレスを取得
+        $admin = $this->user->find($group->created_by);
+        if (!$admin || !$admin->email) {
+            return redirect()->back()->with('error', 'グループ管理者のメールアドレスが見つかりません。');
+        }
+
+        // メールを送信
+        $admin->notify(new GroupJoinRequestNotification($group->name, $applicantEmail));
 
         // 成功メッセージを表示
-        return redirect()->route('dashboard')->with('success', 'グループが削除されました。');
+        return redirect()->back()->with('success', 'グループ管理者に参加申請を送信しました。');
     }
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\GroupService;
 use Closure;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckUserGroup
@@ -19,16 +20,11 @@ class CheckUserGroup
      * @var User $user
      */
     protected $user;
-    /**
-     * @var GroupService $groupService
-     */
-    protected $groupService;
 
-    public function __construct(Group $group, User $user, GroupService $groupService)
+    public function __construct(Group $group, User $user)
     {
         $this->group = $group;
         $this->user = $user;
-        $this->groupService = $groupService;
     }
 
     /**
@@ -45,10 +41,10 @@ class CheckUserGroup
             return $next($request);
         }
 
-        // グループ未設定なら初期設定のグループを作成
-        if (is_null($user->group_id)) {
-            $this->groupService->initializeGroup($user);
-        }
+        // グループが設定されていない場合モーダル表示（グループ作成画面を除く）
+        Inertia::share([
+            'showGroupModal' => is_null(auth()->user()->group_id) && (!$request->routeIs('groups.create') || !$request->routeIs('groups.store')),
+        ]);
 
         return $next($request);
     }

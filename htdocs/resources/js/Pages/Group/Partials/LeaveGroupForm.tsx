@@ -21,7 +21,7 @@ export default function LeaveGroupForm({
             return;
         }
 
-        patch(route("group.leave", groupId));
+        patch(route("groups.leave", groupId));
     };
 
     return (
