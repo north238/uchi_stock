@@ -69,6 +69,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
+    public function groupUsers()
+    {
+        return $this->hasMany(GroupUser::class, 'user_id');
+    }
 
     /**
      * パスワードが設定されているか

@@ -41,22 +41,9 @@ class Group extends Model
     {
         return $this->hasMany(User::class, 'group_id');
     }
-
-    /**
-     * グループデータ保存処理
-     *
-     * @param array $data 登録データの配列
-     * @return \App\Models\Group 登録したグループデータ
-     */
-    public function saveGroupData(array $data): Group
+    public function groupUsers()
     {
-        // バリデーションを行う
-        // $validatedData = $this->validateGroupData($data);
-
-        // グループデータを保存する
-        $group = $this->createGroup($data);
-
-        return $group;
+        return $this->hasMany(GroupUser::class, 'group_id');
     }
 
     /**
@@ -65,16 +52,8 @@ class Group extends Model
      * @param array $data 登録データの配列
      * @return \App\Models\Group 登録したグループデータ
      */
-    private function createGroup(array $data): Group
+    public function createGroup(array $data): Group
     {
-        $group = $this->create([
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'status' => $data['status'],
-            'is_temporary' => 0,
-            'created_by' => $data['created_by'],
-        ]);
-
-        return $group;
+        return $this->create($data);
     }
 }
