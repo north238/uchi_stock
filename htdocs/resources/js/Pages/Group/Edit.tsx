@@ -28,9 +28,11 @@ export default function Edit({ auth, group }: PageProps) {
                         </div>
                     )}
 
-                    <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                        <LeaveGroupForm auth={auth} className="max-w-xl" />
-                    </div>
+                    {group.created_by !== auth.user.id && (
+                        <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                            <LeaveGroupForm auth={auth} className="max-w-xl" />
+                        </div>
+                    )}
 
                     {/* グループ作成者のみ削除ボタンを表示 */}
                     {group.created_by === auth.user.id && (

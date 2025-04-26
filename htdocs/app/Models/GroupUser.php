@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -81,7 +82,7 @@ class GroupUser extends Model
     /**
      * 有効なグループユーザーを取得
      */
-    public function getValidGroupUsers(int $groupId): ?GroupUser
+    public function getValidGroupUsers(int $groupId): Collection
     {
         return $this->where('group_id', $groupId)
             ->where('status', 1)
