@@ -91,6 +91,7 @@ class GroupService
             'group_id' => $groupId,
             'role_id' => 3, // グループ作成者
             'status' => 1, // 承認済み
+            'approved_at' => now(),
         ];
         $this->groupUsers->createGroupUser($saveData);
 

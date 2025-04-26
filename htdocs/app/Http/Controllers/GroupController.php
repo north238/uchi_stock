@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\GroupJoinRequestNotification;
 use App\Services\GroupService;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,7 @@ class GroupController extends Controller
     /**
      * グループ作成画面を表示する
      */
-    public function create()
+    public function create(): RedirectResponse|\Inertia\Response
     {
         // グループ設定画面を表示
         return inertia('Group/Create');
@@ -56,7 +57,7 @@ class GroupController extends Controller
      * @param GroupCreateRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(GroupCreateRequest $request)
+    public function store(GroupCreateRequest $request): RedirectResponse
     {
         try {
             // バリデーション
@@ -97,7 +98,7 @@ class GroupController extends Controller
      * @param int $id
      * @return \Illuminate\Http\RedirectResponse|\Inertia\Response
      */
-    public function edit($id)
+    public function edit(int $id): RedirectResponse|\Inertia\Response
     {
         // グループ情報を取得
         $group = $this->group->find($id);
@@ -118,7 +119,7 @@ class GroupController extends Controller
      * @param int $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(GroupCreateRequest $request, $id)
+    public function update(GroupCreateRequest $request, int $id): RedirectResponse
     {
         try {
             // バリデーション
@@ -150,7 +151,7 @@ class GroupController extends Controller
     /**
      * グループを削除する
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         try {
             // グループ情報を取得
@@ -206,7 +207,7 @@ class GroupController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function createDefaultGroup(Request $request)
+    public function createDefaultGroup(Request $request): RedirectResponse
     {
         try {
             $user = $request->user();
@@ -217,7 +218,7 @@ class GroupController extends Controller
                 throw new Exception($errorMessage);
             }
 
-            redirect()->route('dashboard')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
+            return redirect()->route('dashboard')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
         } catch (Exception $e) {
             Log::error('【グループ】自動生成処理エラー', [
                 'message' => $e->getMessage(),
@@ -232,7 +233,7 @@ class GroupController extends Controller
     /**
      * グループの脱退処理
      */
-    public function leaveGroup($id)
+    public function leaveGroup(int $id): RedirectResponse
     {
         try {
             // グループ情報を取得
@@ -294,7 +295,7 @@ class GroupController extends Controller
      * @param int $id グループID
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function requestToJoin(Request $request, $id)
+    public function requestToJoin(Request $request, int $id): RedirectResponse
     {
         // グループ情報を取得
         $group = $this->group->find($id);

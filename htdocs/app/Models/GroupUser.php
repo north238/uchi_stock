@@ -47,7 +47,7 @@ class GroupUser extends Model
      * @param int $groupId グループID
      * @return \App\Models\GroupUser|null グループユーザーデータ
      */
-    public function getGroupUser(int $userId, int $groupId)
+    public function getGroupUser(int $userId, int $groupId): ?GroupUser
     {
         return $this->where('user_id', $userId)
             ->where('group_id', $groupId)
@@ -60,7 +60,7 @@ class GroupUser extends Model
      * @param array $data 登録データの配列
      * @return \App\Models\GroupUser 登録したグループユーザーデータ
      */
-    public function createGroupUser(array $data): GroupUser
+    public function createGroupUser(array $data): ?GroupUser
     {
         return $this->create($data);
     }
@@ -81,7 +81,7 @@ class GroupUser extends Model
     /**
      * 有効なグループユーザーを取得
      */
-    public function getValidGroupUsers(int $groupId)
+    public function getValidGroupUsers(int $groupId): ?GroupUser
     {
         return $this->where('group_id', $groupId)
             ->where('status', 1)
