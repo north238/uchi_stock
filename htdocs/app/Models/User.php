@@ -85,6 +85,14 @@ class User extends Authenticatable
     }
 
     /**
+     * ユーザー情報取得
+     */
+    public function getUser(int $userId)
+    {
+        return $this->find($userId);
+    }
+
+    /**
      * LINE ID からユーザーを取得
      */
     public function getBylineId(string $lineId)

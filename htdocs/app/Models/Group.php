@@ -47,6 +47,17 @@ class Group extends Model
     }
 
     /**
+     * グループデータの取得
+     *
+     * @param int $groupId グループID
+     * @return \App\Models\Group|null グループデータ
+     */
+    public function getGroup(int $groupId): ?Group
+    {
+        return $this->find($groupId);
+    }
+
+    /**
      * グループデータの作成
      *
      * @param array $data 登録データの配列
@@ -55,5 +66,22 @@ class Group extends Model
     public function createGroup(array $data): Group
     {
         return $this->create($data);
+    }
+
+    /**
+     * グループデータの更新
+     *
+     * @param int $groupId グループID
+     * @param array $data 更新データの配列
+     * @return \App\Models\Group|null 更新したグループデータ
+     */
+    public function updateGroup(int $groupId, array $data): ?Group
+    {
+        $group = $this->find($groupId);
+        if ($group) {
+            $group->update($data);
+            return $group;
+        }
+        return null;
     }
 }
