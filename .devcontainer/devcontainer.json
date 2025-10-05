@@ -3,7 +3,7 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "app",
   "workspaceFolder": "/var/www/html",
-  "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate && npm install",
+  "postCreateCommand": "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi && composer install && npm install",
   "remoteUser": "root",
   "customizations": {
     "vscode": {
