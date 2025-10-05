@@ -47,7 +47,7 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
     volumes:
-      - ./htdocs:/var/www/html
+      - ./htdocs:/var/www/html:cached
       - ./htdocs/node_modules:/var/www/html/node_modules
     working_dir: /var/www/html
     tty: true

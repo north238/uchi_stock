@@ -1,5 +1,5 @@
 # FROM mysql:latest
-FROM mysql:8.0.27
+FROM mysql:8.0.43
 
 ENV TZ=Asia/Tokyo
 
