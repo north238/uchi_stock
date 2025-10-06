@@ -78,6 +78,18 @@ services:
     networks:
       - uchistock_network
 
+  whisper:
+    container_name: uchistock-whisper
+    build:
+      context: .
+      dockerfile: ./docker/whisper/Dockerfile
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./whisper:/usr/src/app
+    networks:
+      - uchistock_network
+
 networks:
   uchistock_network:
     driver: bridge
