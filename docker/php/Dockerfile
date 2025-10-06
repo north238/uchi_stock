@@ -42,9 +42,9 @@ RUN apk del $PHPIZE_DEPS
 # Composer install 2.7.2
 COPY --from=composer:2.7.2 /usr/bin/composer /usr/local/bin/composer
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV COMPOSER_HOME /composer
-ENV PATH $PATH:/composer/vendor/bin
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_HOME=/composer
+ENV PATH=$PATH:/composer/vendor/bin
 
 COPY ./htdocs ./
 COPY ./docker/php/php.ini /usr/local/etc/php/
