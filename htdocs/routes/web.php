@@ -34,23 +34,30 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'check.group'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // プロフィール関連のルーティング
+    Route::prefix('profile')->as('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
 
     // グループ関連のルーティング
-    Route::get('/groups', [GroupController::class, 'create'])->name('groups.create');
-    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-    Route::get('/groups/default', [GroupController::class, 'createDefaultGroup'])->name('groups.default.create');
-    Route::get('/groups/{id}/edit', [GroupController::class, 'edit'])->name('groups.edit');
-    Route::put('/groups/{id}', [GroupController::class, 'update'])->name('groups.update');
-    Route::patch('/groups/{id}', [GroupController::class, 'leaveGroup'])->name('groups.leave');
-    Route::delete('/groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
+    Route::prefix('groups')->as('groups.')->group(function () {
+        Route::get('/', [GroupController::class, 'create'])->name('create');
+        Route::post('/', [GroupController::class, 'store'])->name('store');
+        Route::get('/default', [GroupController::class, 'createDefaultGroup'])->name('default.create');
+        Route::get('/{id}/edit', [GroupController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [GroupController::class, 'update'])->name('update');
+        Route::patch('/{id}', [GroupController::class, 'leaveGroup'])->name('leave');
+        Route::delete('/{id}', [GroupController::class, 'destroy'])->name('destroy');
+    });
 });
 
 //LINEメッセージングAPIのルーティング
-Route::post('/line/webhook', [LineMessengerController::class, 'webhook'])->name('line.webhook');
-Route::get('/line/message', [LineMessengerController::class, 'message'])->name('line.message');
+Route::prefix('line')->as('line.')->group(function () {
+    Route::post('/webhook', [LineMessengerController::class, 'webhook'])->name('webhook');
+    Route::get('/message', [LineMessengerController::class, 'message'])->name('message');
+});
 
 Route::get('/upload-audio', function () {
     return view('upload-audio');
@@ -63,11 +70,13 @@ Route::post('/upload-audio', function (Request $request) {
 
     $file = $request->file('audio');
 
-    $response = Http::attach(
-        'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+    $response = Http::timeout(180)->attach(
+        'file',
+        file_get_contents($file->getRealPath()),
+        $file->getClientOriginalName()
     )->post('http://whisper:5000/transcribe'); // Docker内ネットワーク名に合わせる
 
     return view('upload-audio', ['result' => $response->json()['text'] ?? '変換失敗']);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
