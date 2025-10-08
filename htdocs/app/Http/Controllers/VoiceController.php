@@ -14,7 +14,10 @@ class VoiceController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Voice/Create');
+        $apiUrl = route('api.voice.transcribe');
+        return Inertia::render('Voice/Create', [
+            'apiUrl' => $apiUrl,
+        ]);
     }
 
     /**
