@@ -3,6 +3,7 @@
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LineMessengerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -51,32 +52,16 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{id}', [GroupController::class, 'leaveGroup'])->name('leave');
         Route::delete('/{id}', [GroupController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('voice')->as('voice.')->group(function () {
+        Route::get('/', [VoiceController::class, 'create'])->name('create');
+    });
 });
 
 //LINEメッセージングAPIのルーティング
 Route::prefix('line')->as('line.')->group(function () {
     Route::post('/webhook', [LineMessengerController::class, 'webhook'])->name('webhook');
     Route::get('/message', [LineMessengerController::class, 'message'])->name('message');
-});
-
-Route::get('/upload-audio', function () {
-    return view('upload-audio');
-});
-
-Route::post('/upload-audio', function (Request $request) {
-    $request->validate([
-        'audio' => 'required|file|mimes:mp3,wav,m4a',
-    ]);
-
-    $file = $request->file('audio');
-
-    $response = Http::timeout(180)->attach(
-        'file',
-        file_get_contents($file->getRealPath()),
-        $file->getClientOriginalName()
-    )->post('http://whisper:5000/transcribe'); // Docker内ネットワーク名に合わせる
-
-    return view('upload-audio', ['result' => $response->json()['text'] ?? '変換失敗']);
 });
 
 require __DIR__ . '/auth.php';
