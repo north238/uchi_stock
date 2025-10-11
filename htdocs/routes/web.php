@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\GroupController;
-use App\Http\Controllers\LineMessengerController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,10 +23,10 @@ use Inertia\Inertia;
 Route::get('/', function () {
     // ログインしている場合はダッシュボードにリダイレクト
     if (Auth::check()) {
-        return redirect('/dashboard');
+        return redirect('dashboard');
     }
 
-    return redirect('/login');
+    return redirect('login');
 });
 
 Route::get('/dashboard', function () {
@@ -35,14 +34,14 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'check.group'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // プロフィール関連のルーティング
+    // プロフィール関連
     Route::prefix('profile')->as('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    // グループ関連のルーティング
+    // グループ関連
     Route::prefix('groups')->as('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'create'])->name('create');
         Route::post('/', [GroupController::class, 'store'])->name('store');
@@ -53,15 +52,20 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [GroupController::class, 'destroy'])->name('destroy');
     });
 
+    // アイテム関連
+    Route::prefix('items')->as('items.')->group(function () {
+        Route::get('/', [ItemController::class, 'index'])->name('index');
+        Route::get('/create', [ItemController::class, 'create'])->name('create');
+        Route::post('/', [ItemController::class, 'store'])->name('store');
+        Route::get('/{id}', [ItemController::class, 'show'])->name('show');
+        Route::put('/{id}', [ItemController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ItemController::class, 'destroy'])->name('destroy');
+    });
+
+    // todo::DEMO用削除可能
     Route::prefix('voice')->as('voice.')->group(function () {
         Route::get('/', [VoiceController::class, 'create'])->name('create');
     });
-});
-
-//LINEメッセージングAPIのルーティング
-Route::prefix('line')->as('line.')->group(function () {
-    Route::post('/webhook', [LineMessengerController::class, 'webhook'])->name('webhook');
-    Route::get('/message', [LineMessengerController::class, 'message'])->name('message');
 });
 
 require __DIR__ . '/auth.php';
