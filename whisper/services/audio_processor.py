@@ -1,25 +1,23 @@
-from fastapi import FastAPI, UploadFile, HTTPException
-import whisper
 import tempfile
 import subprocess
 import os
+import whisper
+from fastapi import UploadFile, HTTPException
 
-app = FastAPI()
-
-# モデルを起動時にロード（リクエストごとにロードしない）
 model = whisper.load_model("small")
 
 
-@app.post("/transcribe")
-async def transcribe(file: UploadFile):
+async def transcribe_audio(file: UploadFile) -> str:
+    tmp_path = None
+    converted_path = None
     try:
-        # 一時ファイルにアップロードデータを書き込む
+        # 一時ファイル作成
         suffix = os.path.splitext(file.filename)[1] or ".webm"
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(await file.read())
             tmp_path = tmp.name
 
-        # Whisperは16kHz/モノラルが最適 ⇒ ffmpegで変換
+        # ffmpegで16kHz/モノラルに変換（Whisper最適化）
         converted_path = tmp_path.rsplit(".", 1)[0] + "_16k.wav"
         subprocess.run(
             [
@@ -32,7 +30,7 @@ async def transcribe(file: UploadFile):
                 "-ac",
                 "1",
                 "-af",
-                "loudnorm",  # 音量正規化（重要）
+                "loudnorm",  # 音量正規化
                 converted_path,
             ],
             check=True,
@@ -40,34 +38,35 @@ async def transcribe(file: UploadFile):
             stderr=subprocess.DEVNULL,
         )
 
-        # 変換後ファイルをWhisperで文字起こし
+        # Whisperで文字起こし
         result = model.transcribe(
             converted_path,
             language="ja",
-            temperature=0.0,  # 乱数抑制
-            best_of=5,  # 候補数増やす
-            beam_size=10,  # ビーム探索幅を拡大（精度↑, 速度↓）
-            patience=0.2,  # ビームサーチの探索継続率
-            fp16=False,  # CPUで精度を安定化
+            temperature=0.0,
+            best_of=5,
+            beam_size=10,
+            patience=0.2,
+            fp16=False,
             condition_on_previous_text=True,
         )
 
+        # 補正処理（誤変換修正など）
         text = result["text"]
-        corrections = {"無天下": "無添加", "生石犬": "生石鹸"}
+        corrections = {
+            "無天下": "無添加",
+            "生石犬": "生石鹸",
+        }
         for wrong, correct in corrections.items():
             text = text.replace(wrong, correct)
 
-        return {"text": text}
+        return text
 
     except subprocess.CalledProcessError:
         raise HTTPException(status_code=500, detail="音声変換に失敗しました。")
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
     finally:
-        # 一時ファイル削除（ディスク肥大化防止）
-        if os.path.exists(tmp_path):
+        # 一時ファイル削除
+        if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
-        if os.path.exists(converted_path):
+        if converted_path and os.path.exists(converted_path):
             os.remove(converted_path)

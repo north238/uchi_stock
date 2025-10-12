@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir fastapi uvicorn openai-whisper python-multipart
 COPY ./whisper/* ./
 
 # FastAPI起動
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
