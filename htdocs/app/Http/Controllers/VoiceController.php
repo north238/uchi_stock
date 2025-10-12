@@ -44,7 +44,7 @@ class VoiceController extends Controller
             if ($response->successful()) {
                 $text = $response->json()['text'] ?? '変換結果を取得できませんでした';
             } else {
-                $text = 'Whisperサーバーからエラー応答がありました';
+                $text = $response->json()['detail'] ?? 'Whisperサーバーからエラー応答がありました';
             }
         } catch (\Exception $e) {
             $text = '通信エラー: ' . $e->getMessage();
