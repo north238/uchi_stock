@@ -2,8 +2,10 @@ import React from "react";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 
 interface VoiceResult {
-    name: string;
-    quantity: number;
+    status: string;
+    message: string;
+    text: string;
+    items: Array<{ item: string; quantity: number }>;
 }
 
 interface VoiceInputProps {

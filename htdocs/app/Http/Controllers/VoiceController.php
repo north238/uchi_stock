@@ -72,7 +72,7 @@ class VoiceController extends Controller
         return response()->json([
             'status' => isset($data['status']) ? $data['status'] : 'error',
             'message' => $message,
-            'input' => $text,
+            'text' => $text,
             'items' => $items,
         ]);
     }

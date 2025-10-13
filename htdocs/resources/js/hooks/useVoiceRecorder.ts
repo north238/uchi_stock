@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { blobToFormData } from "@/utils/audioUtils";
+import { log } from "console";
 
 interface VoiceResult {
-    name: string;
-    quantity: number;
+    status: string;
+    message: string;
+    text: string;
+    items: Array<{ item: string; quantity: number }>;
 }
 
 export const useVoiceRecorder = (
@@ -14,7 +17,7 @@ export const useVoiceRecorder = (
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
         null
     );
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     const startRecording = async () => {
@@ -38,24 +41,40 @@ export const useVoiceRecorder = (
             setAudioUrl(url);
 
             const formData = blobToFormData(blob);
-            setLoading(true);
 
+            setLoading(true);
             try {
                 const res = await fetch(apiUrl, {
                     method: "POST",
                     body: formData,
                 });
                 if (!res.ok) {
-                    const text = await res.text();
-                    console.error("サーバーエラー:", text);
-                    onResult("サーバーエラー");
+                    const err = await res.json().catch(() => ({}));
+                    onResult({
+                        status: err.status || "error",
+                        message: err.message || "サーバーエラーが発生しました。",
+                        text: "",
+                        items: [],
+                    });
                     return;
                 }
                 const data = await res.json();
-                onResult(data.text);
-            } catch (error) {
+                console.log(data);
+
+                onResult({
+                    status: data.status || "error",
+                    message: data.message || "音声解析に成功しました。",
+                    text: data.text ?? "",
+                    items: data.items ?? [],
+                });
+            } catch (error: any) {
                 console.error(error);
-                onResult("通信エラー");
+                onResult({
+                    status: "error",
+                    message: "通信エラー: " + error.message,
+                    text: "",
+                    items: [],
+                });
             } finally {
                 setLoading(false);
             }

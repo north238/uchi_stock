@@ -44,9 +44,13 @@ export default function Form({
 
             {/* 音声入力コンポーネント */}
             <VoiceInput
-                onResult={({ name, quantity }) => {
-                    setName(name);
-                    setQuantity(quantity);
+                onResult={(result) => {
+                    if (result.status === "success") {
+                        setName(result.items[0]?.item || "");
+                        setQuantity(result.items[0]?.quantity || 1);
+                    } else {
+                        alert(result.message || "音声認識に失敗しました。");
+                    }
                 }}
                 apiUrl={apiUrl}
             />
