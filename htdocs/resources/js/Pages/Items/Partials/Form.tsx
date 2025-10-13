@@ -7,7 +7,11 @@ interface ItemFormProps {
     apiUrl: string;
 }
 
-export default function Form({ initialValues, onSubmit, apiUrl }: ItemFormProps) {
+export default function Form({
+    initialValues,
+    onSubmit,
+    apiUrl,
+}: ItemFormProps) {
     const [name, setName] = useState(initialValues?.name || "");
     const [quantity, setQuantity] = useState(initialValues?.quantity || 1);
 
@@ -39,7 +43,13 @@ export default function Form({ initialValues, onSubmit, apiUrl }: ItemFormProps)
             </label>
 
             {/* 音声入力コンポーネント */}
-            <VoiceInput onResult={(text) => setName(text)} apiUrl={apiUrl} />
+            <VoiceInput
+                onResult={({ name, quantity }) => {
+                    setName(name);
+                    setQuantity(quantity);
+                }}
+                apiUrl={apiUrl}
+            />
 
             <button
                 type="submit"

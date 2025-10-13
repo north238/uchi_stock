@@ -1,8 +1,13 @@
 import React from "react";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 
+interface VoiceResult {
+    name: string;
+    quantity: number;
+}
+
 interface VoiceInputProps {
-    onResult: (text: string) => void;
+    onResult: (result: VoiceResult) => void;
     apiUrl: string;
     label?: string;
 }

@@ -30,28 +30,50 @@ class VoiceController extends Controller
         ]);
 
         $file = $request->file('audio');
+        $whisperUrl = config('services.whisper.url');
 
         try {
-            // WhisperコンテナへPOST
+            // WhisperサーバーへPOST
             $response = Http::timeout(180)->attach(
                 'file',
                 file_get_contents($file->getRealPath()),
                 $file->getClientOriginalName()
-            )->post('http://whisper:5000/transcribe');
+            )->post($whisperUrl);
 
-            Log::debug($response->body());
+            $data = $response->json();
 
-            if ($response->successful()) {
-                $text = $response->json()['text'] ?? '変換結果を取得できませんでした';
+            if ($response->successful() && isset($data['status']) && $data['status'] === 'success') {
+                $text = $data['data']['input'] ?? '音声を認識できませんでした';
+                $items = $data['data']['items'] ?? [];
+                $message = $data['message'] ?? '音声解析に成功しました。';
+            } elseif (isset($data['status']) && $data['status'] === 'error') {
+                // FastAPI側が400や500エラーを返したケース
+                $text = $data['input'] ?? '（入力を取得できません）';
+                $items = [];
+                $message = $data['message'] ?? '音声解析に失敗しました。';
             } else {
-                $text = $response->json()['detail'] ?? 'Whisperサーバーからエラー応答がありました';
+                // 想定外レスポンス
+                $text = 'Whisperサーバーから予期しない応答がありました。';
+                $items = [];
+                $message = '解析処理に失敗しました。';
             }
         } catch (\Exception $e) {
-            $text = '通信エラー: ' . $e->getMessage();
+            Log::error('【音声解析】システムエラー', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $text = '通信エラーが発生しました。';
+            $items = [];
+            $message = 'Whisperサーバーとの通信に失敗しました。';
         }
 
         return response()->json([
-            'text' => $text,
+            'status' => isset($data['status']) ? $data['status'] : 'error',
+            'message' => $message,
+            'input' => $text,
+            'items' => $items,
         ]);
     }
 }

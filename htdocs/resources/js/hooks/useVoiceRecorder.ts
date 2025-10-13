@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { blobToFormData } from "@/utils/audioUtils";
 
+interface VoiceResult {
+    name: string;
+    quantity: number;
+}
+
 export const useVoiceRecorder = (
     apiUrl: string,
-    onResult: (text: string) => void
+    onResult: (result: VoiceResult) => void
 ) => {
     const [recording, setRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(

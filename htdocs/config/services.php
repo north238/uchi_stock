@@ -41,5 +41,8 @@ return [
             'bot_prompt' => 'aggressive',
         ],
     ],
+    'whisper' => [
+        'url' => env('WHISPER_URL', 'http://whisper:5000/transcribe'),
+    ]
 
 ];
