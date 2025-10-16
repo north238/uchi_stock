@@ -3,7 +3,6 @@ import subprocess
 import os
 import whisper
 from fastapi import UploadFile, HTTPException
-from utils.logger import logger
 
 model = whisper.load_model("small")
 

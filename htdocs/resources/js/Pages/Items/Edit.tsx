@@ -1,5 +1,8 @@
 import { router, usePage } from "@inertiajs/react";
 import Form from "./Partials/Form";
+import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { Head } from "@inertiajs/react";
+import { PageProps } from "@/types";
 
 interface Item {
     id: number;
@@ -7,30 +10,28 @@ interface Item {
     quantity: number;
 }
 
-export default function Edit() {
-    const { apiUrl, item } = usePage<{ apiUrl?: string; item: Item }>().props;
-    if (!apiUrl) {
-        return (
-            <div className="text-red-600 text-center mt-8">
-                ⚠️ API URL が設定されていません。
-            </div>
-        );
-    }
+export default function Edit({ auth }: PageProps) {
+    const { apiUrl, item } = usePage<{ apiUrl: string; item: Item }>().props;
 
     const handleSubmit = (data: { name: string; quantity: number }) => {
         router.put(`/items/${item.id}`, data);
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-xl shadow">
-            <h2 className="text-lg font-bold mb-4 text-gray-700">
-                アイテム編集
-            </h2>
+        <Authenticated
+            user={auth.user}
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    アイテム編集
+                </h2>
+            }
+        >
+            <Head title="アイテム編集" />
             <Form
                 initialValues={item}
                 onSubmit={handleSubmit}
                 apiUrl={apiUrl}
             />
-        </div>
+        </Authenticated>
     );
 }

@@ -1,7 +1,10 @@
 import { usePage, router } from "@inertiajs/react";
 import Form from "./Partials/Form";
+import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { Head } from "@inertiajs/react";
+import { PageProps } from "@/types";
 
-export default function Create() {
+export default function Create({ auth }: PageProps) {
     const { apiUrl } = usePage<{ apiUrl: string }>().props;
 
     const handleSubmit = (data: { name: string; quantity: number }) => {
@@ -9,11 +12,16 @@ export default function Create() {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-xl shadow">
-            <h2 className="text-lg font-bold mb-4 text-gray-700">
-                アイテム登録
-            </h2>
+        <Authenticated
+            user={auth.user}
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    アイテム登録
+                </h2>
+            }
+        >
+            <Head title="アイテム登録" />
             <Form onSubmit={handleSubmit} apiUrl={apiUrl} />
-        </div>
+        </Authenticated>
     );
 }

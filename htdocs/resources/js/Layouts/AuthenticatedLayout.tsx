@@ -64,6 +64,14 @@ export default function Authenticated({
                                     Dashboard
                                 </NavLink>
                             </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink
+                                    href={route("items.create")}
+                                    active={route().current("items.create")}
+                                >
+                                    在庫管理
+                                </NavLink>
+                            </div>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">
@@ -192,6 +200,12 @@ export default function Authenticated({
                             active={route().current("dashboard")}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("items.create")}
+                            active={route().current("items.create")}
+                        >
+                            在庫管理
                         </ResponsiveNavLink>
                     </div>
 

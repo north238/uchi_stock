@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from services.audio_processor import transcribe_audio
 from services.text_parser import parse_text

@@ -1,5 +1,7 @@
 import React from "react";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { PiMicrophoneFill } from "react-icons/pi";
+import { PiMicrophoneSlashFill } from "react-icons/pi";
 
 interface VoiceResult {
     status: string;
@@ -19,8 +21,15 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
     apiUrl,
     label = "",
 }) => {
-    const { recording, audioUrl, loading, startRecording, stopRecording } =
-        useVoiceRecorder(apiUrl, onResult);
+    const {
+        recording,
+        audioUrl,
+        loading,
+        processing,
+        progress,
+        startRecording,
+        stopRecording,
+    } = useVoiceRecorder(apiUrl, onResult);
 
     return (
         <div className="w-full flex flex-col items-center space-y-4">
@@ -28,26 +37,48 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
                 <span className="text-gray-700 font-medium">{label}</span>
             )}
 
+            {/* 🔹 状態メッセージ（ボタン上部） */}
+            {recording && !loading && (
+                <p className="text-sm text-red-500 font-medium animate-pulse">
+                    🎙️ 録音中...（残り {Math.round(15 - (progress / 100) * 15)}{" "}
+                    秒）
+                </p>
+            )}
+            {loading && (
+                <p className="text-sm text-blue-500 font-medium animate-pulse">
+                    🔍 音声解析中...
+                </p>
+            )}
+            {!recording && !loading && (
+                <p className="text-sm text-gray-400">タップして録音入力を開始</p>
+            )}
+
+            {/* 🔘 マイクボタン本体 */}
             <button
                 onClick={recording ? stopRecording : startRecording}
                 disabled={loading}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white shadow-md transition-all duration-300 ${
-                    recording
-                        ? "bg-red-500 hover:bg-red-400 animate-pulse"
-                        : "bg-blue-500 hover:bg-blue-400"
-                } ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                className={`
+                    relative w-20 h-20 flex items-center justify-center rounded-full hover:scale-105
+                    ${recording ? "bg-red-500" : "bg-gray-300"}
+                    transition-all duration-300
+                    `}
             >
-                {recording ? (
-                    <>
-                        <span className="text-xl">⏹️</span>
-                        <span>録音停止</span>
-                    </>
-                ) : (
-                    <>
-                        <span className="text-xl">🎙️</span>
-                        <span>{loading ? "処理中…" : "録音開始"}</span>
-                    </>
+                {recording && (
+                    <div
+                        className="absolute inset-0 border-4 border-red-700 rounded-full animate-pulse"
+                        style={{
+                            boxShadow: `0 0 10px rgba(255, 0, 0, 0.5)`,
+                        }}
+                    ></div>
                 )}
+
+                <span className="text-white text-3xl">
+                    {!processing ? (
+                        <PiMicrophoneFill />
+                    ) : (
+                        <PiMicrophoneSlashFill />
+                    )}
+                </span>
             </button>
 
             {audioUrl && (

@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { blobToFormData } from "@/utils/audioUtils";
-import { log } from "console";
 
 interface VoiceResult {
     status: string;
@@ -18,7 +17,12 @@ export const useVoiceRecorder = (
         null
     );
     const [loading, setLoading] = useState<boolean>(false);
+    const [progress, setProgress] = useState<number>(0);
+    const [processing, setProcessing] = useState<boolean>(false);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const MAX_DURATION = 15; // 録音の最大時間（秒）
 
     const startRecording = async () => {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -30,19 +34,26 @@ export const useVoiceRecorder = (
 
         const recorder = new MediaRecorder(stream, { mimeType: type });
         const chunks: BlobPart[] = [];
+        let elapsed = 0;
 
         recorder.ondataavailable = (e: BlobEvent) => {
             if (e.data.size > 0) chunks.push(e.data);
         };
 
+        // 録音停止時の処理
         recorder.onstop = async () => {
+            // タイマー停止
+            if (timerRef.current) clearInterval(timerRef.current);
+            setProgress(0);
+
             const blob = new Blob(chunks, { type: recorder.mimeType });
             const url = URL.createObjectURL(blob);
-            setAudioUrl(url);
-
             const formData = blobToFormData(blob);
 
+            setAudioUrl(url);
             setLoading(true);
+            setProcessing(true);
+
             try {
                 const res = await fetch(apiUrl, {
                     method: "POST",
@@ -52,14 +63,14 @@ export const useVoiceRecorder = (
                     const err = await res.json().catch(() => ({}));
                     onResult({
                         status: err.status || "error",
-                        message: err.message || "サーバーエラーが発生しました。",
+                        message:
+                            err.message || "サーバーエラーが発生しました。",
                         text: "",
                         items: [],
                     });
                     return;
                 }
                 const data = await res.json();
-                console.log(data);
 
                 onResult({
                     status: data.status || "error",
@@ -76,9 +87,19 @@ export const useVoiceRecorder = (
                     items: [],
                 });
             } finally {
+                setProcessing(false);
                 setLoading(false);
             }
         };
+
+        // 録音中タイマー（15秒で自動停止）
+        timerRef.current = setInterval(() => {
+            elapsed += 0.1;
+            setProgress((elapsed / MAX_DURATION) * 100);
+            if (elapsed >= MAX_DURATION) {
+                stopRecording();
+            }
+        }, 100);
 
         recorder.start();
         setMediaRecorder(recorder);
@@ -86,9 +107,21 @@ export const useVoiceRecorder = (
     };
 
     const stopRecording = () => {
-        mediaRecorder?.stop();
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        }
+        if (timerRef.current) clearInterval(timerRef.current);
         setRecording(false);
     };
 
-    return { recording, audioUrl, loading, startRecording, stopRecording };
+    return {
+        recording,
+        audioUrl,
+        loading,
+        processing,
+        progress,
+        startRecording,
+        stopRecording,
+    };
 };
