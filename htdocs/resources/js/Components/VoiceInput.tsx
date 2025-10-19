@@ -50,7 +50,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
                 </p>
             )}
             {!recording && !loading && (
-                <p className="text-sm text-gray-400">タップして録音入力を開始</p>
+                <p className="text-sm text-gray-400">タップして音声入力を開始</p>
             )}
 
             {/* 🔘 マイクボタン本体 */}

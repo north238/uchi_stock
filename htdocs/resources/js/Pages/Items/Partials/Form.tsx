@@ -1,56 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
+import { showErrorToast } from "@/utils/toast";
+import InputError from "@/Components/InputError";
+
+type FormItemFields = {
+    name: string;
+    quantity: number;
+};
 
 interface ItemFormProps {
-    initialValues?: { name: string; quantity: number };
-    onSubmit: (data: { name: string; quantity: number }) => void;
+    data: FormItemFields;
+    setData: ((field: string, value?: any) => void) | ((payload: Partial<FormItemFields>) => void);
+    onSubmit: (formData: FormItemFields) => void;
     apiUrl: string;
+    errors?: Record<string, string>;
+    processing: boolean;
 }
 
 export default function Form({
-    initialValues,
+    data,
+    setData,
     onSubmit,
     apiUrl,
+    errors,
+    processing,
 }: ItemFormProps) {
-    const [name, setName] = useState(initialValues?.name || "");
-    const [quantity, setQuantity] = useState(initialValues?.quantity || 1);
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        (setData as (field: string, value: any) => void)("name", e.target.value);
+    };
+
+    const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const q = Number(e.target.value) || 0;
+        (setData as (field: string, value: any) => void)("quantity", q);
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit({ name, quantity });
+        onSubmit(data);
     };
 
     return (
         <div className="py-12">
             <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-md sm:rounded-lg">
-                <form onSubmit={handleSubmit} className="space-y-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <InputLabel htmlFor="name" value="品名" />
                         <TextInput
                             type="text"
+                            id="name"
                             name="name"
-                            placeholder="りんご"
+                            placeholder="サンプル品名"
                             className="mt-1 block w-full"
                             isFocused={true}
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={data?.name}
+                            error={!!errors?.name}
+                            onChange={handleNameChange}
                         />
+                        <InputError message={errors?.name} className="mt-2" />
                     </div>
 
                     <div>
                         <InputLabel htmlFor="quantity" value="個数" />
                         <TextInput
                             type="number"
+                            id="quantity"
                             name="quantity"
                             className="mt-1 block w-full"
-                            isFocused={true}
-                            value={quantity}
-                            onChange={(e) =>
-                                setQuantity(Number(e.target.value))
-                            }
+                            isFocused={false}
+                            value={String(data?.quantity)}
+                            error={!!errors?.quantity}
+                            onChange={handleQuantityChange}
+                        />
+                        <InputError
+                            message={errors?.quantity}
+                            className="mt-2"
                         />
                     </div>
 
@@ -58,10 +84,16 @@ export default function Form({
                     <VoiceInput
                         onResult={(result) => {
                             if (result.status === "success") {
-                                setName(result.items[0]?.item || "");
-                                setQuantity(result.items[0]?.quantity || 1);
+                                const itemName = result.items[0]?.item || "";
+                                const itemQuantity =
+                                    result.items[0]?.quantity || 1;
+
+                                (setData as (payload: Partial<FormItemFields>) => void)({
+                                    name: itemName,
+                                    quantity: itemQuantity,
+                                });
                             } else {
-                                alert(
+                                showErrorToast(
                                     result.message || "音声認識に失敗しました。"
                                 );
                             }
@@ -69,7 +101,7 @@ export default function Form({
                         apiUrl={apiUrl}
                     />
 
-                    <PrimaryButton>保存</PrimaryButton>
+                    <PrimaryButton type="submit" disabled={processing}>保存</PrimaryButton>
                 </form>
             </div>
         </div>

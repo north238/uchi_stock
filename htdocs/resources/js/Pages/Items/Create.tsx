@@ -1,14 +1,30 @@
-import { usePage, router } from "@inertiajs/react";
 import Form from "./Partials/Form";
+import { usePage, useForm, Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
+
+type FormItemFields = {
+    name: string;
+    quantity: number;
+}
 
 export default function Create({ auth }: PageProps) {
     const { apiUrl } = usePage<{ apiUrl: string }>().props;
+    const { data, setData, post, processing, errors, reset } =
+        useForm({
+            name: "",
+            quantity: 1,
+        });
 
-    const handleSubmit = (data: { name: string; quantity: number }) => {
-        router.post("/items", data);
+    const handleSubmit = (formData: FormItemFields) => {
+        setData(formData);
+
+        post(route("items.store"), {
+            preserveScroll: true,
+            onSuccess: () => {
+                reset("name", "quantity");
+            },
+        });
     };
 
     return (
@@ -21,7 +37,14 @@ export default function Create({ auth }: PageProps) {
             }
         >
             <Head title="アイテム登録" />
-            <Form onSubmit={handleSubmit} apiUrl={apiUrl} />
+            <Form
+                data={data}
+                setData={setData}
+                onSubmit={handleSubmit}
+                apiUrl={apiUrl}
+                errors={errors}
+                processing={processing}
+            />
         </Authenticated>
     );
 }
