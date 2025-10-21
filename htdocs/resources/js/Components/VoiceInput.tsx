@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { PiMicrophoneFill } from "react-icons/pi";
 import { PiMicrophoneSlashFill } from "react-icons/pi";
@@ -14,12 +14,14 @@ interface VoiceInputProps {
     onResult: (result: VoiceResult) => void;
     apiUrl: string;
     label?: string;
+    onProcessingChange?: (processing: boolean) => void;
 }
 
 const VoiceInput: React.FC<VoiceInputProps> = ({
     onResult,
     apiUrl,
     label = "",
+    onProcessingChange,
 }) => {
     const {
         recording,
@@ -30,6 +32,11 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
         startRecording,
         stopRecording,
     } = useVoiceRecorder(apiUrl, onResult);
+
+    // 親コンポーネントに処理状態を通知
+    useEffect(() => {
+        if (onProcessingChange) onProcessingChange(processing);
+    }, [processing, onProcessingChange]);
 
     return (
         <div className="w-full flex flex-col items-center space-y-4">
@@ -45,21 +52,24 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
                 </p>
             )}
             {loading && (
-                <p className="text-sm text-blue-500 font-medium animate-pulse">
+                <p className="text-sm text-blue-400 font-medium animate-pulse">
                     🔍 音声解析中...
                 </p>
             )}
             {!recording && !loading && (
-                <p className="text-sm text-gray-400">タップして音声入力を開始</p>
+                <p className="text-sm text-gray-400">
+                    タップして音声入力を開始
+                </p>
             )}
 
             {/* 🔘 マイクボタン本体 */}
             <button
                 onClick={recording ? stopRecording : startRecording}
+                type="button"
                 disabled={loading}
                 className={`
                     relative w-20 h-20 flex items-center justify-center rounded-full hover:scale-105
-                    ${recording ? "bg-red-500" : "bg-gray-300"}
+                    ${recording ? "bg-red-600 dark:bg-red-200" : "bg-blue-600 dark:bg-blue-200"}
                     transition-all duration-300
                     `}
             >
@@ -72,7 +82,13 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
                     ></div>
                 )}
 
-                <span className="text-white text-3xl">
+                <span
+                    className={`text-white text-3xl ${
+                        recording
+                            ? "dark:text-red-500"
+                            : "dark:text-blue-500"
+                    }`}
+                >
                     {!processing ? (
                         <PiMicrophoneFill />
                     ) : (

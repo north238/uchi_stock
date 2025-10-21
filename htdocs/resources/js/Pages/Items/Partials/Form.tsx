@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -13,7 +13,9 @@ type FormItemFields = {
 
 interface ItemFormProps {
     data: FormItemFields;
-    setData: ((field: string, value?: any) => void) | ((payload: Partial<FormItemFields>) => void);
+    setData:
+        | ((field: string, value?: any) => void)
+        | ((payload: Partial<FormItemFields>) => void);
     onSubmit: (formData: FormItemFields) => void;
     apiUrl: string;
     errors?: Record<string, string>;
@@ -28,8 +30,15 @@ export default function Form({
     errors,
     processing,
 }: ItemFormProps) {
+    const [voiceProcessing, setVoiceProcessing] = useState(false);
+    const nameRef = React.useRef<HTMLInputElement | null>(null);
+    const nameEmpty = !data.name || data.name.trim() === "";
+
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        (setData as (field: string, value: any) => void)("name", e.target.value);
+        (setData as (field: string, value: any) => void)(
+            "name",
+            e.target.value
+        );
     };
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +48,12 @@ export default function Form({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // クライアント側バリデーション
+        if (nameEmpty) {
+            showErrorToast("品名を入力してください。");
+            nameRef.current?.focus();
+            return;
+        }
         onSubmit(data);
     };
 
@@ -52,12 +67,14 @@ export default function Form({
                             type="text"
                             id="name"
                             name="name"
-                            placeholder="サンプル品名"
+                            placeholder="例：りんご"
                             className="mt-1 block w-full"
                             isFocused={true}
-                            value={data?.name}
+                            value={data.name ?? ""}
                             error={!!errors?.name}
+                            ref={nameRef}
                             onChange={handleNameChange}
+                            disabled={voiceProcessing || processing}
                         />
                         <InputError message={errors?.name} className="mt-2" />
                     </div>
@@ -70,9 +87,10 @@ export default function Form({
                             name="quantity"
                             className="mt-1 block w-full"
                             isFocused={false}
-                            value={String(data?.quantity)}
+                            value={String(data?.quantity ?? 1)}
                             error={!!errors?.quantity}
                             onChange={handleQuantityChange}
+                            disabled={voiceProcessing || processing}
                         />
                         <InputError
                             message={errors?.quantity}
@@ -88,7 +106,11 @@ export default function Form({
                                 const itemQuantity =
                                     result.items[0]?.quantity || 1;
 
-                                (setData as (payload: Partial<FormItemFields>) => void)({
+                                (
+                                    setData as (
+                                        payload: Partial<FormItemFields>
+                                    ) => void
+                                )({
                                     name: itemName,
                                     quantity: itemQuantity,
                                 });
@@ -99,9 +121,15 @@ export default function Form({
                             }
                         }}
                         apiUrl={apiUrl}
+                        onProcessingChange={(p) => setVoiceProcessing(p)}
                     />
 
-                    <PrimaryButton type="submit" disabled={processing}>保存</PrimaryButton>
+                    <PrimaryButton
+                        type="submit"
+                        disabled={processing || voiceProcessing || nameEmpty}
+                    >
+                        保存
+                    </PrimaryButton>
                 </form>
             </div>
         </div>

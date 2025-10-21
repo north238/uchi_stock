@@ -3,11 +3,6 @@ import { usePage, useForm, Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
 
-type FormItemFields = {
-    name: string;
-    quantity: number;
-}
-
 export default function Create({ auth }: PageProps) {
     const { apiUrl } = usePage<{ apiUrl: string }>().props;
     const { data, setData, post, processing, errors, reset } =
@@ -16,9 +11,7 @@ export default function Create({ auth }: PageProps) {
             quantity: 1,
         });
 
-    const handleSubmit = (formData: FormItemFields) => {
-        setData(formData);
-
+    const handleSubmit = () => {
         post(route("items.store"), {
             preserveScroll: true,
             onSuccess: () => {
