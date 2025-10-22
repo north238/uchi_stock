@@ -14,7 +14,6 @@ class Item extends Model
         'name',
         'quantity',
         'memo',
-        'image_path',
         'genre_id',
         'place_id',
         'group_id',
@@ -40,5 +39,44 @@ class Item extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * アイテムデータの作成
+     *
+     * @param array $data 登録データの配列
+     * @return \App\Models\Item 登録したアイテムデータ
+     */
+    public function createItem(array $data): Item
+    {
+        return $this->create($data);
+    }
+
+    /**
+     * アイテムデータの取得
+     *
+     * @param int $itemId アイテムID
+     * @return \App\Models\Item|null アイテムデータ
+     */
+    public function getItem(int $itemId): ?Item
+    {
+        return $this->find($itemId);
+    }
+
+    /**
+     * アイテムデータの更新
+     *
+     * @param int $itemId アイテムID
+     * @param array $data 更新データの配列
+     * @return \App\Models\Item|null 更新したアイテムデータ
+     */
+    public function updateItem(int $itemId, array $data): ?Item
+    {
+        $item = $this->find($itemId);
+        if ($item) {
+            $item->update($data);
+            return $item;
+        }
+        return null;
     }
 }
