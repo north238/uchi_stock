@@ -9,136 +9,120 @@ import { useForm, Link } from "@inertiajs/react";
 import { User } from "@/types";
 
 export default function DeleteGroupForm({
-    className = "",
-    auth,
+  className = "",
+  auth,
 }: {
-    className?: string;
-    auth: {
-        user: User;
-    };
+  className?: string;
+  auth: {
+    user: User;
+  };
 }) {
-    const [confirmingGroupDeletion, setConfirmingGroupDeletion] =
-        useState(false);
-    const passwordInput = useRef<HTMLInputElement>(null);
+  const [confirmingGroupDeletion, setConfirmingGroupDeletion] = useState(false);
+  const passwordInput = useRef<HTMLInputElement>(null);
 
-    const {
-        data,
-        setData,
-        delete: destroy,
-        processing,
-        reset,
-        errors,
-    } = useForm({
-        password: "",
+  const {
+    data,
+    setData,
+    delete: destroy,
+    processing,
+    reset,
+    errors,
+  } = useForm({
+    password: "",
+  });
+
+  const confirmGroupDeletion = () => {
+    setConfirmingGroupDeletion(true);
+  };
+
+  const deleteGroup: FormEventHandler = (e) => {
+    e.preventDefault();
+
+    const groupId = auth.user.group_id;
+
+    destroy(route("groups.destroy", groupId), {
+      preserveScroll: true,
+      onSuccess: () => closeModal(),
+      onError: () => passwordInput.current?.focus(),
+      onFinish: () => reset(),
     });
+  };
 
-    const confirmGroupDeletion = () => {
-        setConfirmingGroupDeletion(true);
-    };
+  const closeModal = () => {
+    setConfirmingGroupDeletion(false);
 
-    const deleteGroup: FormEventHandler = (e) => {
-        e.preventDefault();
+    reset();
+  };
 
-        const groupId = auth.user.group_id;
+  return (
+    <section className={`space-y-6 ${className}`}>
+      <header>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">グループ削除</h2>
 
-        destroy(route("groups.destroy", groupId), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current?.focus(),
-            onFinish: () => reset(),
-        });
-    };
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          グループを削除すると、すべてのリソースとデータが完全に削除されます。
+          <br />
+          削除したグループは復元できませんのでご注意ください。
+          <br />
+          グループを削除するには、パスワードを入力してください。
+        </p>
+      </header>
 
-    const closeModal = () => {
-        setConfirmingGroupDeletion(false);
+      {auth.user.is_password_set === false ? (
+        <div>
+          <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
+            グループを削除するには、パスワードを下記リンクより設定してください。
+          </p>
+          <Link
+            href={route("profile.edit")}
+            className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+          >
+            パスワード設定
+          </Link>
+        </div>
+      ) : (
+        <DangerButton onClick={confirmGroupDeletion}>削除する</DangerButton>
+      )}
 
-        reset();
-    };
+      <Modal show={confirmingGroupDeletion} onClose={closeModal} maxWidth="md">
+        <form onSubmit={deleteGroup} className="p-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            グループ削除を実行しますか？
+          </h2>
 
-    return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    グループ削除
-                </h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            グループを削除すると、すべてのリソースとデータが完全に削除されます。
+            <br />
+            削除したグループは復元できませんのでご注意ください。
+          </p>
 
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    グループを削除すると、すべてのリソースとデータが完全に削除されます。
-                    <br />
-                    削除したグループは復元できませんのでご注意ください。
-                    <br />
-                    グループを削除するには、パスワードを入力してください。
-                </p>
-            </header>
+          <div className="mt-6">
+            <InputLabel htmlFor="password" value="パスワード" />
 
-            {auth.user.is_password_set === false ? (
-                <div>
-                    <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                        グループを削除するには、パスワードを下記リンクより設定してください。
-                    </p>
-                    <Link
-                        href={route("profile.edit")}
-                        className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
-                    >
-                        パスワード設定
-                    </Link>
-                </div>
-            ) : (
-                <DangerButton onClick={confirmGroupDeletion}>
-                    削除する
-                </DangerButton>
-            )}
+            <TextInput
+              id="password"
+              type="password"
+              name="password"
+              ref={passwordInput}
+              value={data.password}
+              onChange={(e) => setData("password", e.target.value)}
+              className="mt-1 block w-3/4"
+              isFocused
+              placeholder="••••••••"
+            />
 
-            <Modal
-                show={confirmingGroupDeletion}
-                onClose={closeModal}
-                maxWidth="md"
-            >
-                <form onSubmit={deleteGroup} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        グループ削除を実行しますか？
-                    </h2>
+            <InputError message={errors.password} className="mt-2" />
+          </div>
 
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        グループを削除すると、すべてのリソースとデータが完全に削除されます。
-                        <br />
-                        削除したグループは復元できませんのでご注意ください。
-                    </p>
+          <div className="mt-4 flex justify-center gap-2">
+            <SecondaryButton onClick={closeModal}>キャンセル</SecondaryButton>
 
-                    <div className="mt-6">
-                        <InputLabel htmlFor="password" value="パスワード" />
-
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                            className="mt-1 block w-3/4"
-                            isFocused
-                            placeholder="••••••••"
-                        />
-
-                        <InputError
-                            message={errors.password}
-                            className="mt-2"
-                        />
-                    </div>
-
-                    <div className="mt-4 flex justify-center gap-2">
-                        <SecondaryButton onClick={closeModal}>
-                            キャンセル
-                        </SecondaryButton>
-
-                        <DangerButton className="" disabled={processing}>
-                            削除する
-                        </DangerButton>
-                    </div>
-                </form>
-            </Modal>
-        </section>
-    );
+            <DangerButton className="" disabled={processing}>
+              削除する
+            </DangerButton>
+          </div>
+        </form>
+      </Modal>
+    </section>
+  );
 }

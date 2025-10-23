@@ -4,9 +4,13 @@
     "scripts": {
         "dev": "vite --host",
         "build": "tsc && vite build && vite build --ssr",
-        "tsc": "tsc"
+        "tsc": "tsc",
+        "lint": "eslint 'resources/js/**/*.{ts,tsx}'",
+        "lint:fix": "eslint 'resources/js/**/*.{ts,tsx}' --fix",
+        "format": "prettier --write 'resources/js/**/*.{ts,tsx,js,jsx,json,css,scss,md}'"
     },
     "devDependencies": {
+        "@eslint/js": "^9.38.0",
         "@headlessui/react": "^1.4.2",
         "@inertiajs/react": "^1.0.0",
         "@tailwindcss/forms": "^0.5.3",
@@ -16,12 +20,17 @@
         "@vitejs/plugin-react": "^4.2.0",
         "autoprefixer": "^10.4.12",
         "axios": "^1.6.4",
+        "eslint": "^9.38.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react": "^7.37.5",
         "laravel-vite-plugin": "^1.0.0",
         "postcss": "^8.4.31",
+        "prettier": "^3.6.2",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "tailwindcss": "^3.2.1",
         "typescript": "^5.0.2",
+        "typescript-eslint": "^8.46.2",
         "vite": "^5.0.0"
     },
     "dependencies": {
