@@ -35,7 +35,7 @@ export default function UpdateGroupForm({
     // 保存処理
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route("group.update", group.id));
+        put(route("groups.update", group.id));
     };
 
     return (

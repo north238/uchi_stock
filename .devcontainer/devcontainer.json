@@ -1,0 +1,21 @@
+{
+  "name": "UchiStock DevContainer",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "postCreateCommand": "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi && composer install && npm install",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "ms-azuretools.vscode-docker",
+        "felixfbecker.php-debug",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  }
+}

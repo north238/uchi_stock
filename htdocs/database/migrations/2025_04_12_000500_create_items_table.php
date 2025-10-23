@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('アイテム名');
             $table->integer('quantity')->default(1)->comment('数量');
+            $table->integer('is_favorite')->default(0)->comment('お気に入りフラグ');
             $table->string('memo')->nullable()->comment('メモ');
-            $table->string('image_path')->nullable()->comment('OCR元画像のパス');
             $table->foreignId('genre_id')->nullable()->constrained('genres')->nullOnDelete()->comment('ジャンルID'); // ジャンル削除時 NULL にする
             $table->foreignId('place_id')->nullable()->constrained('places')->nullOnDelete()->comment('保管場所ID'); // 保管場所削除時 NULL にする
             $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete()->comment('グループID'); // グループ削除時 NULL にする

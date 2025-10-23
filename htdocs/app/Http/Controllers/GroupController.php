@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Group\GroupCreationFailedException;
+use App\Exceptions\Group\GroupHasMembersException;
+use App\Exceptions\Group\GroupNotFoundException;
 use App\Http\Requests\GroupCreateRequest;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\User;
-use App\Notifications\GroupJoinRequestNotification;
 use App\Services\GroupService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -18,13 +20,13 @@ use Illuminate\Support\Facades\Log;
 class GroupController extends Controller
 {
     /**
-     * @var Group $group
+     * @var Group $groups
      */
-    protected $group;
+    protected $groups;
     /**
-     * @var User $user
+     * @var User $users
      */
-    protected $user;
+    protected $users;
     /**
      * @var GroupUser $groupUsers
      */
@@ -34,10 +36,10 @@ class GroupController extends Controller
      */
     protected $groupService;
 
-    public function __construct(Group $group, User $user, GroupUser $groupUsers, GroupService $groupService)
+    public function __construct(Group $groups, User $users, GroupUser $groupUsers, GroupService $groupService)
     {
-        $this->group = $group;
-        $this->user = $user;
+        $this->groups = $groups;
+        $this->users = $users;
         $this->groupUsers = $groupUsers;
         $this->groupService = $groupService;
     }
@@ -101,7 +103,7 @@ class GroupController extends Controller
     public function edit(int $id): RedirectResponse|\Inertia\Response
     {
         // グループ情報を取得
-        $group = $this->group->find($id);
+        $group = $this->groups->getGroup($id);
         if (!$group) {
             return redirect()->back()->with('error', 'グループが見つかりません。');
         }
@@ -125,26 +127,36 @@ class GroupController extends Controller
             // バリデーション
             $requestData = $request->validated();
 
-            // グループ情報を取得
-            $group = $this->group->find($id);
-            if (!$group) {
-                throw new Exception('グループが見つかりません');
-            }
+            DB::beginTransaction();
 
             // グループ情報を更新
-            $group->update($requestData);
+            $group = $this->groups->updateGroup($id, $requestData);
+            if (!$group) {
+                throw new GroupNotFoundException('グループが見つかりません', 404, [
+                    'group_id' => $id,
+                    'request' => $request->except(['password', '_token']),
+                ]);
+            }
+
+            DB::commit();
 
             // 成功メッセージを表示
             return redirect()->route('groups.edit', $group->id)->with('success', 'グループ情報が更新されました。');
-        } catch (Exception $e) {
-            Log::error('【グループ】更新処理エラー', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-                'request' => $request->except(['password', '_token']),
-            ]);
+        } catch (GroupNotFoundException $e) { // カスタム例外
+            report($e);
 
-            return redirect()->back()->with(['error' => 'グループ更新に失敗しました。']);
+            DB::rollBack();
+
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+
+            // トランザクションが開始されている場合はロールバック
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
+            return redirect()->back()->with('error', 'グループ更新に失敗しました。');
         }
     }
 
@@ -155,16 +167,18 @@ class GroupController extends Controller
     {
         try {
             // グループ情報を取得
-            $group = $this->group->find($id);
+            $group = $this->groups->getGroup($id);
             if (!$group) {
-                $errorMessage = 'グループが見つかりません';
-                throw new Exception($errorMessage);
+                throw new GroupNotFoundException('グループが見つかりません', 404, [
+                    'group_id' => $id,
+                ]);
             }
 
             // グループ内にメンバーがいる場合は削除できない
             if ($this->groupUsers->getValidGroupUsers($id)->count() > 1) {
-                $errorMessage = 'グループ内にメンバーがいるため、削除できません';
-                throw new Exception($errorMessage);
+                throw new GroupHasMembersException('グループ内にメンバーがいるため、削除できません', 404, [
+                    'group_id' => $id,
+                ]);
             }
 
             DB::beginTransaction();
@@ -174,7 +188,7 @@ class GroupController extends Controller
 
             // ユーザーのグループIDをnullに更新
             $userId = Auth::user()->id;
-            $this->user->updateGroupId($userId, null);
+            $this->users->updateGroupId($userId, null);
 
             // グループユーザーデータの削除
             $type = 'delete';
@@ -188,16 +202,20 @@ class GroupController extends Controller
             ]);
             // 成功メッセージを表示
             return redirect()->route('dashboard')->with('success', 'グループが削除されました。');
+        } catch (GroupNotFoundException $e) { // グループが見つからない場合
+            report($e);
+
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (GroupHasMembersException $e) { // グループ内にメンバーがいる場合
+            report($e);
+
+            return redirect()->back()->with('error', $e->getMessage());
         } catch (Exception $e) {
-            Log::error('【グループ】削除処理エラー', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
+            report($e);
 
             DB::rollBack();
 
-            return redirect()->back()->with(['error' => $errorMessage ?? 'グループ削除に失敗しました。']);
+            return redirect()->back()->with('error', 'グループ削除に失敗しました。');
         }
     }
 
@@ -211,22 +229,25 @@ class GroupController extends Controller
     {
         try {
             $user = $request->user();
+
             // 仮グループ作成
             $status = $this->groupService->initializeGroup($user);
             if ($status === false) {
-                $errorMessage = 'グループの自動生成に失敗しました';
-                throw new Exception($errorMessage);
+                throw new GroupCreationFailedException('グループの自動生成に失敗しました', 404, [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                ]);
             }
 
             return redirect()->route('dashboard')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
-        } catch (Exception $e) {
-            Log::error('【グループ】自動生成処理エラー', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
+        } catch (GroupCreationFailedException $e) { // グループ作成エラーの場合
+            report($e);
 
-            return redirect()->back()->with(['error' => $errorMessage ?? 'グループの自動生成に失敗しました。']);
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+
+            return redirect()->back()->with('error', 'グループの自動生成に失敗しました。');
         }
     }
 
@@ -237,7 +258,7 @@ class GroupController extends Controller
     {
         try {
             // グループ情報を取得
-            $group = $this->group->find($id);
+            $group = $this->groups->getGroup($id);
             if (!$group) {
                 $errorMessage = 'グループが見つかりません';
                 throw new Exception($errorMessage);
@@ -253,7 +274,7 @@ class GroupController extends Controller
             DB::beginTransaction();
 
             // ユーザーのグループIDをnullに更新
-            $this->user->updateGroupId($userId, null);
+            $this->users->updateGroupId($userId, null);
 
             // グループユーザーデータの退会処理
             $this->groupService->deleteGroupUser($userId, $id);
@@ -277,45 +298,5 @@ class GroupController extends Controller
 
             return redirect()->back()->with(['error' => $errorMessage ?? 'グループからの脱退に失敗しました。']);
         }
-    }
-
-    /**
-     * グループへの参加処理
-     * - 招待状からの参加
-     */
-    public function joinGroup($id)
-    {
-        //
-    }
-
-    /**
-     * グループへの参加を申請する
-     *
-     * @param Request $request
-     * @param int $id グループID
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function requestToJoin(Request $request, int $id): RedirectResponse
-    {
-        // グループ情報を取得
-        $group = $this->group->find($id);
-        if (!$group) {
-            return redirect()->back()->with('error', 'グループが見つかりません。');
-        }
-
-        // 申請者のメールアドレスを取得
-        $applicantEmail = $request->user()->email;
-
-        // グループ管理者のメールアドレスを取得
-        $admin = $this->user->find($group->created_by);
-        if (!$admin || !$admin->email) {
-            return redirect()->back()->with('error', 'グループ管理者のメールアドレスが見つかりません。');
-        }
-
-        // メールを送信
-        $admin->notify(new GroupJoinRequestNotification($group->name, $applicantEmail));
-
-        // 成功メッセージを表示
-        return redirect()->back()->with('success', 'グループ管理者に参加申請を送信しました。');
     }
 }

@@ -47,7 +47,7 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
     volumes:
-      - ./htdocs:/var/www/html
+      - ./htdocs:/var/www/html:cached
       - ./htdocs/node_modules:/var/www/html/node_modules
     working_dir: /var/www/html
     tty: true
@@ -75,6 +75,18 @@ services:
     depends_on:
       - app
       - redis
+    networks:
+      - uchistock_network
+
+  whisper:
+    container_name: uchistock-whisper
+    build:
+      context: .
+      dockerfile: ./docker/whisper/Dockerfile
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./whisper:/usr/src/app
     networks:
       - uchistock_network
 
