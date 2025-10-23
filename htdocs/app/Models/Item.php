@@ -13,6 +13,7 @@ class Item extends Model
     protected $fillable = [
         'name',
         'quantity',
+        'is_favorite',
         'memo',
         'genre_id',
         'place_id',

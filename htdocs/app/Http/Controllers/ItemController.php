@@ -60,6 +60,10 @@ class ItemController extends Controller
             $saveData = [
                 'name' => $requestData['name'],
                 'quantity' => $requestData['quantity'],
+                'is_favorite' => $requestData['is_favorite'] ?? 0,
+                'memo' => $requestData['memo'] ?? null,
+                'genre_id' => $requestData['genre_id'] ?? null,
+                'place_id' => $requestData['place_id'] ?? null,
                 'group_id' => $request->user()->group_id,
                 'created_by' => $request->user()->id,
             ];
