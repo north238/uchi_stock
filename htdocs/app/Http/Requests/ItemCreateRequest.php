@@ -24,6 +24,9 @@ class ItemCreateRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'quantity' => 'required|integer|min:0',
+            'memo' => 'nullable|string|max:255',
+            'genre_id' => 'nullable|integer|exists:genres,id',
+            'place_id' => 'nullable|integer|exists:places,id',
         ];
     }
 
@@ -35,6 +38,9 @@ class ItemCreateRequest extends FormRequest
         return [
             'name' => '品名',
             'quantity' => '数量',
+            'memo' => 'メモ',
+            'genre_id' => 'ジャンル',
+            'place_id' => '保管場所',
         ];
     }
 }
