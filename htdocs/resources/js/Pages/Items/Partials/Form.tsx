@@ -6,12 +6,14 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { showErrorToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
 import SelectInput from "@/Components/SelectInput";
+import { TextArea } from "@/Components/TextArea";
 
 type FormItemFields = {
   name: string;
   quantity: number;
   genre_id?: string;
   place_id?: string;
+  memo?: string;
 };
 
 interface ItemFormProps {
@@ -65,6 +67,10 @@ export default function Form({
 
   const handlePlaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setData("place_id", e.target.value);
+  };
+
+  const handleMemoChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setData("memo", e.target.value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -144,6 +150,21 @@ export default function Form({
               disabled={voiceProcessing || processing}
             />
             <InputError message={errors?.place_id} className="mt-2" />
+          </div>
+
+          <div>
+            <InputLabel htmlFor="memo" value="メモ（任意）" />
+            <TextArea
+              id="memo"
+              name="memo"
+              value={data.memo || ""}
+              placeholder="フリー入力"
+              onChange={handleMemoChange}
+              error={!!errors?.memo}
+              className="mt-1 block w-full"
+              disabled={voiceProcessing || processing}
+            />
+            <InputError message={errors?.memo} className="mt-2" />
           </div>
 
           {/* 音声入力コンポーネント */}
