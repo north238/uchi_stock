@@ -5,10 +5,13 @@ import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { showErrorToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
+import SelectInput from "@/Components/SelectInput";
 
 type FormItemFields = {
   name: string;
   quantity: number;
+  genre_id?: string;
+  place_id?: string;
 };
 
 interface ItemFormProps {
@@ -32,6 +35,21 @@ export default function Form({
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
 
+  // ジャンルとロケーションのオプション定義
+  const genreOptions = [
+    { value: "", label: "---" },
+    { value: "1", label: "食品" },
+    { value: "2", label: "日用品" },
+    { value: "3", label: "文具" },
+  ];
+
+  const placeOptions = [
+    { value: "", label: "---" },
+    { value: "1", label: "キッチン" },
+    { value: "2", label: "リビング" },
+    { value: "3", label: "洗面所" },
+  ];
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     (setData as (field: string, value: any) => void)("name", e.target.value);
   };
@@ -39,6 +57,14 @@ export default function Form({
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = Number(e.target.value) || 0;
     (setData as (field: string, value: any) => void)("quantity", q);
+  };
+
+  const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setData("genre_id", e.target.value);
+  };
+
+  const handlePlaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setData("place_id", e.target.value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -88,6 +114,36 @@ export default function Form({
               disabled={voiceProcessing || processing}
             />
             <InputError message={errors?.quantity} className="mt-2" />
+          </div>
+
+          <div>
+            <InputLabel htmlFor="genre_id" value="ジャンル（任意）" />
+            <SelectInput
+              id="genre_id"
+              name="genre_id"
+              options={genreOptions}
+              value={data.genre_id || ""}
+              onChange={handleGenreChange}
+              error={!!errors?.genre_id}
+              className="mt-1 block w-full"
+              disabled={voiceProcessing || processing}
+            />
+            <InputError message={errors?.genre_id} className="mt-2" />
+          </div>
+
+          <div>
+            <InputLabel htmlFor="place_id" value="保管場所（任意）" />
+            <SelectInput
+              id="place_id"
+              name="place_id"
+              options={placeOptions}
+              value={data.place_id || ""}
+              onChange={handlePlaceChange}
+              error={!!errors?.place_id}
+              className="mt-1 block w-full"
+              disabled={voiceProcessing || processing}
+            />
+            <InputError message={errors?.place_id} className="mt-2" />
           </div>
 
           {/* 音声入力コンポーネント */}

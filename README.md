@@ -64,9 +64,18 @@ cd uchi_stock
 
 2. 環境設定（Dockerを使用する場合はappコンテナ内で実行）
 ```bash
+# 環境設定ファイルのコピー
 cp .env.example .env
+
+# 依存パッケージのインストール
 composer install
 npm install
+
+# LINE認証の設定
+# 1. LINE Developers(https://developers.line.biz/ja/)でチャネルを作成
+# 2. .envファイルに以下の値を設定
+# LINE_CHANNEL_ID=xxxxx
+# LINE_CHANNEL_SECRET=xxxxx
 ```
 
 3. アプリケーションキーの生成
@@ -87,6 +96,9 @@ php artisan db:seed
 ```bash
 # Vite（別ターミナルで）
 npm run dev
+
+# アプリケーションにアクセス
+open http://localhost:8080
 ```
 
 ## 開発ガイドライン
@@ -108,6 +120,12 @@ npm run dev
 # PHPUnit
 php artisan test
 
+```
+
+## JSファイル（記述チェック・フォーマット）
+```bash
+npm run lint
+npm run format
 ```
 
 ## ライセンス
