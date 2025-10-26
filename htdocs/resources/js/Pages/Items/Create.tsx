@@ -8,13 +8,16 @@ export default function Create({ auth }: PageProps) {
   const { data, setData, post, processing, errors, reset } = useForm({
     name: "",
     quantity: 1,
+    memo: "",
+    genre_id: "",
+    place_id: "",
   });
 
   const handleSubmit = () => {
     post(route("items.store"), {
       preserveScroll: true,
       onSuccess: () => {
-        reset("name", "quantity");
+        reset("name", "quantity", "memo", "genre_id", "place_id");
       },
     });
   };
