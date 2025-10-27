@@ -7,6 +7,7 @@ import { showErrorToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
 import SelectInput from "@/Components/SelectInput";
 import { TextArea } from "@/Components/TextArea";
+import { useFormOptions } from "@/hooks/useFormOptions";
 
 type FormItemFields = {
   name: string;
@@ -36,21 +37,7 @@ export default function Form({
   const [voiceProcessing, setVoiceProcessing] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
-
-  // ジャンルとロケーションのオプション定義
-  const genreOptions = [
-    { value: "", label: "---" },
-    { value: "1", label: "食品" },
-    { value: "2", label: "日用品" },
-    { value: "3", label: "文具" },
-  ];
-
-  const placeOptions = [
-    { value: "", label: "---" },
-    { value: "1", label: "キッチン" },
-    { value: "2", label: "リビング" },
-    { value: "3", label: "洗面所" },
-  ];
+  const { genres, places, loading, error } = useFormOptions();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     (setData as (field: string, value: any) => void)("name", e.target.value);
@@ -87,6 +74,7 @@ export default function Form({
   return (
     <div className="py-12">
       <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-md sm:rounded-lg">
+        {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <InputLabel htmlFor="name" value="品名" />
@@ -127,12 +115,12 @@ export default function Form({
             <SelectInput
               id="genre_id"
               name="genre_id"
-              options={genreOptions}
+              options={genres}
               value={data.genre_id || ""}
               onChange={handleGenreChange}
               error={!!errors?.genre_id}
               className="mt-1 block w-full"
-              disabled={voiceProcessing || processing}
+              disabled={voiceProcessing || processing || loading}
             />
             <InputError message={errors?.genre_id} className="mt-2" />
           </div>
@@ -142,12 +130,12 @@ export default function Form({
             <SelectInput
               id="place_id"
               name="place_id"
-              options={placeOptions}
+              options={places}
               value={data.place_id || ""}
               onChange={handlePlaceChange}
               error={!!errors?.place_id}
               className="mt-1 block w-full"
-              disabled={voiceProcessing || processing}
+              disabled={voiceProcessing || processing || loading}
             />
             <InputError message={errors?.place_id} className="mt-2" />
           </div>

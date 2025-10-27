@@ -18,4 +18,15 @@ class Place extends Model
     {
         return $this->belongsTo(Group::class, 'group_id');
     }
+
+    /**
+     * グループIDに紐づく保管場所一覧を取得
+     */
+    public function getPlacesListByGroupId(int $groupId)
+    {
+        return $this->query()
+            ->where('group_id', $groupId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+    }
 }

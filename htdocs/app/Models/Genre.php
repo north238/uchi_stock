@@ -23,4 +23,16 @@ class Genre extends Model
     {
         return $this->belongsTo(Group::class, 'group_id');
     }
+
+    /**
+     * グループIDに紐づくジャンル一覧を取得
+     */
+    public function getGenresListByGroupId(int $groupId)
+    {
+        return $this->query()
+            ->with('color')
+            ->where('group_id', $groupId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+    }
 }

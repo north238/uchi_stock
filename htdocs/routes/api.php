@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\GenreController;
+use App\Http\Controllers\Api\PlaceController;
 use App\Http\Controllers\LineMessengerController;
 use App\Http\Controllers\VoiceController;
 use Illuminate\Http\Request;
@@ -27,4 +29,11 @@ Route::post('/voice/transcribe', [VoiceController::class, 'transcribe'])->name('
 Route::prefix('line')->as('line.')->group(function () {
     Route::post('/webhook', [LineMessengerController::class, 'webhook'])->name('webhook');
     Route::get('/message', [LineMessengerController::class, 'message'])->name('message');
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    // ジャンル一覧取得API
+    Route::get('/genres', [GenreController::class, 'index'])->name('api.genres.index');
+    // 保存場所一覧取得API
+    Route::get('/places', [PlaceController::class, 'index'])->name('api.places.index');
 });
