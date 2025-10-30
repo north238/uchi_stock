@@ -8,6 +8,7 @@ import InputError from "@/Components/InputError";
 import SelectInput from "@/Components/SelectInput";
 import { TextArea } from "@/Components/TextArea";
 import { useFormOptions } from "@/hooks/useFormOptions";
+import SelectableWithAdd from "./SelectableWithAdd";
 
 type FormItemFields = {
   name: string;
@@ -35,6 +36,7 @@ export default function Form({
   processing,
 }: ItemFormProps) {
   const [voiceProcessing, setVoiceProcessing] = useState(false);
+  const [isGenreModalOpen, setIsGenreModalOpen] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
   const { genres, places, loading, error } = useFormOptions();
@@ -69,6 +71,10 @@ export default function Form({
       return;
     }
     onSubmit(data);
+  };
+
+  const handleAddGenre = () => {
+    setIsGenreModalOpen(true); // 例えばモーダルを開くなど
   };
 
   return (
@@ -111,18 +117,16 @@ export default function Form({
           </div>
 
           <div>
-            <InputLabel htmlFor="genre_id" value="ジャンル（任意）" />
-            <SelectInput
+            <SelectableWithAdd
               id="genre_id"
-              name="genre_id"
+              label="ジャンル（任意）"
               options={genres}
               value={data.genre_id || ""}
               onChange={handleGenreChange}
-              error={!!errors?.genre_id}
-              className="mt-1 block w-full"
+              error={errors?.genre_id}
+              onAdd={handleAddGenre}
               disabled={voiceProcessing || processing || loading}
             />
-            <InputError message={errors?.genre_id} className="mt-2" />
           </div>
 
           <div>
