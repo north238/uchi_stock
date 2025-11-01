@@ -1,5 +1,5 @@
 import React from "react";
-import PrimaryButton from "@/Components/PrimaryButton";
+import Button from "@/Components/Button";
 
 type CancelButtonProps = {
   onClick: () => void;
@@ -13,13 +13,13 @@ export default function CancelButton({
   label = "キャンセル",
 }: CancelButtonProps) {
   return (
-    <PrimaryButton
+    <Button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center gap-1"
+      variant="danger"
     >
       {label}
-    </PrimaryButton>
+    </Button>
   );
 }

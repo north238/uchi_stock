@@ -32,8 +32,10 @@ Route::prefix('line')->as('line.')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    // ジャンル一覧取得API
+    // ジャンルAPI
     Route::get('/genres', [GenreController::class, 'index'])->name('api.genres.index');
-    // 保存場所一覧取得API
+    Route::post('/genres', [GenreController::class, 'store'])->name('api.genres.store');
+    // 保存場所API
     Route::get('/places', [PlaceController::class, 'index'])->name('api.places.index');
+    Route::post('/places', [PlaceController::class, 'store'])->name('api.places.store');
 });

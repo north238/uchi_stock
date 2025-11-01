@@ -1,5 +1,5 @@
 import React from "react";
-import PrimaryButton from "@/Components/PrimaryButton";
+import Button from "@/Components/Button";
 
 type SaveButtonProps = {
   onClick: () => void;
@@ -13,13 +13,13 @@ export default function SaveButton({
   label = "保存",
 }: SaveButtonProps) {
   return (
-    <PrimaryButton
+    <Button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center gap-1"
+      variant="success"
     >
       {label}
-    </PrimaryButton>
+    </Button>
   );
 }

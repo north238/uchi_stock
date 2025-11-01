@@ -3,9 +3,8 @@ import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
-import SelectInput from "@/Components/SelectInput";
 import { TextArea } from "@/Components/TextArea";
 import { useFormOptions } from "@/hooks/useFormOptions";
 import SelectableWithAdd from "./SelectableWithAdd";
@@ -13,17 +12,17 @@ import SelectableWithAdd from "./SelectableWithAdd";
 type FormItemFields = {
   name: string;
   quantity: number;
-  genre_id?: string;
-  place_id?: string;
-  memo?: string;
+  genre_id: string | null;
+  place_id: string | null;
+  memo: string | null;
 };
 
 interface ItemFormProps {
   data: FormItemFields;
-  setData: ((field: string, value?: any) => void) | ((payload: Partial<FormItemFields>) => void);
-  onSubmit: (formData: FormItemFields) => void;
+  setData: (field: keyof FormItemFields, value: FormItemFields[keyof FormItemFields]) => void;
+  onSubmit: (formData: FormItemFields) => Promise<void>;
   apiUrl: string;
-  errors?: Record<string, string>;
+  errors?: Partial<Record<keyof FormItemFields, string>>;
   processing: boolean;
 }
 
@@ -37,17 +36,18 @@ export default function Form({
 }: ItemFormProps) {
   const [voiceProcessing, setVoiceProcessing] = useState(false);
   const [isGenreModalOpen, setIsGenreModalOpen] = useState(false);
+  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
   const { genres, places, loading, error } = useFormOptions();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    (setData as (field: string, value: any) => void)("name", e.target.value);
+    setData("name", e.target.value);
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = Number(e.target.value) || 0;
-    (setData as (field: string, value: any) => void)("quantity", q);
+    setData("quantity", q);
   };
 
   const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -73,8 +73,33 @@ export default function Form({
     onSubmit(data);
   };
 
-  const handleAddGenre = () => {
-    setIsGenreModalOpen(true); // 例えばモーダルを開くなど
+  const handleAddGenre = async (genreName: string) => {
+    try {
+      // APIを呼び出してジャンルを追加
+      const response = await axios.post("/api/genres", { name: genreName });
+      // 成功したら再度ジャンルリストを更新
+      setIsGenreModalOpen(false);
+      // 必要に応じてトースト表示
+      showSuccessToast("ジャンルを追加しました");
+    } catch (error) {
+      console.log(error);
+
+      showErrorToast("ジャンルの追加に失敗しました");
+    }
+  };
+
+  const handleAddPlace = async (placeName: string) => {
+    try {
+      // APIを呼び出して保管場所を追加
+      const response = await axios.post("/api/places", { name: placeName });
+      // 成功したら再度保管場所リストを更新
+      setIsPlaceModalOpen(false);
+      // 必要に応じてトースト表示
+      showSuccessToast("保管場所を追加しました");
+    } catch (error) {
+      console.log(error);
+      showErrorToast("保管場所の追加に失敗しました");
+    }
   };
 
   return (
@@ -119,29 +144,31 @@ export default function Form({
           <div>
             <SelectableWithAdd
               id="genre_id"
+              name="genre_name"
               label="ジャンル（任意）"
               options={genres}
               value={data.genre_id || ""}
+              isModalOpen={isGenreModalOpen}
               onChange={handleGenreChange}
-              error={errors?.genre_id}
               onAdd={handleAddGenre}
+              error={errors?.genre_id}
               disabled={voiceProcessing || processing || loading}
             />
           </div>
 
           <div>
-            <InputLabel htmlFor="place_id" value="保管場所（任意）" />
-            <SelectInput
+            <SelectableWithAdd
               id="place_id"
-              name="place_id"
+              name="place_name"
+              label="保管場所（任意）"
               options={places}
               value={data.place_id || ""}
+              isModalOpen={isPlaceModalOpen}
               onChange={handlePlaceChange}
-              error={!!errors?.place_id}
-              className="mt-1 block w-full"
+              onAdd={handleAddPlace}
+              error={errors?.place_id}
               disabled={voiceProcessing || processing || loading}
             />
-            <InputError message={errors?.place_id} className="mt-2" />
           </div>
 
           <div>
@@ -165,11 +192,8 @@ export default function Form({
               if (result.status === "success") {
                 const itemName = result.items[0]?.item || "";
                 const itemQuantity = result.items[0]?.quantity || 1;
-
-                (setData as (payload: Partial<FormItemFields>) => void)({
-                  name: itemName,
-                  quantity: itemQuantity,
-                });
+                setData("name", itemName);
+                setData("quantity", itemQuantity);
               } else {
                 showErrorToast(result.message || "音声認識に失敗しました。");
               }

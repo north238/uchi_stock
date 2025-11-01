@@ -6,23 +6,28 @@ import Modal from "@/Components/Modal";
 import AddButton from "@/Components/Buttons/AddButton";
 import SaveButton from "@/Components/Buttons/SaveButton";
 import CancelButton from "@/Components/Buttons/CancelButton";
+import TextInput from "@/Components/TextInput";
 
 type Props = {
   id: string;
+  name: string;
   label: string;
   options: { value: string | number; label: string }[];
   value: string | number | null;
+  isModalOpen: boolean;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onAdd: (newName: string) => void;
+  onAdd: (newName: string) => Promise<void>;
   error?: string;
   disabled?: boolean;
 };
 
 export default function SelectableWithAdd({
   id,
+  name,
   label,
   options,
   value,
+  isModalOpen,
   onChange,
   onAdd,
   error,
@@ -30,44 +35,60 @@ export default function SelectableWithAdd({
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (newValue.trim()) {
-      onAdd(newValue.trim());
-      setNewValue("");
-      setIsOpen(false);
+  const handleSubmit = async () => {
+    const newName = newValue.trim();
+    if (newName && !isSubmitting) {
+      try {
+        setIsSubmitting(true);
+        await onAdd(newName);
+        setNewValue("");
+        setIsOpen(false);
+      } catch (error) {
+        console.log(error);
+        // エラーは親で処理
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   return (
     <div>
       <InputLabel htmlFor={id} value={label} />
-      <div className="flex gap-2 items-center">
-        <SelectInput
-          id={id}
-          name={id}
-          options={options}
-          value={value || ""}
-          onChange={onChange}
-          error={!!error}
-          className="mt-1 block w-full"
-          disabled={disabled}
-        />
-        <AddButton onClick={() => setIsOpen(true)} disabled={disabled} />
+      <div className="flex gap-2 items-center mt-1">
+        <div className="flex-grow">
+          <SelectInput
+            id={id}
+            name={id}
+            options={options}
+            value={value || ""}
+            onChange={onChange}
+            error={!!error}
+            className="block w-full"
+            disabled={disabled}
+          />
+        </div>
+        <div className="flex-shrink-0 w-20">
+          <AddButton onClick={() => setIsOpen(true)} disabled={disabled} />
+        </div>
       </div>
       <InputError message={error} className="mt-2" />
 
-      <Modal show={isOpen} onClose={() => setIsOpen(false)}>
-        <div className="p-4">
-          <h2 className="text-lg font-semibold mb-2">新規追加</h2>
-          <input
+      <Modal maxWidth="lg" show={isOpen} onClose={() => setIsOpen(isModalOpen)}>
+        <div className="p-8">
+          <h2 className="font-semibold mb-2 dark:text-white">新規追加</h2>
+          <TextInput
             type="text"
-            value={newValue}
+            id={name}
+            name={name}
             onChange={(e) => setNewValue(e.target.value)}
-            className="border rounded w-full p-2"
             placeholder={`${label}名を入力`}
+            className="border rounded w-full"
+            isFocused={true}
           />
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="mt-4 flex justify-end gap-4">
             <CancelButton onClick={() => setIsOpen(false)} />
             <SaveButton onClick={handleSubmit} />
           </div>
