@@ -29,31 +29,14 @@ class GenreController extends Controller
             $groupId = Auth::user()->group_id;
             $genres = $this->genres->getGenresListByGroupId($groupId);
 
-            // データが存在しない場合
-            if ($genres->isEmpty()) {
-                return response()->json([
-                    'genres' => [],
-                    'status' => 'success',
-                    'message' => 'ジャンルが登録されていません',
-                ], 200);
-            }
-
-            return response()->json([
-                'genres' => $genres,
-                'status' => 'success',
-                'message' => 'ジャンル一覧を取得しました',
-            ], 200);
+            return response()->json($genres->values(), 200);
         } catch (Throwable $e) {
             Log::error('ジャンル一覧取得エラー:', [
                 'message' => $e->getMessage(),
                 'user_id' => Auth::id()
             ]);
 
-            return response()->json([
-                'genres' => [],
-                'status' => 'error',
-                'message' => 'ジャンル一覧の取得に失敗しました',
-            ], 500);
+            return response()->json([], 500);
         }
     }
 
@@ -62,9 +45,36 @@ class GenreController extends Controller
      */
     public function store(Request $request)
     {
+        $groupId = Auth::user()->group_id;
+        $genreName = $request->input('name');
+        // 返却値を初期化
+        $status = 'success';
+        $message = 'ジャンルを登録しました';
+        $statusCode = 200;
+
+        // 登録データ作成
+        $data = [
+            'name' => $genreName,
+            'group_id' => $groupId,
+            'color_id' => 1, // デフォルトカラーID
+        ];
+
+        try {
+            $this->genres->createGenre($data);
+        } catch (Throwable $e) {
+            Log::error('ジャンル登録エラー:', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
+            $status = 'error';
+            $message = 'ジャンルを登録に失敗しました';
+            $statusCode = 500;
+        }
+
         return response()->json([
-            'status' => 'success',
-            'message' => 'ジャンル一覧を取得しました',
-        ], 200);
+            'status' => $status,
+            'message' => $message,
+        ], $statusCode);
     }
 }

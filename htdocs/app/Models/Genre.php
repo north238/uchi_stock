@@ -35,4 +35,12 @@ class Genre extends Model
             ->orderBy('created_at', 'asc')
             ->get();
     }
+
+    /**
+     * ジャンル登録
+     */
+    public function createGenre(array $data)
+    {
+        return $this->create($data);
+    }
 }

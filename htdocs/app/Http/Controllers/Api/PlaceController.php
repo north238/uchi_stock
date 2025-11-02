@@ -30,31 +30,51 @@ class PlaceController extends Controller
             $groupId = Auth::user()->group_id;
             $places = $this->places->getPlacesListByGroupId($groupId);
 
-            // データが存在しない場合
-            if ($places->isEmpty()) {
-                return response()->json([
-                    'places' => [],
-                    'status' => 'success',
-                    'message' => '保管場所が登録されていません',
-                ], 200);
-            }
-
-            return response()->json([
-                'places' => $places,
-                'status' => 'success',
-                'message' => '保管場所一覧を取得しました',
-            ], 200);
+            return response()->json($places->values(), 200);
         } catch (Throwable $e) {
             Log::error('保管場所一覧取得エラー:', [
                 'message' => $e->getMessage(),
                 'user_id' => Auth::id()
             ]);
 
-            return response()->json([
-                'genres' => [],
-                'status' => 'error',
-                'message' => '保管場所一覧の取得に失敗しました',
-            ], 500);
+            return response()->json([], 500);
         }
+    }
+
+    /**
+     * 保管場所登録API
+     */
+    public function store(Request $request)
+    {
+        $groupId = Auth::user()->group_id;
+        $placeName = $request->input('name');
+        // 返却値を初期化
+        $status = 'success';
+        $message = '保管場所を登録しました';
+        $statusCode = 200;
+
+        // 登録データ作成
+        $data = [
+            'name' => $placeName,
+            'group_id' => $groupId,
+        ];
+
+        try {
+            $this->places->createPlace($data);
+        } catch (Throwable $e) {
+            Log::error('保管場所登録エラー:', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
+            $status = 'error';
+            $message = '保管場所を登録に失敗しました';
+            $statusCode = 500;
+        }
+
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+        ], $statusCode);
     }
 }

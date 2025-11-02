@@ -29,4 +29,12 @@ class Place extends Model
             ->orderBy('created_at', 'asc')
             ->get();
     }
+
+    /**
+     * 保管場所を登録
+     */
+    public function createPlace(array $data)
+    {
+        return $this->create($data);
+    }
 }
