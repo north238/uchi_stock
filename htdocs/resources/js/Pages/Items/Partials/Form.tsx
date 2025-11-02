@@ -8,6 +8,7 @@ import InputError from "@/Components/InputError";
 import { TextArea } from "@/Components/TextArea";
 import { useFormOptions } from "@/hooks/useFormOptions";
 import SelectableWithAdd from "./SelectableWithAdd";
+import { addGenre, addPlace } from "@/api/optionsApi";
 
 type FormItemFields = {
   name: string;
@@ -17,14 +18,19 @@ type FormItemFields = {
   memo: string | null;
 };
 
+// 明示的なフィールド名ユニオンで型安全にする
+type FieldName = "name" | "quantity" | "genre_id" | "place_id" | "memo";
+
+/* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
 interface ItemFormProps {
   data: FormItemFields;
-  setData: (field: keyof FormItemFields, value: FormItemFields[keyof FormItemFields]) => void;
-  onSubmit: (formData: FormItemFields) => Promise<void>;
+  setData: (field: FieldName, value?: string | number | null) => void;
+  onSubmit: () => void | Promise<void>;
   apiUrl: string;
   errors?: Partial<Record<keyof FormItemFields, string>>;
   processing: boolean;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars, no-unused-vars */
 
 export default function Form({
   data,
@@ -39,7 +45,7 @@ export default function Form({
   const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
-  const { genres, places, loading, error } = useFormOptions();
+  const { genres, places, loading, error, reloadGenres, reloadPlaces } = useFormOptions();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData("name", e.target.value);
@@ -64,40 +70,34 @@ export default function Form({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // クライアント側バリデーション
     if (nameEmpty) {
       showErrorToast("品名を入力してください。");
       nameRef.current?.focus();
       return;
     }
-    onSubmit(data);
+    onSubmit();
   };
 
   const handleAddGenre = async (genreName: string) => {
     try {
-      // APIを呼び出してジャンルを追加
-      const response = await axios.post("/api/genres", { name: genreName });
-      // 成功したら再度ジャンルリストを更新
+      await addGenre(genreName);
+      await reloadGenres();
       setIsGenreModalOpen(false);
-      // 必要に応じてトースト表示
       showSuccessToast("ジャンルを追加しました");
     } catch (error) {
-      console.log(error);
-
+      console.error(error);
       showErrorToast("ジャンルの追加に失敗しました");
     }
   };
 
   const handleAddPlace = async (placeName: string) => {
     try {
-      // APIを呼び出して保管場所を追加
-      const response = await axios.post("/api/places", { name: placeName });
-      // 成功したら再度保管場所リストを更新
+      await addPlace(placeName);
+      await reloadPlaces();
       setIsPlaceModalOpen(false);
-      // 必要に応じてトースト表示
       showSuccessToast("保管場所を追加しました");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       showErrorToast("保管場所の追加に失敗しました");
     }
   };

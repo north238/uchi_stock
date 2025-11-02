@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getGenres, getPlaces } from "@/api/optionsApi";
 
 axios.defaults.withCredentials = true;
 
@@ -14,48 +15,38 @@ export const useFormOptions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const loadGenres = async () => {
+    try {
+      const data = await getGenres();
+      if (!Array.isArray(data)) throw new Error("ジャンルデータの形式が不正です");
+      setGenres([{ value: "", label: "---" }, ...data.map((g) => ({ value: String(g.id), label: g.name }))]);
+    } catch (err) {
+      console.error("loadGenres error:", err);
+      setGenres([{ value: "", label: "---" }]);
+      throw err;
+    }
+  };
+
+  const loadPlaces = async () => {
+    try {
+      const data = await getPlaces();
+      if (!Array.isArray(data)) throw new Error("保管場所データの形式が不正です");
+      setPlaces([{ value: "", label: "---" }, ...data.map((p) => ({ value: String(p.id), label: p.name }))]);
+    } catch (err) {
+      console.error("loadPlaces error:", err);
+      setPlaces([{ value: "", label: "---" }]);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     const fetchOptions = async () => {
       try {
         await axios.get("/sanctum/csrf-cookie"); // CSRF保護を有効化
-        const [genresResponse, placesResponse] = await Promise.all([
-          axios.get<{ id: number; name: string }[]>("/api/genres"),
-          axios.get<{ id: number; name: string }[]>("/api/places"),
-        ]);
-
-        // ジャンルのデータチェックと設定
-        const genresData = genresResponse.data ?? [];
-        if (!Array.isArray(genresData)) {
-          throw new Error("ジャンルデータの登録がありません");
-        }
-
-        setGenres([
-          { value: "", label: "---" },
-          ...genresResponse.data.map((genre) => ({
-            value: String(genre.id),
-            label: genre.name,
-          })),
-        ]);
-
-        // 保管場所のデータチェックと設定
-        const placesData = placesResponse.data ?? [];
-        if (!Array.isArray(placesData)) {
-          throw new Error("保管場所データの登録がありません");
-        }
-
-        setPlaces([
-          { value: "", label: "---" },
-          ...placesResponse.data.map((place) => ({
-            value: String(place.id),
-            label: place.name,
-          })),
-        ]);
+        await Promise.all([loadGenres(), loadPlaces()]);
       } catch (err) {
         console.error("データ取得エラー:", err);
         setError(err instanceof Error ? err.message : "データの取得に失敗しました");
-        // エラー時はデフォルト値のみを設定
-        setGenres([{ value: "", label: "---" }]);
-        setPlaces([{ value: "", label: "---" }]);
       } finally {
         setLoading(false);
       }
@@ -64,5 +55,5 @@ export const useFormOptions = () => {
     fetchOptions();
   }, []);
 
-  return { genres, places, loading, error };
+  return { genres, places, loading, error, reloadGenres: loadGenres, reloadPlaces: loadPlaces };
 };

@@ -56,4 +56,15 @@ class GenreController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * ジャンル登録API
+     */
+    public function store(Request $request)
+    {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'ジャンル一覧を取得しました',
+        ], 200);
+    }
 }
