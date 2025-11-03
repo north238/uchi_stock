@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ItemCreateRequest extends FormRequest
+class ItemUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -38,9 +38,9 @@ class ItemCreateRequest extends FormRequest
         return [
             'name' => '品名',
             'quantity' => '数量',
+            'memo' => 'メモ',
             'genre_id' => 'ジャンル',
             'place_id' => '保管場所',
-            'memo' => 'メモ',
         ];
     }
 }
