@@ -5,13 +5,15 @@ import { PageProps } from "@/types";
 
 export default function Create({ auth }: PageProps) {
   const { apiUrl } = usePage<{ apiUrl: string }>().props;
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const form = useForm({
     name: "",
     quantity: 1,
     memo: "",
     genre_id: "",
     place_id: "",
   });
+
+  const { data, setData, post, processing, errors, reset } = form;
 
   const handleSubmit = () => {
     post(route("items.store"), {

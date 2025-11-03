@@ -3,27 +3,34 @@ import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
-import SelectInput from "@/Components/SelectInput";
 import { TextArea } from "@/Components/TextArea";
+import { useFormOptions } from "@/hooks/useFormOptions";
+import SelectableWithAdd from "./SelectableWithAdd";
+import { addGenre, addPlace } from "@/api/optionsApi";
 
 type FormItemFields = {
   name: string;
   quantity: number;
-  genre_id?: string;
-  place_id?: string;
-  memo?: string;
+  genre_id: string | null;
+  place_id: string | null;
+  memo: string | null;
 };
 
+// 明示的なフィールド名ユニオンで型安全にする
+type FieldName = "name" | "quantity" | "genre_id" | "place_id" | "memo";
+
+/* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
 interface ItemFormProps {
   data: FormItemFields;
-  setData: ((field: string, value?: any) => void) | ((payload: Partial<FormItemFields>) => void);
-  onSubmit: (formData: FormItemFields) => void;
+  setData: (field: FieldName, value?: string | number | null) => void;
+  onSubmit: () => void | Promise<void>;
   apiUrl: string;
-  errors?: Record<string, string>;
+  errors?: Partial<Record<keyof FormItemFields, string>>;
   processing: boolean;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars, no-unused-vars */
 
 export default function Form({
   data,
@@ -34,31 +41,19 @@ export default function Form({
   processing,
 }: ItemFormProps) {
   const [voiceProcessing, setVoiceProcessing] = useState(false);
+  const [isGenreModalOpen, setIsGenreModalOpen] = useState(false);
+  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
   const nameEmpty = !data.name || data.name.trim() === "";
-
-  // ジャンルとロケーションのオプション定義
-  const genreOptions = [
-    { value: "", label: "---" },
-    { value: "1", label: "食品" },
-    { value: "2", label: "日用品" },
-    { value: "3", label: "文具" },
-  ];
-
-  const placeOptions = [
-    { value: "", label: "---" },
-    { value: "1", label: "キッチン" },
-    { value: "2", label: "リビング" },
-    { value: "3", label: "洗面所" },
-  ];
+  const { genres, places, loading, error, reloadGenres, reloadPlaces } = useFormOptions();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    (setData as (field: string, value: any) => void)("name", e.target.value);
+    setData("name", e.target.value);
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = Number(e.target.value) || 0;
-    (setData as (field: string, value: any) => void)("quantity", q);
+    setData("quantity", q);
   };
 
   const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -75,18 +70,42 @@ export default function Form({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // クライアント側バリデーション
     if (nameEmpty) {
       showErrorToast("品名を入力してください。");
       nameRef.current?.focus();
       return;
     }
-    onSubmit(data);
+    onSubmit();
+  };
+
+  const handleAddGenre = async (genreName: string) => {
+    try {
+      await addGenre(genreName);
+      await reloadGenres();
+      setIsGenreModalOpen(false);
+      showSuccessToast("ジャンルを追加しました");
+    } catch (error) {
+      console.error(error);
+      showErrorToast("ジャンルの追加に失敗しました");
+    }
+  };
+
+  const handleAddPlace = async (placeName: string) => {
+    try {
+      await addPlace(placeName);
+      await reloadPlaces();
+      setIsPlaceModalOpen(false);
+      showSuccessToast("保管場所を追加しました");
+    } catch (error) {
+      console.error(error);
+      showErrorToast("保管場所の追加に失敗しました");
+    }
   };
 
   return (
     <div className="py-12">
       <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-md sm:rounded-lg">
+        {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <InputLabel htmlFor="name" value="品名" />
@@ -123,33 +142,33 @@ export default function Form({
           </div>
 
           <div>
-            <InputLabel htmlFor="genre_id" value="ジャンル（任意）" />
-            <SelectInput
+            <SelectableWithAdd
               id="genre_id"
-              name="genre_id"
-              options={genreOptions}
+              name="genre_name"
+              label="ジャンル（任意）"
+              options={genres}
               value={data.genre_id || ""}
+              isModalOpen={isGenreModalOpen}
               onChange={handleGenreChange}
-              error={!!errors?.genre_id}
-              className="mt-1 block w-full"
-              disabled={voiceProcessing || processing}
+              onAdd={handleAddGenre}
+              error={errors?.genre_id}
+              disabled={voiceProcessing || processing || loading}
             />
-            <InputError message={errors?.genre_id} className="mt-2" />
           </div>
 
           <div>
-            <InputLabel htmlFor="place_id" value="保管場所（任意）" />
-            <SelectInput
+            <SelectableWithAdd
               id="place_id"
-              name="place_id"
-              options={placeOptions}
+              name="place_name"
+              label="保管場所（任意）"
+              options={places}
               value={data.place_id || ""}
+              isModalOpen={isPlaceModalOpen}
               onChange={handlePlaceChange}
-              error={!!errors?.place_id}
-              className="mt-1 block w-full"
-              disabled={voiceProcessing || processing}
+              onAdd={handleAddPlace}
+              error={errors?.place_id}
+              disabled={voiceProcessing || processing || loading}
             />
-            <InputError message={errors?.place_id} className="mt-2" />
           </div>
 
           <div>
@@ -173,11 +192,8 @@ export default function Form({
               if (result.status === "success") {
                 const itemName = result.items[0]?.item || "";
                 const itemQuantity = result.items[0]?.quantity || 1;
-
-                (setData as (payload: Partial<FormItemFields>) => void)({
-                  name: itemName,
-                  quantity: itemQuantity,
-                });
+                setData("name", itemName);
+                setData("quantity", itemQuantity);
               } else {
                 showErrorToast(result.message || "音声認識に失敗しました。");
               }
