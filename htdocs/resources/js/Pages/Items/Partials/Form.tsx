@@ -13,8 +13,8 @@ import { addGenre, addPlace } from "@/api/optionsApi";
 type FormItemFields = {
   name: string;
   quantity: number;
-  genre_id: string | null;
-  place_id: string | null;
+  genre_id: number | null;
+  place_id: number | null;
   memo: string | null;
 };
 

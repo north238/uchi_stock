@@ -9,8 +9,8 @@ export default function Create({ auth }: PageProps) {
     name: "",
     quantity: 1,
     memo: "",
-    genre_id: "",
-    place_id: "",
+    genre_id: null,
+    place_id: null,
   });
 
   const { data, setData, post, processing, errors, reset } = form;

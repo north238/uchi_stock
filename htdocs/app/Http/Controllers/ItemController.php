@@ -104,19 +104,21 @@ class ItemController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $apiUrl = route('api.voice.transcribe');
+
+        $item = $this->items->getItem($id);
+        if (!$item) {
+            abort(404);
+        }
+
+        return Inertia::render('Items/Edit', [
+            'apiUrl' => $apiUrl,
+            'item' => $item,
+        ]);
     }
 
     /**
