@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Services\ItemService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -35,7 +36,16 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Items/Index');
+        $groupId = Auth::user()->group_id;
+        if (!$groupId) {
+            return redirect()->back()->with('error', 'グループに所属していないため、アイテムを表示できません。');
+        }
+
+        $items = $this->items->getItemsByGroupId($groupId);
+
+        return Inertia::render('Items/Index', [
+            'items' => $items,
+        ]);
     }
 
     /**

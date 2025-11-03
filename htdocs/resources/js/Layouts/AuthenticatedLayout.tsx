@@ -61,7 +61,7 @@ export default function Authenticated({
                 </NavLink>
               </div>
               <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink href={route("items.create")} active={route().current("items.create")}>
+                <NavLink href={route("items.index")} active={route().current("items.index")}>
                   在庫管理
                 </NavLink>
               </div>
@@ -149,8 +149,8 @@ export default function Authenticated({
               Dashboard
             </ResponsiveNavLink>
             <ResponsiveNavLink
-              href={route("items.create")}
-              active={route().current("items.create")}
+              href={route("items.index")}
+              active={route().current("items.index")}
             >
               在庫管理
             </ResponsiveNavLink>
