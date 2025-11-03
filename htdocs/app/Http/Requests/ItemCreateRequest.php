@@ -22,8 +22,11 @@ class ItemCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:0',
+            'name' => ['required', 'string', 'max:255'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'genre_id' => ['nullable', 'integer', 'exists:genres,id'],
+            'place_id' => ['nullable', 'integer', 'exists:places,id'],
+            'memo' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -35,6 +38,9 @@ class ItemCreateRequest extends FormRequest
         return [
             'name' => '品名',
             'quantity' => '数量',
+            'genre_id' => 'ジャンル',
+            'place_id' => '保管場所',
+            'memo' => 'メモ',
         ];
     }
 }
