@@ -2,7 +2,6 @@ import Form from "./Partials/Form";
 import { usePage, useForm, Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
-import { showSuccessToast } from "@/utils/toast";
 
 interface Item {
   id: number;
@@ -28,18 +27,6 @@ export default function Edit({ auth }: PageProps) {
   const handleSubmit = () => {
     put(route("items.update", item.id), {
       preserveScroll: true,
-      onSuccess: (page) => {
-        // サーバがフラッシュメッセージを返す場合のみ表示（重複防止）
-        // @ts-ignore - page props typing may be unknown
-        const flashSuccess = page?.props?.flash?.success;
-        if (flashSuccess) {
-          showSuccessToast(String(flashSuccess));
-        }
-      },
-      onError: (errors) => {
-        // サーバ側バリデーションなどでエラーがあれば成功メッセージは表示しない
-        // 追加でサーバのフラッシュ error を表示したい場合は以下を参照
-      },
     });
   };
 
