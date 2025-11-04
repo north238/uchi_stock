@@ -29,7 +29,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <div className="mb-4 font-medium text-sm text-green-600 dark:text-green-400">{status}</div>
       )}
 
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="space-y-3">
         <InputLabel htmlFor="email" value="メールアドレス" />
         <TextInput
           id="email"
@@ -46,9 +46,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
           }}
         />
 
-        <InputError message={errors.email} className="mt-2" />
+        <InputError message={errors.email} className="mt-1" />
 
-        <div className="flex flex-col items-center justify-center gap-2 mt-4">
+        <div className="flex flex-col items-center justify-center gap-2">
           <PrimaryButton className="" disabled={processing}>
             パスワード再設定リンクを送信
           </PrimaryButton>

@@ -24,14 +24,14 @@ export default function Guest({ children }: PropsWithChildren) {
     }
   }, [flash]);
   return (
-    <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-white dark:bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen mx-1 bg-gray-50 dark:bg-gray-900">
       <div>
         {/* <Link href="/">
                     <ApplicationLogo className="w-20 h-20 fill-current text-gray-500" />
                 </Link> */}
       </div>
 
-      <div className="w-full sm:max-w-md mt-6 p-6 bg-white dark:bg-gray-800 border border-gray-200 shadow-md overflow-hidden sm:rounded-lg">
+      <div className="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         {children}
       </div>
     </div>

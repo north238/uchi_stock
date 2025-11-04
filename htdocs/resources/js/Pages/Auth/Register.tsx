@@ -41,7 +41,7 @@ export default function Register() {
     <GuestLayout>
       <Head title="新規登録" />
 
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="space-y-3">
         <div>
           <InputLabel htmlFor="name" value="お名前" />
 
@@ -60,10 +60,10 @@ export default function Register() {
             }}
           />
 
-          <InputError message={errors.name} className="mt-2" />
+          <InputError message={errors.name} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <InputLabel htmlFor="email" value="メールアドレス" />
 
           <TextInput
@@ -81,10 +81,10 @@ export default function Register() {
             }}
           />
 
-          <InputError message={errors.email} className="mt-2" />
+          <InputError message={errors.email} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <InputLabel htmlFor="password" value="パスワード" />
 
           <TextInput
@@ -102,10 +102,10 @@ export default function Register() {
             }}
           />
 
-          <InputError message={errors.password} className="mt-2" />
+          <InputError message={errors.password} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <InputLabel htmlFor="password_confirmation" value="パスワード確認" />
 
           <TextInput
@@ -123,10 +123,10 @@ export default function Register() {
             }}
           />
 
-          <InputError message={errors.password_confirmation} className="mt-2" />
+          <InputError message={errors.password_confirmation} className="mt-1" />
         </div>
 
-        <div className="flex flex-col items-center justify-center gap-2 mt-4">
+        <div className="flex flex-col items-center justify-center gap-2">
           <PrimaryButton className="" disabled={processing}>
             新規登録する
           </PrimaryButton>

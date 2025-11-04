@@ -30,7 +30,7 @@ export default function ResetPassword({ token, email }: { token: string; email: 
     <GuestLayout>
       <Head title="パスワードリセット" />
 
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="space-y-3">
         <div>
           <InputLabel htmlFor="email" value="メールアドレス" />
 
@@ -46,10 +46,10 @@ export default function ResetPassword({ token, email }: { token: string; email: 
             onChange={(e) => setData("email", e.target.value)}
           />
 
-          <InputError message={errors.email} className="mt-2" />
+          <InputError message={errors.email} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <InputLabel htmlFor="password" value="パスワード" />
 
           <TextInput
@@ -65,10 +65,10 @@ export default function ResetPassword({ token, email }: { token: string; email: 
             onChange={(e) => setData("password", e.target.value)}
           />
 
-          <InputError message={errors.password} className="mt-2" />
+          <InputError message={errors.password} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <InputLabel htmlFor="password_confirmation" value="パスワード確認" />
 
           <TextInput
@@ -82,10 +82,10 @@ export default function ResetPassword({ token, email }: { token: string; email: 
             onChange={(e) => setData("password_confirmation", e.target.value)}
           />
 
-          <InputError message={errors.password_confirmation} className="mt-2" />
+          <InputError message={errors.password_confirmation} className="mt-1" />
         </div>
 
-        <div className="flex items-center justify-end mt-4">
+        <div className="flex items-center justify-end">
           <PrimaryButton className="" disabled={processing}>
             パスワードリセット
           </PrimaryButton>
