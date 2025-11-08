@@ -28,6 +28,8 @@ UchiStockは、家庭の在庫管理を効率化するためのWebアプリケ�
 
 ### その他
 - Whisper API（音声認識）
+  - 別リポジトリで管理しています。
+  - https://github.com/north238/voice-analyzer-api.git
 - Docker（開発環境）
 
 ## 環境構築
