@@ -41,7 +41,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
     <GuestLayout>
       <Head title="ログイン" />
 
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="space-y-3">
         <div>
           <InputLabel htmlFor="email" value="メールアドレス" />
 
@@ -61,10 +61,10 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
             }}
           />
 
-          <InputError message={errors.email} className="mt-2" />
+          <InputError message={errors.email} className="mt-1" />
         </div>
 
-        <div className="mt-4">
+        <div>
           <div className="flex justify-between">
             <InputLabel htmlFor="password" value="パスワード" />
             {canResetPassword && (
@@ -92,10 +92,10 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
             }}
           />
 
-          <InputError message={errors.password} className="mt-2" />
+          <InputError message={errors.password} className="mt-1" />
         </div>
 
-        <div className="block mt-4">
+        <div className="block">
           <label className="flex items-center">
             <Checkbox
               name="remember"
@@ -108,7 +108,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
           </label>
         </div>
 
-        <div className="flex flex-col items-center justify-center gap-2 mt-4">
+        <div className="flex flex-col items-center justify-center gap-2">
           <PrimaryButton disabled={processing}>ログイン</PrimaryButton>
           <Link
             href={route("register")}

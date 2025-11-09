@@ -65,6 +65,16 @@ class Item extends Model
     }
 
     /**
+     * グループIDに基づくアイテムデータの取得
+     */
+    public function getItemsByGroupId(int $groupId)
+    {
+        return $this->with(['genre', 'place'])
+            ->where('group_id', $groupId)
+            ->get();
+    }
+
+    /**
      * アイテムデータの更新
      *
      * @param int $itemId アイテムID

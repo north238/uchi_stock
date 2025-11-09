@@ -31,8 +31,8 @@ export default function ConfirmPassword() {
         パスワードを再度ご入力してください
       </div>
 
-      <form onSubmit={submit}>
-        <div className="mt-4">
+      <form onSubmit={submit} className="space-y-3">
+        <div>
           <InputLabel htmlFor="password" value="パスワード" />
 
           <TextInput
@@ -47,10 +47,10 @@ export default function ConfirmPassword() {
             onChange={(e) => setData("password", e.target.value)}
           />
 
-          <InputError message={errors.password} className="mt-2" />
+          <InputError message={errors.password} className="mt-1" />
         </div>
 
-        <div className="flex items-center justify-center mt-4">
+        <div className="flex items-center justify-center">
           <PrimaryButton className="" disabled={processing}>
             確認
           </PrimaryButton>
