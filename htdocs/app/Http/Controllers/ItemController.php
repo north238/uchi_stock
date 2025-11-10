@@ -37,10 +37,6 @@ class ItemController extends Controller
     public function index()
     {
         $groupId = Auth::user()->group_id;
-        if (!$groupId) {
-            return redirect()->back()->with('error', 'グループに所属していないため、アイテムを表示できません。');
-        }
-
         $items = $this->items->getItemsByGroupId($groupId);
 
         return Inertia::render('Items/Index', [

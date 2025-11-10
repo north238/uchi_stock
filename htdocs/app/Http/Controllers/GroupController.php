@@ -201,7 +201,7 @@ class GroupController extends Controller
                 'group_id' => $id,
             ]);
             // 成功メッセージを表示
-            return redirect()->route('dashboard')->with('success', 'グループが削除されました。');
+            return redirect()->route('items.index')->with('success', 'グループが削除されました。');
         } catch (GroupNotFoundException $e) { // グループが見つからない場合
             report($e);
 
@@ -239,7 +239,7 @@ class GroupController extends Controller
                 ]);
             }
 
-            return redirect()->route('dashboard')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
+            return redirect()->route('items.index')->with('success', 'グループが自動生成されました。あとから編集・変更可能です');
         } catch (GroupCreationFailedException $e) { // グループ作成エラーの場合
             report($e);
 
@@ -286,7 +286,7 @@ class GroupController extends Controller
 
             DB::commit();
 
-            return redirect()->route('dashboard')->with('success', 'グループから脱退しました。');
+            return redirect()->route('items.index')->with('success', 'グループから脱退しました。');
         } catch (Exception $e) {
             Log::error('【グループ】脱退処理エラー', [
                 'message' => $e->getMessage(),

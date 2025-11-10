@@ -23,17 +23,21 @@ use Inertia\Inertia;
 Route::get('/', function () {
     // ログインしている場合はダッシュボードにリダイレクト
     if (Auth::check()) {
-        return redirect('dashboard');
+        return redirect()->route('items.index');
     }
 
     return redirect('login');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'check.group'])->name('dashboard');
+// ログイン認証のみルート
+Route::middleware(['auth'])->prefix('groups')->as('groups.')->group(function () {
+    Route::get('/', [GroupController::class, 'create'])->name('create');
+    Route::post('/', [GroupController::class, 'store'])->name('store');
+    Route::get('/default', [GroupController::class, 'createDefaultGroup'])->name('default.create');
+});
 
-Route::middleware('auth')->group(function () {
+// ログイン認証、グループチェック後のルート
+Route::middleware(['auth', 'check.group'])->group(function () {
     // プロフィール関連
     Route::prefix('profile')->as('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('edit');
@@ -43,9 +47,6 @@ Route::middleware('auth')->group(function () {
 
     // グループ関連
     Route::prefix('groups')->as('groups.')->group(function () {
-        Route::get('/', [GroupController::class, 'create'])->name('create');
-        Route::post('/', [GroupController::class, 'store'])->name('store');
-        Route::get('/default', [GroupController::class, 'createDefaultGroup'])->name('default.create');
         Route::get('/{id}/edit', [GroupController::class, 'edit'])->name('edit');
         Route::put('/{id}', [GroupController::class, 'update'])->name('update');
         Route::patch('/{id}', [GroupController::class, 'leaveGroup'])->name('leave');
@@ -60,11 +61,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}', [ItemController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/{id}', [ItemController::class, 'destroy'])->name('destroy');
-    });
-
-    // todo::DEMO用削除可能
-    Route::prefix('voice')->as('voice.')->group(function () {
-        Route::get('/', [VoiceController::class, 'create'])->name('create');
     });
 });
 

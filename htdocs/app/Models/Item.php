@@ -67,8 +67,12 @@ class Item extends Model
     /**
      * グループIDに基づくアイテムデータの取得
      */
-    public function getItemsByGroupId(int $groupId)
+    public function getItemsByGroupId(?int $groupId)
     {
+        if (is_null($groupId)) {
+            return null;
+        }
+
         return $this->with(['genre', 'place'])
             ->where('group_id', $groupId)
             ->get();
