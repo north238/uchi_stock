@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Throwable;
 
 class ItemController extends Controller
 {
@@ -181,6 +182,37 @@ class ItemController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $item = $this->items->getItem($id);
+        if(!$item) {
+            return redirect()->back()->with('error', 'アイテムが見つかりません。');
+        }
+        // TODO::ロール確認
+        $userId = Auth::id();
+
+        try {
+            DB::beginTransaction();
+
+            // アイテム論理削除
+            $item->delete();
+
+            DB::commit();
+            Log::info('【アイテム削除】処理完了', [
+                'user_id' => $userId,
+                'items_id' => $id,
+            ]);
+
+            return redirect()->back()->with('success', 'アイテムを削除しました。');
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            Log::error('【アイテム削除】システムエラー', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'items_id' => $id,
+            ]);
+
+            return redirect()->back()->with('error', 'アイテムの削除に失敗しました。');
+        }
     }
 }

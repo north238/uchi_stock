@@ -18,11 +18,16 @@ RUN apk add --no-cache \
     linux-headers \
     bash \
     nodejs \
-    npm
+    npm \
+    freetype-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev
 
 # PHP拡張機能をインストール
 RUN pecl install redis xdebug && \
-    docker-php-ext-configure intl &&\
+    docker-php-ext-configure intl && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
     docker-php-ext-enable redis xdebug && \
     docker-php-ext-install zip \
     intl \
@@ -34,7 +39,8 @@ RUN pecl install redis xdebug && \
     mbstring \
     pdo \
     session \
-    xml
+    xml \
+    gd
 
 # 不要なパッケージを削除
 RUN apk del $PHPIZE_DEPS
