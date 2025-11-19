@@ -42,6 +42,7 @@ class SocialiteLoginController extends Controller
     {
         $response = Socialite::driver('line')->redirect();
         $url = $response->getTargetUrl();
+        // 友達追加を促すパラメータを付与
         $urlWithParam = $url . (strpos($url, '?') === false ? '?' : '&') . 'bot_prompt=aggressive';
         return redirect()->away($urlWithParam);
     }
@@ -119,11 +120,11 @@ class SocialiteLoginController extends Controller
                     $this->users->updateUserByUserId($newUser->id, ['avatar_path' => $savedPath]);
                 }
             }
-        } catch (\Throwable $e) {
-            Log::warning('【LINE】アバター保存失敗', ['error' => $e->getMessage(), 'user' => $newUser->id ?? null]);
+        } catch (Throwable $e) {
+            Log::warning('【ログイン】アバター保存失敗', ['error' => $e->getMessage(), 'user' => $newUser->id ?? null]);
         }
 
-        Log::info('【LINE】新規ユーザー登録', ['user' => $newUser]);
+        Log::info('【ログイン】新規ユーザー登録', ['user' => $newUser]);
 
         return $newUser;
     }
@@ -145,26 +146,23 @@ class SocialiteLoginController extends Controller
 
         $this->users->updateUserByLineId($lineId, $userData);
 
-        // アバター更新（オプション）
+        // アバター更新（失敗でも処理継続）
         try {
             $avatarUrl = method_exists($user, 'getAvatar') ? $user->getAvatar() : ($user->avatar ?? null);
             if ($avatarUrl && filter_var($avatarUrl, FILTER_VALIDATE_URL)) {
-                // users->getBylineId 等でユーザーIDを取得するユーティリティを利用
                 $existing = $this->users->getBylineId($lineId);
-                Log::debug($existing);
                 if ($existing) {
                     $savedPath = $this->downloadAndSaveAvatar($avatarUrl, $existing->id);
-                    Log::debug($savedPath);
                     if ($savedPath) {
                         $this->users->updateUserByUserId($existing->id, ['avatar_path' => $savedPath]);
                     }
                 }
             }
-        } catch (\Throwable $e) {
-            Log::warning('【LINE】アバター更新失敗', ['error' => $e->getMessage(), 'line_id' => $lineId]);
+        } catch (Throwable $e) {
+            Log::warning('【ログイン】アバター更新失敗', ['error' => $e->getMessage(), 'line_id' => $lineId]);
         }
 
-        Log::info('【LINE】ユーザー情報更新', ['user' => $user]);
+        Log::info('【ログイン】ユーザー情報更新', ['user' => $user]);
 
         return true;
     }
@@ -178,62 +176,54 @@ class SocialiteLoginController extends Controller
      */
     private function downloadAndSaveAvatar(string $url, int $userId): ?string
     {
-        $response = Http::withHeaders(['User-Agent' => 'uchi_stock/1.0'])
-            ->timeout(5)
-            ->get($url);
-
-        Log::debug('Avatar download response', [
-            'status' => $response->status(),
-            'headers' => $response->headers(),
-        ]);
-
-        if (! $response->successful()) {
-            return null;
-        }
-
-        $contentType = $response->header('Content-Type', '');
-        if (! str_starts_with($contentType, 'image/')) {
-            return null;
-        }
-
-        // 既存画像は一括削除して最新だけ保持
-        Storage::disk('public')->deleteDirectory("users/{$userId}");
-
         try {
-            // ★1: LINE画像を読み込み（MIME偽装があってもOK）
-            $image = Image::fromString($response->body());
+            $response = Http::withHeaders(['User-Agent' => 'uchi_stock/1.0'])
+                ->timeout(5)
+                ->get($url);
 
-            // ★2: 最大512pxにリサイズ（縦横比維持、アップサイズ禁止）
-            $image->resize(512, 512, Image::SHRINK_ONLY);
-
-            // ★3: WebPに統一して保存
-            $uuid = Str::uuid()->toString();
-            $filename = "{$uuid}.webp";
-            $storePath = "users/{$userId}/{$filename}";
-
-            // 一時ファイルへ保存してから Storage へ
-            $tempPath = storage_path("app/tmp_{$uuid}.webp");
-            $image->save($tempPath, 80, Image::WEBP);
-            // ┗ 品質80は一般的に高品質で軽量
-
-            Storage::disk('public')->put($storePath, file_get_contents($tempPath));
-
-            if (file_exists($tempPath)) {
-                try {
-                    unlink($tempPath);
-                } catch (Throwable $e) {
-                    Log::warning("Temporary avatar file delete failed: {$tempPath}", [
-                        'error' => $e->getMessage(),
-                    ]);
-                }
+            // レスポンスチェック
+            if (! $response->successful() || ! str_starts_with($response->header('Content-Type', ''), 'image/')) {
+                Log::warning("【ログイン】アバター取得エラー", [
+                    'user_id' => $userId,
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'content_type' => $response->header('Content-Type')
+                ]);
+                return null;
             }
 
+            // 既存画像は削除
+            Storage::disk('public')->deleteDirectory("users/{$userId}");
+
+            // 画像作成
+            // 縦横比維持かつアップサイズ禁止でリサイズ
+            $image = Image::fromString($response->body());
+            $maxSize = 512;
+            $width = $image->getWidth();
+            $height = $image->getHeight();
+
+            // 比率計算
+            $ratio = min($maxSize / $width, $maxSize / $height, 1); // 1以上にならないよう制限
+            $newWidth = (int)($width * $ratio);
+            $newHeight = (int)($height * $ratio);
+
+            $image->resize($newWidth, $newHeight);
+
+            // 保存先パス
+            $filename = Str::uuid() . '.webp';
+            $storePath = "users/{$userId}/{$filename}";
+
+            // Storageに直接保存
+            Storage::disk('public')->put($storePath, $image->toString(Image::WEBP, 80));
+
             return $storePath;
-        } catch (Exception $e) {
-            Log::error('Avatar processing failed', [
-                'error' => $e->getMessage(),
+        } catch (Throwable $e) {
+            Log::error('【ログイン】アバター保存処理エラー', [
                 'user_id' => $userId,
                 'url' => $url,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
             ]);
             return null;
         }
