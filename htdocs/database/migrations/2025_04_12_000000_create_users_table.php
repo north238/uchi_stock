@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('line_id')->unique()->nullable();
             $table->string('line_access_token')->nullable();
             $table->string('line_refresh_token')->nullable();
+            $table->string('avatar_path', 50)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

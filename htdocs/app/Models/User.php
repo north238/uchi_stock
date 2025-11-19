@@ -29,6 +29,7 @@ class User extends Authenticatable
         'line_id',
         'line_access_token',
         'line_refresh_token',
+        'avatar_path',
     ];
 
     /**
@@ -111,7 +112,15 @@ class User extends Authenticatable
     /**
      * ユーザー情報更新
      */
-    public function updateUser(string $lineId, array $userData)
+    public function updateUserByUserId(int $id, array $userData)
+    {
+        return $this->where('id', $id)->update($userData);
+    }
+
+    /**
+     * ユーザー情報更新
+     */
+    public function updateUserByLineId(string $lineId, array $userData)
     {
         return $this->where('line_id', $lineId)->update($userData);
     }
