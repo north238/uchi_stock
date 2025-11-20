@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   email_verified_at: string;
+  avatar_path?: string;
   group_id?: number;
   line_id?: string;
   is_password_set?: boolean;
