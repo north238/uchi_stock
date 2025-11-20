@@ -23,7 +23,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
   label = "",
   onProcessingChange,
 }) => {
-  const { recording, audioUrl, loading, processing, progress, startRecording, stopRecording } =
+  const { recording, loading, processing, progress, startRecording, stopRecording } =
     useVoiceRecorder(apiUrl, onResult);
 
   // 親コンポーネントに処理状態を通知
@@ -32,7 +32,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
   }, [processing, onProcessingChange]);
 
   return (
-    <div className="w-full flex flex-col items-center space-y-4">
+    <div className="w-full flex flex-col items-center gap-2">
       {label && <span className="text-gray-700 font-medium">{label}</span>}
 
       {/* 🔹 状態メッセージ（ボタン上部） */}
@@ -52,7 +52,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
         type="button"
         disabled={loading}
         className={`
-                    relative w-20 h-20 flex items-center justify-center rounded-full hover:scale-105
+                    relative w-12 h-12 flex items-center justify-center rounded-full hover:scale-105
                     ${recording ? "bg-red-600 dark:bg-red-200" : "bg-blue-600 dark:bg-blue-200"}
                     transition-all duration-300
                     `}
@@ -75,11 +75,12 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
         </span>
       </button>
 
-      {audioUrl && (
-        <div className="flex flex-col items-center space-y-2">
+      {/* 録音データの表示 useVoiceRecorderへ記述（デバック用） */}
+      {/* {audioUrl && (
+        <div className="flex flex-col items-center mt-2">
           <audio controls src={audioUrl} className="max-w-md" />
         </div>
-      )}
+      )} */}
     </div>
   );
 };
