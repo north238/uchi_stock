@@ -44,7 +44,7 @@ export default function Authenticated({
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
       <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -54,12 +54,6 @@ export default function Authenticated({
                   <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                 </Link>
               </div>
-
-              <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink href={route("dashboard")} active={route().current("dashboard")}>
-                  Dashboard
-                </NavLink>
-              </div>
               <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                 <NavLink href={route("items.index")} active={route().current("items.index")}>
                   在庫管理
@@ -68,8 +62,16 @@ export default function Authenticated({
             </div>
 
             <div className="hidden sm:flex sm:items-center sm:ms-6">
-              <div>アカウントimg</div>
-              <div className="ms-3 relative">
+              <div>
+                <img
+                  src={
+                    user.avatar_path ? `/storage/${user.avatar_path}` : "/img/default-avatar.svg"
+                  }
+                  alt="User Avatar"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              </div>
+              <div className="ms-2 relative">
                 <Dropdown>
                   <Dropdown.Trigger>
                     <span className="inline-flex rounded-md">
@@ -145,13 +147,7 @@ export default function Authenticated({
 
         <div className={(showingNavigationDropdown ? "block" : "hidden") + " sm:hidden"}>
           <div className="pt-2 pb-3 space-y-1">
-            <ResponsiveNavLink href={route("dashboard")} active={route().current("dashboard")}>
-              Dashboard
-            </ResponsiveNavLink>
-            <ResponsiveNavLink
-              href={route("items.index")}
-              active={route().current("items.index")}
-            >
+            <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
               在庫管理
             </ResponsiveNavLink>
           </div>
@@ -180,7 +176,7 @@ export default function Authenticated({
         </header>
       )}
 
-      <main>{children}</main>
+      <main className="flex-1 overflow-y-auto">{children}</main>
 
       {forceModal && (
         <Modal

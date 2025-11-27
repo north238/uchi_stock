@@ -18,11 +18,6 @@ export default function Index({ auth }: PageProps) {
   return (
     <Authenticated
       user={auth.user}
-      header={
-        <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          アイテム一覧
-        </h2>
-      }
     >
       <Head title="アイテム一覧" />
 

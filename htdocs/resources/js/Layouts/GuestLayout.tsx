@@ -1,5 +1,4 @@
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Link, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import { PropsWithChildren, useEffect } from "react";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 
@@ -24,14 +23,8 @@ export default function Guest({ children }: PropsWithChildren) {
     }
   }, [flash]);
   return (
-    <div className="flex items-center justify-center min-h-screen mx-1 bg-gray-50 dark:bg-gray-900">
-      <div>
-        {/* <Link href="/">
-                    <ApplicationLogo className="w-20 h-20 fill-current text-gray-500" />
-                </Link> */}
-      </div>
-
-      <div className="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="w-full max-w-sm sm:p-6 p-4 sm:mx-0 mx-2 bg-white dark:bg-gray-800 rounded-md shadow-lg">
         {children}
       </div>
     </div>

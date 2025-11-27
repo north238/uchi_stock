@@ -76,8 +76,9 @@ export default function SelectableWithAdd({
       </div>
       <InputError message={error} className="mt-2" />
 
-      <Modal maxWidth="lg" show={isOpen} onClose={() => setIsOpen(isModalOpen)}>
-        <div className="p-8">
+      {/* モーダル要素 */}
+      <Modal maxWidth="sm" show={isOpen} onClose={() => setIsOpen(isModalOpen)}>
+        <div className="p-4 w-80">
           <h2 className="font-semibold mb-2 dark:text-white">新規追加</h2>
           <TextInput
             type="text"
@@ -88,7 +89,7 @@ export default function SelectableWithAdd({
             className="border rounded w-full"
             isFocused={true}
           />
-          <div className="mt-4 flex justify-end gap-4">
+          <div className="mt-4 flex justify-end gap-2">
             <CancelButton onClick={() => setIsOpen(false)} />
             <SaveButton onClick={handleSubmit} />
           </div>
