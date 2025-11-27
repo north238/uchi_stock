@@ -103,10 +103,10 @@ export default function Form({
   };
 
   return (
-    <div className="py-12">
+    <div className="py-6">
       <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-md sm:rounded-lg">
         {error && <div className="text-red-500 mb-4">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-2">
           <div>
             <InputLabel htmlFor="name" value="品名" />
             <TextInput
