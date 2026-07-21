@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-07-22
-現在地: **Phase 1 完了。Phase 2 着手前**
-作業ブランチ: `feat/mvp_phase1`
+現在地: **Phase 2 完了。Phase 3 着手前**
+作業ブランチ: `feat/mvp_phase2`（Phase 0/1 は `feat/mvp_phase1` としてPR #80経由で`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -20,7 +20,7 @@
 | -------- | ---- | ------ | ---- |
 | 0 | 事前準備 | 03 §7.1 | ✅ 完了 |
 | 1 | デザイン基盤（トークン） | 04 §2,§3,§4,§6.1 | ✅ 完了 |
-| 2 | DB・モデル基盤 | 03 §7.2–7.4 | ⬜ 未着手 |
+| 2 | DB・モデル基盤 | 03 §7.2–7.4 | ✅ 完了 |
 | 3 | API（status/購入/Undo） | 03 §7.5–7.11 | ⬜ 未着手 |
 | 4 | 共通部品トークン化 | 04 §6.3,§6.5,§6.6 | ⬜ 未着手 |
 | 5 | レイアウト2種 | 04 §6.4 | ⬜ 未着手 |
@@ -51,14 +51,14 @@
 
 ## Phase 2: DB・モデル基盤（バックエンド）[03 §7.2–7.4 / ステップ1]
 
-- [ ] `app/Enums/ItemStatus.php`（値・label・sortWeight・values）[03 §7.2]
-- [ ] migration: `add_status_to_items`（string, default in_stock, after name）[03 §7.3]
+- [x] `app/Enums/ItemStatus.php`（値・label・sortWeight・values）[03 §7.2]
+- [x] migration: `add_status_to_items`（string, default in_stock, after name）[03 §7.3]
 - [x] `items.quantity` を nullable化（`create_items_table` マイグレーションを直接編集。doctrine/dbal不要）[03 §7.1, §7.3]
-- [ ] migration: `create_purchase_histories_table`（item_id cascade / user_id nullOnDelete / purchased_at / index）[03 §7.3]
-- [ ] `app/Models/PurchaseHistory.php`（fillable/casts/item/user）[03 §7.4]
-- [ ] `Item` モデル更新: `status` を fillable/casts、`purchaseHistories()` 追加 [03 §7.4]
-- [ ] `Item::getItemsByGroupId` 差し替え（withMax + orderByRaw + sort引数）[03 §7.4]
-- [ ] `php artisan migrate` 実行、既存レコードが status=in_stock で埋まることを確認
+- [x] migration: `create_purchase_histories_table`（item_id cascade / user_id nullOnDelete / purchased_at / index）[03 §7.3]
+- [x] `app/Models/PurchaseHistory.php`（fillable/casts/item/user）[03 §7.4]
+- [x] `Item` モデル更新: `status` を fillable/casts、`purchaseHistories()` 追加 [03 §7.4]
+- [x] `Item::getItemsByGroupId` 差し替え（withMax + orderByRaw + sort引数）[03 §7.4]
+- [x] `php artisan migrate:fresh --seed` 実行（既存7件のローカルテストデータは削除して再構築。ユーザー承認済み）。`quantity` nullable / `status` default `in_stock` をDBスキーマで確認済み
 
 ## Phase 3: API（status / 購入 / Undo）[03 §7.5–7.11 / ステップ2]
 
@@ -129,5 +129,6 @@
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-22: Phase 2（DB・モデル基盤）完了。`app/Enums/ItemStatus.php` 新規作成（label/sortWeight/values）。マイグレーション2本追加（`add_status_to_items`＝status列 default in_stock、`create_purchase_histories_table`）。`app/Models/PurchaseHistory.php` 新規作成。`Item` モデルに `status` の fillable/casts、`purchaseHistories()` リレーション追加、`getItemsByGroupId` を `withMax` + `orderByRaw`（status順/purchased順）へ差し替え。`migrate:fresh --seed` を実行（既存のローカル手動テストデータ7件は消える前提でユーザー承認済み）。DBスキーマ（quantity nullable / status default in_stock）・Enumキャスト・並び順ロジックをtinkerで実地検証。既存Featureテストは変更前と同じ7件失敗（Auth系・環境起因、Phase 2の変更とは無関係と確認済み）で回帰なし。作業ブランチは `feat/mvp_phase1`→PR #80で`development`へマージ済み、現在は新規ブランチ `feat/mvp_phase2` で作業中（ユーザーが別途ブランチ運用を実施）。
 - 2026-07-22: Phase 0（事前準備）・Phase 1（デザイン基盤トークン）完了。作業ブランチは既存の `feat/mvp_phase1` を継続使用。`items.quantity` の nullable 化は `doctrine/dbal` 不使用で `create_items_table` マイグレーションを直接編集する方式に変更（`docs/03` 更新済み）。`app.css` にカラートークン（paper/surface/ink/status/accent/danger）を light/dark 両方で定義、`tailwind.config.js` に同トークン・丸ゴシックフォント・`shadow.card` を登録し、`tailwindcss` CLI 単体ビルドでユーティリティ生成を確認。
 - 2026-07-21: ドキュメント（01〜04）整備完了、本TODO作成。実装未着手。
