@@ -7,6 +7,9 @@
 
 - `docs/01_concept.md` — 目的・設計原則・検証計画
 - `docs/02_requirements.md` — MVP（フェーズ0）改修要件
+- `docs/03_implementation_plan.md` — 実装計画・バックエンド詳細仕様
+- `docs/04_frontend_design_guide.md` — フロント全画面のデザイン指示書
+- `docs/05_implementation_todo.md` — **実装の進捗管理（TODOチェックリスト）**
 
 ---
 
@@ -108,3 +111,10 @@ docker-compose exec app npm run format                 # Format
 
 - ブランチ: `main`（本番）/ `development`（開発）/ `feat|fix/*`（作業）。PR は原則 `development` 向け。
 - コミットメッセージは日本語。プレフィックス例: 追加 / 修正 / 削除 / 改修 / リファクタ。
+
+## 11. 実装タスクの進捗管理
+
+- MVP フェーズ0 の実装タスクは `docs/05_implementation_todo.md` で一元管理する。
+- **タスクが完了したら、必ず `docs/05_implementation_todo.md` の該当チェックボックスを `[ ]` → `[x]` に更新する。** フェーズ完了時は「進捗サマリ」の状態（⬜🟡✅）と末尾「進捗メモ」も更新する。
+- 実装の着手・再開前に、まず同ファイルで現在地（未完了タスク）を確認する。
+- 仕様に変更が生じた場合は、先に `docs/02`〜`04` を修正してから TODO を更新する（ドキュメントが正）。

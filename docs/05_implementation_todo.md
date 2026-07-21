@@ -1,0 +1,133 @@
+# UchiStock 実装 TODO / 進捗管理
+
+最終更新: 2026-07-21
+現在地: **実装未着手（全タスク未完了）**
+作業ブランチ: 未作成
+対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
+
+このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
+
+## 使い方（更新ルール）
+
+- タスク完了時に `- [ ]` を `- [x]` にする。
+- 各フェーズ完了時に、下の「進捗サマリ」の状態と、末尾「進捗メモ」に日付・コミット要旨を追記する。
+- 仕様に変更が出たら、先に `docs/03` or `docs/04` を直してから本表を更新する（ドキュメントが正）。
+- 参照記法: `[03 §7.2]` = `docs/03_implementation_plan.md` の §7.2、`[04 §6.3]` = `docs/04_frontend_design_guide.md` の §6.3。
+
+## 進捗サマリ
+
+| フェーズ | 内容 | 主参照 | 状態 |
+| -------- | ---- | ------ | ---- |
+| 0 | 事前準備 | 03 §7.1 | ⬜ 未着手 |
+| 1 | デザイン基盤（トークン） | 04 §2,§3,§4,§6.1 | ⬜ 未着手 |
+| 2 | DB・モデル基盤 | 03 §7.2–7.4 | ⬜ 未着手 |
+| 3 | API（status/購入/Undo） | 03 §7.5–7.11 | ⬜ 未着手 |
+| 4 | 共通部品トークン化 | 04 §6.3,§6.5,§6.6 | ⬜ 未着手 |
+| 5 | レイアウト2種 | 04 §6.4 | ⬜ 未着手 |
+| 6 | Items 一覧カード | 03 ステップ3 / 04 §5,§10 | ⬜ 未着手 |
+| 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ⬜ 未着手 |
+| 8 | 他画面トンマナ | 04 §6.7 | ⬜ 未着手 |
+| 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ⬜ 未着手 |
+
+状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
+
+**依存関係**: 1 はフロント（4–8）の前提 ／ 2 → 3 ／ 6 は 1・3 に依存 ／ 7 は 6 に依存。バックエンド（2,3）とフロント基盤（1,4,5）は並行可能。
+
+---
+
+## Phase 0: 事前準備
+
+- [ ] 作業ブランチ作成（`feat/*`。`development` へPR）
+- [ ] `composer require doctrine/dbal`（quantity の nullable 化に必要）[03 §7.1]
+
+## Phase 1: デザイン基盤（トークン）[04 §2,§3,§4,§6.1]
+
+- [ ] `resources/css/app.css`: CSS変数トークン定義（light）＋ `@media (prefers-color-scheme: dark)` 上書き [04 §2.1]
+- [ ] `app.css`: danger トークン追加（light/dark）[04 §6.1]
+- [ ] `tailwind.config.js`: `colors` にトークン登録（paper/surface/ink/…/status/accent）[04 §2.2]
+- [ ] `tailwind.config.js`: `colors` に danger/danger-ink/danger-soft 追加 [04 §6.1]
+- [ ] `tailwind.config.js`: `fontFamily.sans` を丸ゴシック優先へ差し替え [04 §3]
+- [ ] `tailwind.config.js`: `boxShadow.card` 登録 [04 §4]
+- [ ] 確認: `bg-surface`/`text-ink`/`bg-status-*` がライト・ダーク双方で効く
+
+## Phase 2: DB・モデル基盤（バックエンド）[03 §7.2–7.4 / ステップ1]
+
+- [ ] `app/Enums/ItemStatus.php`（値・label・sortWeight・values）[03 §7.2]
+- [ ] migration: `add_status_to_items`（string, default in_stock, after name）[03 §7.3]
+- [ ] migration: `change_quantity_nullable_on_items`（要 doctrine/dbal）[03 §7.3]
+- [ ] migration: `create_purchase_histories_table`（item_id cascade / user_id nullOnDelete / purchased_at / index）[03 §7.3]
+- [ ] `app/Models/PurchaseHistory.php`（fillable/casts/item/user）[03 §7.4]
+- [ ] `Item` モデル更新: `status` を fillable/casts、`purchaseHistories()` 追加 [03 §7.4]
+- [ ] `Item::getItemsByGroupId` 差し替え（withMax + orderByRaw + sort引数）[03 §7.4]
+- [ ] `php artisan migrate` 実行、既存レコードが status=in_stock で埋まることを確認
+
+## Phase 3: API（status / 購入 / Undo）[03 §7.5–7.11 / ステップ2]
+
+- [ ] `routes/web.php`: 3ルート追加（status.update / purchase.store / purchase.destroy）[03 §7.5]
+- [ ] `ItemController::findOwnedItem`（グループ認可）追加 [03 §7.6]
+- [ ] 既存 `edit`/`update`/`destroy` を `findOwnedItem` に置換（他グループ→404）[03 §7.6]
+- [ ] `ItemController::updateStatus`（validate + 更新 + back）[03 §7.7]
+- [ ] `ItemService::recordPurchase` + `ItemController::storePurchase`（**flash successなし**）[03 §7.7,§7.8]
+- [ ] `ItemService::undoLatestPurchase` + `ItemController::destroyLatestPurchase`（previous_status で復元）[03 §7.7,§7.8]
+- [ ] `ItemCreateRequest`/`ItemUpdateRequest`: quantity nullable / status ルール [03 §7.9]
+- [ ] `store`/`update` の保存配列に status 追加（未指定 in_stock）[03 §7.9]
+- [ ] `index`: `sort` 受け取り + `days_since_purchase` 付与 + props(items, sort) [03 §7.7,§7.12]
+- [ ] `database/factories/ItemFactory.php` / `PurchaseHistoryFactory.php` [03 §7.10]
+- [ ] Feature: `ItemStatusTest`（自グループ更新 / 他グループ404 / 不正値422）[03 §7.11]
+- [ ] Feature: `ItemPurchaseTest`（買った記録＋status / 他グループ404 / Undo復元）[03 §7.11]
+- [ ] `php artisan test` グリーン
+
+## Phase 4: 共通部品トークン化 [04 §6.3,§6.5,§6.6]
+
+- [ ] `Components/Button.tsx`: variant 再定義（primary/neutral/danger/ghost）・トークン化 [04 §6.3]
+- [ ] `Buttons/SaveButton`→primary / `CancelButton`→neutral / `AddButton`→ghost（緑・赤の誤用是正）[04 §6.2,§6.3]
+- [ ] `PrimaryButton`/`SecondaryButton`/`DangerButton` トークン化 or `Button` へ集約 [04 §6.3]
+- [ ] 入力部品トークン化＋focus accent（`TextInput`/`TextArea`/`SelectInput`/`Checkbox`/`InputLabel`/`InputError`/`Divider`）[04 §6.5]
+- [ ] `Modal.tsx` トークン化（面/オーバーレイ/ボタン）[04 §6.6]
+- [ ] `Dropdown.tsx` トークン化（面/項目hover）[04 §6.6]
+- [ ] `utils/toast.ts`: テーマ調整 + `showBuyUndoToast` 追加 [04 §6.6,§10.7]
+
+## Phase 5: レイアウト2種 [04 §6.4]
+
+- [ ] `Layouts/AuthenticatedLayout.tsx`: 背景/ナビ/ヘッダー/アクティブaccent をトークン化 [04 §6.4]
+- [ ] `Layouts/GuestLayout.tsx`: paper/surface/角丸/影 をトークン化 [04 §6.4]
+
+## Phase 6: Items 一覧カード [03 ステップ3 / 04 §5,§10]
+
+- [ ] `resources/js/constants/itemStatus.ts`（値↔ラベル↔色クラス）[04 §10.1]
+- [ ] `Components/StatusSegment.tsx`（1タップ変更・aria）[04 §5.2,§10.5]
+- [ ] `Components/BuyButton.tsx`（コーラル／in_stockはghost）[04 §5.3,§10.5]
+- [ ] `Pages/Items/Partials/ItemCard.tsx`（品名/メタ/前回購入/操作段）[04 §5.1,§10.3]
+- [ ] `Items/Index.tsx` カード型へ全面刷新（旧テーブル廃止・1カラム max-w-xl・空状態・ソートUI）[04 §5,§10.8]
+- [ ] Item型・通信（patch/post/delete＋Undo連携・preserveScroll）[04 §10.2,§10.6]
+- [ ] 目視: 状態順ソート / 前回購入表示 / 個数「残り{n}」・null非表示 [04 §10.3]
+
+## Phase 7: Items フォーム [03 ステップ4 / 04 §10.9]
+
+- [ ] `Form.tsx`: status 選択（`StatusSegment` 流用）追加、`FieldName` に status [04 §10.9]
+- [ ] quantity 任意化（`?? ""`・未入力null）・ラベル「個数（任意）」[04 §10.9]
+- [ ] ＋追加ボタン中立化 / 保存ボタンを accent へ [04 §5.7,§6.2]
+- [ ] 音声入力デグレなし確認（onResult 現状維持）[04 §10.9]
+
+## Phase 8: 他画面トンマナ [04 §6.7]
+
+- [ ] Auth 6画面（Login/Register/Forgot/Reset/Confirm/VerifyEmail）: リンク/ボタン色統一、LINE01維持 [04 §6.7]
+- [ ] Group（Create/Edit ＋ partials）: 主=primary / 削除=danger / 退会=danger or neutral [04 §6.7]
+- [ ] Profile（Edit ＋ partials）: セクション化・保存=primary・削除=danger [04 §6.7]
+- [ ] `Welcome.tsx`: トークン化（簡潔に）[04 §6.7]
+- [ ] `Dashboard.tsx`: 要否判断（残すならトークン化 / 未使用なら対応不要）[04 §6.7]
+
+## Phase 9: 総仕上げ・受け入れ [03 §5, ステップ5]
+
+- [ ] 全画面をライト/ダークで目視確認
+- [ ] デグレ確認: 音声入力（`api.voice.transcribe`）/ グループ機能 [03 ステップ5]
+- [ ] `php artisan test` 最終グリーン
+- [ ] スマホ実機で「開いて3秒で判断」を確認（要件 §9）
+- [ ] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]
+- [ ] 変更禁止事項に差分がないことを確認 [02 §5]
+
+---
+
+## 進捗メモ（新しいものを上に）
+
+- 2026-07-21: ドキュメント（01〜04）整備完了、本TODO作成。実装未着手。
