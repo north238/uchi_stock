@@ -61,6 +61,9 @@ Route::middleware(['auth', 'check.group'])->group(function () {
         Route::get('/{id}', [ItemController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/{id}', [ItemController::class, 'destroy'])->name('destroy');
+        Route::patch('/{id}/status', [ItemController::class, 'updateStatus'])->name('status.update');
+        Route::post('/{id}/purchase', [ItemController::class, 'storePurchase'])->name('purchase.store');
+        Route::delete('/{id}/purchase/latest', [ItemController::class, 'destroyLatestPurchase'])->name('purchase.destroy');
     });
 });
 

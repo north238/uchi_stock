@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ItemStatus;
 use App\Http\Requests\ItemCreateRequest;
 use App\Http\Requests\ItemUpdateRequest;
 use App\Models\Item;
 use App\Services\ItemService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Throwable;
 
@@ -38,10 +41,19 @@ class ItemController extends Controller
     public function index()
     {
         $groupId = Auth::user()->group_id;
-        $items = $this->items->getItemsByGroupId($groupId);
+        $sort = request('sort', 'status');
+        $items = $this->items->getItemsByGroupId($groupId, $sort);
+
+        $items->each(function ($item) {
+            $item->days_since_purchase = $item->last_purchased_at
+                ? Carbon::parse($item->last_purchased_at)
+                    ->startOfDay()->diffInDays(now('Asia/Tokyo')->startOfDay())
+                : null;
+        });
 
         return Inertia::render('Items/Index', [
             'items' => $items,
+            'sort' => $sort,
         ]);
     }
 
@@ -67,7 +79,8 @@ class ItemController extends Controller
 
             $saveData = [
                 'name' => $requestData['name'],
-                'quantity' => $requestData['quantity'],
+                'status' => $requestData['status'] ?? ItemStatus::InStock->value,
+                'quantity' => $requestData['quantity'] ?? null,
                 'is_favorite' => $requestData['is_favorite'] ?? 0,
                 'memo' => $requestData['memo'] ?? null,
                 'genre_id' => $requestData['genre_id'] ?? null,
@@ -118,10 +131,7 @@ class ItemController extends Controller
     {
         $apiUrl = route('api.voice.transcribe');
 
-        $item = $this->items->getItem($id);
-        if (!$item) {
-            abort(404);
-        }
+        $item = $this->findOwnedItem($id);
 
         return Inertia::render('Items/Edit', [
             'apiUrl' => $apiUrl,
@@ -135,14 +145,12 @@ class ItemController extends Controller
     public function update(ItemUpdateRequest $request, string $id)
     {
         try {
-            $item = $this->items->getItem($id);
-            if (!$item) {
-                abort(404);
-            }
+            $item = $this->findOwnedItem($id);
 
             DB::beginTransaction();
 
             $validatedData = $request->validated();
+            $validatedData['status'] = $validatedData['status'] ?? ItemStatus::InStock->value;
 
             // アイテムを更新
             $updatedItem = $this->items->updateItem($id, $validatedData);
@@ -182,10 +190,7 @@ class ItemController extends Controller
      */
     public function destroy(string $id)
     {
-        $item = $this->items->getItem($id);
-        if(!$item) {
-            return redirect()->back()->with('error', 'アイテムが見つかりません。');
-        }
+        $item = $this->findOwnedItem($id);
         // TODO::ロール確認
         $userId = Auth::id();
 
@@ -214,5 +219,58 @@ class ItemController extends Controller
 
             return redirect()->back()->with('error', 'アイテムの削除に失敗しました。');
         }
+    }
+
+    /**
+     * ステータスを更新する
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::enum(ItemStatus::class)],
+        ]);
+
+        $item = $this->findOwnedItem($id);
+        $item->update(['status' => $validated['status']]);
+
+        return redirect()->back();
+    }
+
+    /**
+     * 「買った」を記録する
+     */
+    public function storePurchase(Request $request, string $id)
+    {
+        $item = $this->findOwnedItem($id);
+        $this->itemService->recordPurchase($item, $request->user());
+
+        return redirect()->back();
+    }
+
+    /**
+     * 直近の購入記録を取り消す（Undo）
+     */
+    public function destroyLatestPurchase(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'previous_status' => ['required', Rule::enum(ItemStatus::class)],
+        ]);
+
+        $item = $this->findOwnedItem($id);
+        $this->itemService->undoLatestPurchase($item, ItemStatus::from($validated['previous_status']));
+
+        return redirect()->back();
+    }
+
+    /**
+     * 自グループに属するアイテムを取得する（他グループは404）
+     */
+    private function findOwnedItem(string $id): Item
+    {
+        $item = Item::where('id', $id)
+            ->where('group_id', Auth::user()->group_id)
+            ->first();
+        abort_if(!$item, 404);
+        return $item;
     }
 }
