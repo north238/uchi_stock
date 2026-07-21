@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-21
-現在地: **実装未着手（全タスク未完了）**
-作業ブランチ: 未作成
+最終更新: 2026-07-22
+現在地: **Phase 1 完了。Phase 2 着手前**
+作業ブランチ: `feat/mvp_phase1`
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -18,8 +18,8 @@
 
 | フェーズ | 内容 | 主参照 | 状態 |
 | -------- | ---- | ------ | ---- |
-| 0 | 事前準備 | 03 §7.1 | ⬜ 未着手 |
-| 1 | デザイン基盤（トークン） | 04 §2,§3,§4,§6.1 | ⬜ 未着手 |
+| 0 | 事前準備 | 03 §7.1 | ✅ 完了 |
+| 1 | デザイン基盤（トークン） | 04 §2,§3,§4,§6.1 | ✅ 完了 |
 | 2 | DB・モデル基盤 | 03 §7.2–7.4 | ⬜ 未着手 |
 | 3 | API（status/購入/Undo） | 03 §7.5–7.11 | ⬜ 未着手 |
 | 4 | 共通部品トークン化 | 04 §6.3,§6.5,§6.6 | ⬜ 未着手 |
@@ -37,24 +37,23 @@
 
 ## Phase 0: 事前準備
 
-- [ ] 作業ブランチ作成（`feat/*`。`development` へPR）
-- [ ] `composer require doctrine/dbal`（quantity の nullable 化に必要）[03 §7.1]
+- [x] 作業ブランチ作成（`feat/*`。`development` へPR）→ 既存の `feat/mvp_phase1` をそのまま使用
 
 ## Phase 1: デザイン基盤（トークン）[04 §2,§3,§4,§6.1]
 
-- [ ] `resources/css/app.css`: CSS変数トークン定義（light）＋ `@media (prefers-color-scheme: dark)` 上書き [04 §2.1]
-- [ ] `app.css`: danger トークン追加（light/dark）[04 §6.1]
-- [ ] `tailwind.config.js`: `colors` にトークン登録（paper/surface/ink/…/status/accent）[04 §2.2]
-- [ ] `tailwind.config.js`: `colors` に danger/danger-ink/danger-soft 追加 [04 §6.1]
-- [ ] `tailwind.config.js`: `fontFamily.sans` を丸ゴシック優先へ差し替え [04 §3]
-- [ ] `tailwind.config.js`: `boxShadow.card` 登録 [04 §4]
-- [ ] 確認: `bg-surface`/`text-ink`/`bg-status-*` がライト・ダーク双方で効く
+- [x] `resources/css/app.css`: CSS変数トークン定義（light）＋ `@media (prefers-color-scheme: dark)` 上書き [04 §2.1]
+- [x] `app.css`: danger トークン追加（light/dark）[04 §6.1]
+- [x] `tailwind.config.js`: `colors` にトークン登録（paper/surface/ink/…/status/accent）[04 §2.2]
+- [x] `tailwind.config.js`: `colors` に danger/danger-ink/danger-soft 追加 [04 §6.1]
+- [x] `tailwind.config.js`: `fontFamily.sans` を丸ゴシック優先へ差し替え [04 §3]
+- [x] `tailwind.config.js`: `boxShadow.card` 登録 [04 §4]
+- [x] 確認: `bg-surface`/`text-ink`/`bg-status-*` がライト・ダーク双方で効く（`tailwindcss` CLI で単体ビルドし、`bg-status-in`/`shadow-card`/`bg-danger` 等のユーティリティが生成されることを確認済み）
 
 ## Phase 2: DB・モデル基盤（バックエンド）[03 §7.2–7.4 / ステップ1]
 
 - [ ] `app/Enums/ItemStatus.php`（値・label・sortWeight・values）[03 §7.2]
 - [ ] migration: `add_status_to_items`（string, default in_stock, after name）[03 §7.3]
-- [ ] migration: `change_quantity_nullable_on_items`（要 doctrine/dbal）[03 §7.3]
+- [x] `items.quantity` を nullable化（`create_items_table` マイグレーションを直接編集。doctrine/dbal不要）[03 §7.1, §7.3]
 - [ ] migration: `create_purchase_histories_table`（item_id cascade / user_id nullOnDelete / purchased_at / index）[03 §7.3]
 - [ ] `app/Models/PurchaseHistory.php`（fillable/casts/item/user）[03 §7.4]
 - [ ] `Item` モデル更新: `status` を fillable/casts、`purchaseHistories()` 追加 [03 §7.4]
@@ -130,4 +129,5 @@
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-22: Phase 0（事前準備）・Phase 1（デザイン基盤トークン）完了。作業ブランチは既存の `feat/mvp_phase1` を継続使用。`items.quantity` の nullable 化は `doctrine/dbal` 不使用で `create_items_table` マイグレーションを直接編集する方式に変更（`docs/03` 更新済み）。`app.css` にカラートークン（paper/surface/ink/status/accent/danger）を light/dark 両方で定義、`tailwind.config.js` に同トークン・丸ゴシックフォント・`shadow.card` を登録し、`tailwindcss` CLI 単体ビルドでユーティリティ生成を確認。
 - 2026-07-21: ドキュメント（01〜04）整備完了、本TODO作成。実装未着手。

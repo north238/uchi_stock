@@ -11,6 +11,63 @@
   body {
     margin: 0;
   }
+
+  :root {
+    /* ベース（温かみのある紙色。定番クリームは避けた中立紙） */
+    --color-paper: 241 242 238; /* #F1F2EE 背景 */
+    --color-surface: 255 255 255; /* #FFFFFF カード */
+    --color-surface-2: 247 248 244; /* #F7F8F4 面2 */
+    --color-ink: 35 39 31; /* #23271F 文字 */
+    --color-muted: 109 115 104; /* #6D7368 補助文字 */
+    --color-faint: 154 160 148; /* #9AA094 弱文字 */
+    --color-line: 229 231 223; /* #E5E7DF 罫線 */
+    --color-line-strong: 213 216 205; /* #D5D8CD 強罫線 */
+
+    /* アクセント＝コーラル（アクション専用） */
+    --color-accent: 239 106 74; /* #EF6A4A */
+    --color-accent-ink: 255 255 255; /* ボタン上の文字 */
+    --color-accent-soft: 253 238 233; /* #FDEEE9 */
+
+    /* ステータス＝緑の単色濃淡（意味色 / 濃い=ある→薄い=ない） */
+    --color-st-in: 31 158 90; /* #1F9E5A ある（満） */
+    --color-st-in-ink: 255 255 255;
+    --color-st-low: 154 211 176; /* #9AD3B0 少ない（中） */
+    --color-st-low-ink: 16 80 47;
+    --color-st-out: 238 245 240; /* #EEF5F0 ない（空・アウトライン） */
+    --color-st-out-ink: 92 155 120;
+    --color-st-out-line: 203 228 213; /* #CBE4D5 */
+
+    /* 破壊的操作（削除・退会） */
+    --color-danger: 202 60 60; /* #CA3C3C */
+    --color-danger-ink: 255 255 255;
+    --color-danger-soft: 249 233 233; /* #F9E9E9 */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-paper: 22 24 20; /* #161814 */
+      --color-surface: 35 38 31; /* #23261F */
+      --color-surface-2: 28 31 25; /* #1C1F19 */
+      --color-ink: 238 240 232; /* #EEF0E8 */
+      --color-muted: 162 168 154; /* #A2A89A */
+      --color-faint: 118 124 110; /* #767C6E */
+      --color-line: 51 55 48; /* #333730 */
+      --color-line-strong: 63 68 58; /* #3F443A */
+      --color-accent: 244 122 92; /* #F47A5C */
+      --color-accent-ink: 36 16 9; /* #241009 */
+      --color-accent-soft: 58 36 29; /* #3A241D */
+      --color-st-in: 43 171 102; /* #2BAB66 */
+      --color-st-in-ink: 6 33 15;
+      --color-st-low: 79 143 107; /* #4F8F6B */
+      --color-st-low-ink: 234 250 240;
+      --color-st-out: 35 48 42; /* #23302A */
+      --color-st-out-ink: 127 184 151;
+      --color-st-out-line: 55 73 63; /* #37493F */
+      --color-danger: 224 104 104; /* #E06868 */
+      --color-danger-ink: 40 12 12;
+      --color-danger-soft: 58 30 30;
+    }
+  }
 }
 
 .primary-link-btn {

@@ -74,9 +74,9 @@
 
 **目的**: status と購入履歴のデータ基盤を用意する。
 
-- [ ] マイグレーション追加（既存は編集しない）
+- [x] `items.quantity` を nullable 化 済み（`create_items_table` マイグレーションを直接編集。doctrine/dbal不要。理由: 2026-07時点でPhase 0は本番未反映のため、既存マイグレーション編集による影響なし）
+- [ ] マイグレーション追加（既存は編集しない。上記quantityの変更を除く）
   - `items` に `status`（string, default `in_stock`, `name` の後ろ想定）を追加。既存レコードは `in_stock` で埋まる（default）。
-  - `items.quantity` を nullable に変更（`change()`。`doctrine/dbal` の要否を確認）。
   - `purchase_histories` 新規作成（要件 §3.2）: `id` / `item_id`(FK cascade) / `user_id`(FK nullOnDelete) / `purchased_at`(datetime) / `timestamps`。
 - [ ] `App\Enums\ItemStatus` 作成（値・ラベル・並び順重み）。
 - [ ] `App\Models\PurchaseHistory` 作成（`item()` / `user()` リレーション）。
@@ -129,8 +129,8 @@
 
 | 種別       | ファイル                                                            | 変更                                             |
 | ---------- | ------------------------------------------------------------------- | ------------------------------------------------ |
+| migration  | `database/migrations/2025_04_12_000500_create_items_table.php`      | 変更（quantityをnullable化・直接編集済み）       |
 | migration  | `database/migrations/xxxx_add_status_to_items.php`                  | 新規                                             |
-| migration  | `database/migrations/xxxx_change_quantity_nullable_on_items.php`    | 新規                                             |
 | migration  | `database/migrations/xxxx_create_purchase_histories_table.php`      | 新規                                             |
 | enum       | `app/Enums/ItemStatus.php`                                          | 新規                                             |
 | model      | `app/Models/PurchaseHistory.php`                                    | 新規                                             |
@@ -159,7 +159,7 @@
 ## 6. 確定した設計判断（旧・未確定事項）
 
 1. **誤タップ対策 = Undo トースト**（DELETE エンドポイントを追加）。前ステータスは**フロントが保持**し、Undo 時に送って復元する（サーバに前状態を保存しない）。
-2. **`quantity` nullable 化に `doctrine/dbal` が必要**（Laravel 10 の `change()`）。→ ステップ1の前に `composer require doctrine/dbal` を実行する。
+2. **`quantity` nullable 化は既存マイグレーション（`create_items_table`）を直接編集して対応**。`doctrine/dbal` は導入しない（`change()` を使わないため不要）。2026-07時点でPhase 0は本番未反映のため、既存マイグレーション編集による影響はない。
 3. **グループ認可は新規API＋既存 edit/update/destroy にも追加**。他グループの ID を直接叩いた場合は 404 とする（§7.6）。
 
 ## 7. 実装詳細仕様（バックエンド）
@@ -168,9 +168,8 @@
 
 ### 7.1 事前準備
 
-```bash
-composer require doctrine/dbal   # quantity の nullable 化(change())に必要
-```
+`items.quantity` の nullable 化は `create_items_table` マイグレーションを直接編集する方式に変更したため、
+`doctrine/dbal` の追加は不要（事前準備コマンドなし）。
 
 ### 7.2 `App\Enums\ItemStatus`（新規）
 
@@ -208,7 +207,11 @@ enum ItemStatus: string
 }
 ```
 
-### 7.3 マイグレーション3本（既存は編集しない）
+### 7.3 マイグレーション（`items.quantity` の nullable 化は既存マイグレーション直接編集で対応済み・下記の対象外）
+
+`items.quantity` の nullable 化は `create_items_table` マイグレーション自体を直接編集済み
+（`$table->integer('quantity')->nullable()->default(null)->comment('数量(任意)')`）。
+以下は新規追加するマイグレーション。
 
 ```php
 // 1) add_status_to_items
@@ -218,13 +221,7 @@ Schema::table('items', function (Blueprint $t) {
 });
 // 既存レコードは default により in_stock で埋まる。down は dropColumn('status')。
 
-// 2) change_quantity_nullable_on_items（要 doctrine/dbal）
-Schema::table('items', function (Blueprint $t) {
-    $t->integer('quantity')->nullable()->default(null)->comment('数量(任意)')->change();
-});
-// down は ->integer('quantity')->default(1)->change();
-
-// 3) create_purchase_histories_table
+// 2) create_purchase_histories_table
 Schema::create('purchase_histories', function (Blueprint $t) {
     $t->id();
     $t->foreignId('item_id')->constrained('items')->cascadeOnDelete();       // アイテム削除で履歴も削除
