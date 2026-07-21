@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ItemStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ItemUpdateRequest extends FormRequest
 {
@@ -23,7 +25,8 @@ class ItemUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'status' => ['nullable', Rule::enum(ItemStatus::class)],
+            'quantity' => ['nullable', 'integer', 'min:0'],
             'genre_id' => ['nullable', 'integer', 'exists:genres,id'],
             'place_id' => ['nullable', 'integer', 'exists:places,id'],
             'memo' => ['nullable', 'string', 'max:255'],
@@ -37,6 +40,7 @@ class ItemUpdateRequest extends FormRequest
     {
         return [
             'name' => '品名',
+            'status' => 'ステータス',
             'quantity' => '数量',
             'memo' => 'メモ',
             'genre_id' => 'ジャンル',
