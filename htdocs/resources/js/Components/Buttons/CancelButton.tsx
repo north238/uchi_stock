@@ -17,7 +17,7 @@ export default function CancelButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      variant="danger"
+      variant="neutral"
     >
       {label}
     </Button>
