@@ -58,8 +58,6 @@ services:
       - uchistock_network
     extra_hosts:
       - 'host.docker.internal:host-gateway'
-    env_file:
-      - .env
 
   web:
     container_name: uchistock-web
