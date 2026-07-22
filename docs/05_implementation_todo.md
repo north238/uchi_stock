@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-22
-現在地: **Phase 4 完了。Phase 5 着手前**
-作業ブランチ: `feat/mvp_phase2`（Phase 0/1 は `feat/mvp_phase1` としてPR #80経由で`development`へマージ済み）
+最終更新: 2026-07-23
+現在地: **Phase 5 完了。Phase 6 着手前**
+作業ブランチ: `feat/mvp_phase5`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -23,7 +23,7 @@
 | 2 | DB・モデル基盤 | 03 §7.2–7.4 | ✅ 完了 |
 | 3 | API（status/購入/Undo） | 03 §7.5–7.11 | ✅ 完了 |
 | 4 | 共通部品トークン化 | 04 §6.3,§6.5,§6.6 | ✅ 完了 |
-| 5 | レイアウト2種 | 04 §6.4 | ⬜ 未着手 |
+| 5 | レイアウト2種 | 04 §6.4 | ✅ 完了 |
 | 6 | Items 一覧カード | 03 ステップ3 / 04 §5,§10 | ⬜ 未着手 |
 | 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ⬜ 未着手 |
 | 8 | 他画面トンマナ | 04 §6.7 | ⬜ 未着手 |
@@ -88,8 +88,10 @@
 
 ## Phase 5: レイアウト2種 [04 §6.4]
 
-- [ ] `Layouts/AuthenticatedLayout.tsx`: 背景/ナビ/ヘッダー/アクティブaccent をトークン化 [04 §6.4]
-- [ ] `Layouts/GuestLayout.tsx`: paper/surface/角丸/影 をトークン化 [04 §6.4]
+- [x] `Layouts/AuthenticatedLayout.tsx`: 背景/ナビ/ヘッダー/アクティブaccent をトークン化 [04 §6.4]
+- [x] `Layouts/GuestLayout.tsx`: paper/surface/角丸/影 をトークン化 [04 §6.4]
+- [x] `Components/NavLink.tsx`/`ResponsiveNavLink.tsx`: アクティブ色を indigo/blue → accent へ置換（§6.4 に付随）
+- [x] グループ未所属強制モーダルのボタン（`primary-link-btn`/`secondary-link-btn`）を `app.css` でトークン化（主=accent／スキップ=neutral、§6.2 準拠）
 
 ## Phase 6: Items 一覧カード [03 ステップ3 / 04 §5,§10]
 
@@ -129,6 +131,7 @@
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-23: Phase 5（レイアウト2種）完了。`Layouts/AuthenticatedLayout.tsx`: 背景`bg-gray-100`→`bg-paper`、ナビ/ヘッダー`bg-white`→`bg-surface`＋`border-line`、ドロップダウン起点ボタン・ハンバーガー・モバイルメニューをトークン化（`text-muted`/`text-ink`/`bg-surface-2`）。グループ未所属の強制モーダルは見出し`text-ink`・本文`text-muted`・警告アイコン`text-danger`に統一。`Layouts/GuestLayout.tsx`: 背景`bg-paper`、カード`bg-surface rounded-[20px] shadow-card border border-line`（`max-w-sm`は維持）。付随して `Components/NavLink.tsx`/`ResponsiveNavLink.tsx` のアクティブ色（indigo/blue）を`accent`/`accent-soft`へ、非アクティブを`muted`/`line-strong`へ置換。強制モーダルのボタンに使われている`primary-link-btn`/`secondary-link-btn`（`app.css`）もblue直値からトークン（主=accent／スキップ=neutral、§6.2準拠）へ置換。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のエラーのみ、無関係と確認）、`vite build`成功。**ブラウザでの実見た目確認は本セッションのツール制約により未実施**。
 - 2026-07-22: Phase 4（共通部品トークン化）完了。`Button.tsx` の variant を `primary`/`neutral`/`danger`/`ghost` に再定義（`warning`/`success` 廃止）し全色をトークン参照へ。`SaveButton`→`primary`、`AddButton`→`ghost`、`CancelButton`→`neutral` に是正（従来 保存/追加=緑・キャンセル=赤の誤用を解消）。`PrimaryButton`/`SecondaryButton`/`DangerButton` は構造を維持したままトークン化（`Button`への統合は見送り、指示書§6.3の「段階的でよい」に従う）。`TextInput`/`TextArea`/`SelectInput`/`Checkbox`/`InputLabel`/`InputError`/`Divider` をトークン化しfocusをaccentリングに統一、フィールド角丸を`rounded-lg`に統一。`Modal.tsx`（オーバーレイ`bg-ink/40`・パネル`bg-surface rounded-[20px] shadow-card`）・`Dropdown.tsx`（面`bg-surface`・`rounded-xl shadow-card`・項目hover`bg-surface-2`）をトークン化。`utils/toast.ts`を`toast.tsx`にリネームし`showBuyUndoToast`を追加、トースト全体の配色は`toastClassName`が`ToastContainer`側のpropだったため`app.tsx`側に移して設定。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のエラー・警告は変更前から存在し無関係と確認）、`vite build`成功、コンパイル後のCSS/JSに新トークンクラスが反映されていることを確認。ローカルDocker環境で`public/hot`が古いまま残っておりVite dev serverが実際には起動していない不整合を発見・削除（本番ビルド出力にフォールバックさせ動作確認に使用。git管理外のファイルのため影響なし）。**ブラウザでの実見た目確認は本セッションのツール制約により未実施**、次回実機/ブラウザでのライト・ダーク目視確認を推奨。
 - 2026-07-22: Phase 3（API: status/購入/Undo）完了。`routes/web.php` に3ルート追加（`items.status.update`/`items.purchase.store`/`items.purchase.destroy`）。`ItemController` に `findOwnedItem`（他グループは404）、`updateStatus`/`storePurchase`/`destroyLatestPurchase` を追加し、既存 `edit`/`update`/`destroy` も `findOwnedItem` に置換。`index` で `sort`（status/purchased）受け取りと `days_since_purchase` 付与に対応。`ItemService` に `recordPurchase`/`undoLatestPurchase` を実装（DBトランザクション）。`ItemCreateRequest`/`ItemUpdateRequest` の `quantity` を `nullable|min:0` に緩和、`status` を enum バリデーションに追加、未指定時は `in_stock` をデフォルト適用。`ItemFactory`/`PurchaseHistoryFactory` を新規作成。Feature テスト `ItemStatusTest`（自グループ更新・他グループ404・不正値422）・`ItemPurchaseTest`（購入記録・他グループ404・Undo復元）を追加し全6件パス。`php artisan test` 全体は新規6件含め24件パス、既存の7件失敗（Auth系・環境起因）は変更前と同一で回帰なしを確認。
 - 2026-07-22: Phase 2（DB・モデル基盤）完了。`app/Enums/ItemStatus.php` 新規作成（label/sortWeight/values）。マイグレーション2本追加（`add_status_to_items`＝status列 default in_stock、`create_purchase_histories_table`）。`app/Models/PurchaseHistory.php` 新規作成。`Item` モデルに `status` の fillable/casts、`purchaseHistories()` リレーション追加、`getItemsByGroupId` を `withMax` + `orderByRaw`（status順/purchased順）へ差し替え。`migrate:fresh --seed` を実行（既存のローカル手動テストデータ7件は消える前提でユーザー承認済み）。DBスキーマ（quantity nullable / status default in_stock）・Enumキャスト・並び順ロジックをtinkerで実地検証。既存Featureテストは変更前と同じ7件失敗（Auth系・環境起因、Phase 2の変更とは無関係と確認済み）で回帰なし。作業ブランチは `feat/mvp_phase1`→PR #80で`development`へマージ済み、現在は新規ブランチ `feat/mvp_phase2` で作業中（ユーザーが別途ブランチ運用を実施）。
