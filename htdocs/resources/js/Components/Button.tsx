@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'warning' | 'success';
+type ButtonVariant = 'primary' | 'neutral' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,7 +23,7 @@ export default function Button({
     <button
       {...props}
       className={`
-                inline-flex items-center justify-center w-full rounded
+                inline-flex items-center justify-center w-full rounded-md
                 transition ease-in-out duration-150
                 font-semibold
                 ${
@@ -34,20 +34,20 @@ export default function Button({
                     : 'px-4 py-2 text-base'
                 }
                 ${
-                  variant === 'secondary'
-                    ? 'bg-gray-600 dark:bg-gray-200 text-white dark:text-gray-500 hover:bg-white hover:text-gray-500 hover:border-gray-500'
+                  variant === 'neutral'
+                    ? 'bg-surface border border-line-strong text-ink hover:bg-surface-2'
                     : variant === 'danger'
-                    ? 'bg-red-600 dark:bg-red-200 text-white dark:text-red-500 hover:bg-white hover:text-red-500 hover:border-red-500'
-                    : variant === 'warning'
-                    ? 'bg-yellow-600 dark:bg-yellow-200 text-white dark:text-yellow-500 hover:bg-white hover:text-yellow-500 hover:border-yellow-500'
-                    : variant === 'success'
-                    ? 'bg-green-600 dark:bg-green-200 text-white dark:text-green-500 hover:bg-white hover:text-green-500 hover:border-green-500'
-                    : 'bg-blue-600 dark:bg-blue-200 text-white dark:text-blue-500 hover:bg-white hover:text-blue-500 hover:border-blue-500'
+                    ? 'bg-danger text-danger-ink hover:bg-surface hover:text-danger hover:border hover:border-danger'
+                    : variant === 'ghost'
+                    ? 'bg-transparent text-accent hover:bg-accent-soft'
+                    : 'bg-accent text-accent-ink hover:bg-surface hover:text-accent hover:border hover:border-accent'
                 }
                 ${
                   disabled
                     ? "opacity-50 cursor-not-allowed"
-                    : "focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                    : `focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                        variant === 'danger' ? 'focus:ring-danger' : 'focus:ring-accent'
+                      }`
                 }
                 ${className}
             `}

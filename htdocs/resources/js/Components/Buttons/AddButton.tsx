@@ -17,7 +17,7 @@ export default function AddButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      variant="success"
+      variant="ghost"
     >
       {label}
     </Button>
