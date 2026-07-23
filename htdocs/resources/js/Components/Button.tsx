@@ -45,7 +45,7 @@ export default function Button({
                 ${
                   disabled
                     ? "opacity-50 cursor-not-allowed"
-                    : `focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    : `focus:outline-none focus:ring-2 ${
                         variant === 'danger' ? 'focus:ring-danger' : 'focus:ring-accent'
                       }`
                 }

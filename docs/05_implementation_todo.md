@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-07-24
-現在地: **Phase 7 完了。Phase 8 着手前**
+現在地: **Phase 8 完了。Phase 9 着手前**（Phase 10/11 はドキュメント整備のみ完了。実装は未着手）
 作業ブランチ: `feat/mvp_phase5`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -26,8 +26,10 @@
 | 5 | レイアウト2種 | 04 §6.4 | ✅ 完了 |
 | 6 | Items 一覧カード | 03 ステップ3 / 04 §5,§10 | ✅ 完了 |
 | 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ✅ 完了 |
-| 8 | 他画面トンマナ | 04 §6.7 | ⬜ 未着手 |
+| 8 | 他画面トンマナ | 04 §6.7 | ✅ 完了 |
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ⬜ 未着手 |
+| 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ⬜ 未着手 |
+| 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | 🟡 着手中（ドキュメント更新のみ完了） |
 
 状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
 
@@ -112,11 +114,11 @@
 
 ## Phase 8: 他画面トンマナ [04 §6.7]
 
-- [ ] Auth 6画面（Login/Register/Forgot/Reset/Confirm/VerifyEmail）: リンク/ボタン色統一、LINE01維持 [04 §6.7]
-- [ ] Group（Create/Edit ＋ partials）: 主=primary / 削除=danger / 退会=danger or neutral [04 §6.7]
-- [ ] Profile（Edit ＋ partials）: セクション化・保存=primary・削除=danger [04 §6.7]
-- [ ] `Welcome.tsx`: トークン化（簡潔に）[04 §6.7]
-- [ ] `Dashboard.tsx`: 要否判断（残すならトークン化 / 未使用なら対応不要）[04 §6.7]
+- [x] Auth 6画面（Login/Register/Forgot/Reset/Confirm/VerifyEmail）: リンク/ボタン色統一、LINE01維持 [04 §6.7]
+- [x] Group（Create/Edit ＋ partials）: 主=primary / 削除=danger / 退会=danger or neutral [04 §6.7]
+- [x] Profile（Edit ＋ partials）: セクション化・保存=primary・削除=danger [04 §6.7]
+- [x] `Welcome.tsx`: トークン化（簡潔に）[04 §6.7]
+- [x] `Dashboard.tsx`: 要否判断は保留し、現状維持前提でトークン化のみ実施（削除は本フェーズの決定事項外）[04 §6.7]
 
 ## Phase 9: 総仕上げ・受け入れ [03 §5, ステップ5]
 
@@ -127,21 +129,39 @@
 - [ ] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]
 - [ ] 変更禁止事項に差分がないことを確認 [02 §5]
 
----
+## Phase 10: 登録UX改善（遷移・購入履歴自動記録・トースト）[03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7]
 
-## 気になる挙動（要検討）
+2026-07-24 にユーザーとの検討で方針決定済み（ドキュメント更新済み、実装は未着手）。
 
-Phase 7 完了時点でユーザーから指摘のあった、仕様として未確定の挙動。修正は対応せず、タスク整理時に改めて検討する。
+- [ ] `ItemController@store`: リダイレクト先を `items.create` → `items.index` に変更し、`with('success', "{$item->name}を登録しました")` を付与 [03 §7.13]
+- [ ] `Items/Create.tsx`: ヘッダー左上に「戻る」導線を追加（遷移先は `items.index` 固定、`MdArrowBack`）[03 §7.13 / 04 §5.8,§10.4]
+- [ ] `ItemController@store`: アイテム作成と同一トランザクションで購入履歴を1件自動作成（`purchased_at`=登録日時、status上書きなし）[03 §7.14]
+- [ ] `ItemService`: `createInitialPurchaseHistory(Item, User)` を追加し `recordPurchase` とロジックを分離 [03 §7.14]
+- [ ] 「購入記録なし」分岐（`days_since_purchase === null`）はコードとして維持（削除しない）[04 §10.3]
+- [ ] `utils/toast.tsx`: `showBuyUndoToast` を `autoClose: 3500` ・コンパクトな `className` に調整 [04 §5.6,§10.7]
+- [ ] Feature テスト: `store` のリダイレクト先変更・購入履歴自動作成を検証するテストを追加/更新
 
-- [ ] **アイテム登録後の遷移先**: 現状は `items.create` にとどまり入力欄がリセットされる（連続登録を想定した挙動）。一覧（`items.index`）へ遷移する方が良いのではという指摘あり。要UX方針決定。
-- [ ] **登録時点の購入日時が不明**: アイテム新規登録時に `purchase_histories` が作成されないため、登録直後は「前回購入: 購入記録なし」と表示される。登録＝購入とみなして初回の購入履歴を自動作成するか、現状のままにするか要仕様決定（`docs/03`側の修正が必要になる可能性あり）。
-- [ ] **買った取り消しトーストの主張が強い**: `showBuyUndoToast`（`utils/toast.tsx`）の見た目・サイズが目立ちすぎるとの指摘。デザイン調整が必要（`docs/04` §5.6,§10.7）。
-- [ ] **音声入力を削除したいという要望**: 対応する音声解析APIが現状ないため実質使用不可。ただし `VoiceInput.tsx` / `api.voice.transcribe` は `CLAUDE.md` §8 および `docs/02` §5 で明示的に「変更禁止」とされている項目のため、**現時点では対応保留**（ユーザー判断により今回は手を付けない）。将来的に削除・非表示化する場合は、先に `CLAUDE.md` と `docs/02`〜`04` の当該記述を更新してから着手すること。
+## Phase 11: 音声入力の削除 [02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8]
+
+2026-07-24 にユーザーとの検討で削除方針が決定。**ドキュメント先行**の順序を厳守する。
+
+- [x] ドキュメント更新: `CLAUDE.md` §8 の「変更禁止」から音声入力を除外し「削除予定」を明記 [CLAUDE.md §8]
+- [x] ドキュメント更新: `docs/02` §5 の変更禁止事項から音声入力を除外し削除予定の注記を追加 [02 §5]
+- [x] ドキュメント更新: `docs/03` §4「変更しないもの」・ステップ5 から音声入力を除外し、ステップ6（削除タスク概要）を追加 [03 §4, ステップ6]
+- [x] ドキュメント更新: `docs/04` §8 デグレ禁止・§5.7・§10.9 の音声入力記述に削除予定の注記を追加 [04 §8,§5.7,§10.9]
+- [ ] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去
+- [ ] バックエンド: `api.voice.transcribe` ルート・対応コントローラを削除
+- [ ] バックエンド: Whisper 関連設定値（`.env`/`.env.example`/`.env.testing` の `WHISPER_URL` 等）を削除
+- [ ] 不要になったパッケージ・設定（`useVoiceRecorder.ts` 等の関連フック含む）を整理
+- [ ] 削除後、リポジトリ全体で音声入力関連の参照が残っていないことを確認（grep等）
+- [ ] `php artisan test` グリーンを再確認
 
 ---
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-24: 【ドキュメント更新のみ・コード変更なし】「気になる挙動」4件についてユーザーと方針を検討し、`CLAUDE.md`・`docs/02`・`docs/03`・`docs/04`・`docs/05` を更新。(1) 登録後の遷移: `items.store` 成功時のリダイレクト先を `items.index` に変更し「〇〇を登録しました」のフラッシュ表示、`Items/Create.tsx` ヘッダーに戻る導線（`items.index`固定）を追加する方針を `docs/03` §7.13・`docs/04` §5.8 に明記。(2) 登録時の購入履歴自動作成: `ItemController@store` で同一トランザクション内に購入履歴を1件自動作成（ステータスは上書きしない。`recordPurchase`とは別処理として`ItemService::createInitialPurchaseHistory`を新設）する方針を `docs/03` §7.14・`docs/02` §3.2 に明記。「購入記録なし」分岐は将来の防御として維持。(3) Undoトースト: `autoClose`を6000→3500に短縮し、コンパクトな`className`を追加する方針を `docs/04` §5.6,§10.7 に明記。(4) 音声入力削除: `CLAUDE.md` §8・`docs/02` §5・`docs/03` §4/ステップ5/6・`docs/04` §8,§5.7,§10.9 から音声入力を「変更禁止」対象外とし「削除予定」に変更（Whisper API未整備で実質使用不可のため）。ドキュメント更新を完了条件とする削除手順を `docs/05` Phase 11 に整理。上記いずれも本セッションでは**ドキュメントのみ更新し、実装コードには一切手を加えていない**。新規タスクは `docs/05` Phase 10（登録UX改善）・Phase 11（音声入力削除）として追加。次回はこれらの実装から着手可能。
+- 2026-07-24: Phase 8（他画面トンマナ）完了。**Auth6画面**（Login/Register/ForgotPassword/ConfirmPassword/VerifyEmail/ResetPassword）: `text-LINK01`/`hover:text-blue-*`/`visited:text-LINK02` のリンク色を `text-accent hover:text-ink` に統一、説明文・補助文言の `text-gray-*` を `text-muted`/`text-ink` に置換。ステータス系メッセージ（メール確認送信済み等）の緑色は「緑はステータス専用」ルールに従い`text-ink`の中立表示に変更。LINEログインボタン（`LINE01`）は指示通り維持。**Group**（Create/Edit＋UpdateGroupForm/DeleteGroupForm/LeaveGroupForm）: パネルを`bg-surface shadow-card sm:rounded-[20px]`に、見出し`text-ink`・本文`text-muted`に統一。既存の主=`PrimaryButton`(accent)・削除=`DangerButton`・脱退=`DangerButton`の割り当てはそのまま維持（§6.2準拠を確認）。DeleteGroupFormのパスワード未設定時リンクも`text-accent`へ。**Profile**（Edit＋4partials）: 同様にパネル・見出し・本文をトークン化、メール確認リンク・送信済みメッセージも整合。**Welcome.tsx**: 未定義だった`bg-dots-*`ユーティリティ（tailwind.config.js未登録で無効化していた）を`bg-paper`に置換、リンク文言・selectionカラーをトークン化。**Dashboard.tsx**: 残す/削除の意思決定はスコープ外のため保留し、現状維持前提でパネル・文字色のみトークン化。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のみ）、`vite build`成功、`php artisan test`で回帰なし（24件パス、既存7件失敗はAuth系・環境起因で同一）、開発DBのデータもテスト前後で保持。**ブラウザでの実見た目確認は本セッションのツール制約により未実施**、Phase 9で全画面のライト/ダーク目視確認を行う。
 - 2026-07-24: Phase 7（Items フォーム）完了。`Pages/Items/Partials/Form.tsx`: `FormItemFields`/`FieldName` に `status` を追加し、品名の次に `StatusSegment`（Phase6で作成済み）を再利用したステータス選択UIを追加（既定は編集時=既存値／新規時=`in_stock`）。`quantity` の型を `number` → `number | null` に変更し、空入力は `null` を送信するよう変更、ラベルを「個数」→「個数（任意）」に変更。フォームパネルの残存旧配色（`bg-white dark:bg-gray-800`・`shadow-md`・`rounded-lg`・エラー文言の`text-red-500`）もトークン化（`bg-surface`・`shadow-card`・`rounded-[20px]`・`text-danger`）。＋追加ボタン（`AddButton`＝ghost）・保存ボタン（`PrimaryButton`＝`bg-accent`）は Phase4 で既に是正済みであることを確認。`Pages/Items/Create.tsx`/`Edit.tsx` の `useForm` 初期値に `status` を追加（Create既定`in_stock`・Edit既存値）、`quantity` 初期値を `1` → `null` に変更、`Edit.tsx` の `Item` 型にも `status`/`quantity: number | null` を追加。音声入力 `VoiceInput` の `onResult` は変更せず現状維持（name/quantityのみセット、statusは不変）で音声入力デグレなしを確認。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のみ）、`vite build`成功、`php artisan test`で回帰なし（24件パス、既存7件失敗はAuth系・環境起因で同一）、開発DB（users/items件数）もテスト実行前後で保持されることを確認。**ブラウザでの実見た目確認（フォームでのステータス切替・個数任意入力の挙動）は本セッションのツール制約により未実施**。
 - 2026-07-23: 【環境修正】テスト実行が開発DBを破壊していた問題を修正。原因は、`docker-compose.yml` の `app` サービスの `env_file: .env`（リポジトリルートの `.env`。`DB_CONNECTION`/`DB_HOST`/`DB_DATABASE`等を含む）がコンテナの実OS環境変数として注入され、Laravelの環境変数解決順序（`$_SERVER`優先）により `phpunit.xml` 側のテスト用DB指定が上書きされず、Feature テストの `RefreshDatabase` が開発DB（`uchistock-db`）に対して `migrate:fresh` 相当を実行し、データが消えていたこと。対応: (1) `docker-compose.yml` の `app` サービスから `env_file: .env` を削除（`db`サービスは対象外）、要 `docker-compose up -d --force-recreate app`。(2) `uchistock-db-testing` DBを新設し `db-user` に権限付与。(3) `htdocs/.env.testing` を新規作成（`DB_DATABASE=uchistock-db-testing`・`APP_ENV=testing`・array/syncドライバ等）し `.gitignore` に追加。(4) `phpunit.xml` は `APP_ENV=testing` のみ残し他は `.env.testing` に一本化。検証: `php artisan test` を複数回実行しても開発DB（users/items件数）が保持され、テストは `uchistock-db-testing` に対して実行されることを確認（migrate:fresh後は空、テスト後も開発DBは無傷）。**なお `Item::getItemsByGroupId` は MySQL固有の `FIELD()` 関数を使用しているため、SQLite化は見送りMySQLのテストDBを採用（ユーザー指摘により方針転換）**。
 - 2026-07-23: 【環境整備】開発時に毎回ユーザー登録する手間を省くため、`database/seeders/UserSeeder.php`（開発用グループ＋`test@example.com`/`password`のログイン可能ユーザー）と `database/seeders/ItemSeeder.php`（ジャンル4種・保管場所4種・在庫状態/購入履歴のバリエーションを持つアイテム8件）を新規作成し `DatabaseSeeder` に登録。`migrate:fresh --seed` で開発DBに投入済み。

@@ -195,18 +195,24 @@ fontFamily: {
 ### 5.6 Undoトースト
 
 - 画面下部に一時表示。`bg-ink text-surface`・`rounded-[14px]`。「『{品名}』を買ったに記録しました」＋右に「取り消す」（コーラル）。
-- 「取り消す」で直近購入を取り消し（`docs/03` の Undo エンドポイント採用時）。数秒で自動的に消える。
+- 「取り消す」で直近購入を取り消し（`docs/03` の Undo エンドポイント採用時）。
+- **小さめの表示・短めの自動消滅**（2026-07-24 決定）。既存実装は `autoClose: 6000` で他のトーストより大きく主張が強かったため、`autoClose: 3000〜4000` 程度に短縮し、パディング・最小高さを控えめにした compact な見た目にする（§10.7）。
 - 既存のトースト実装（`utils/toast`）と役割が重複する場合は方式を統一する。
 
 ### 5.7 登録・編集フォーム調整（F-4）
 
-`resources/js/Pages/Items/Partials/Form.tsx` を調整（音声入力フローは現状維持・デグレ禁止）:
+`resources/js/Pages/Items/Partials/Form.tsx` を調整（音声入力フローは現状維持・デグレ禁止。※音声入力自体は削除予定。§8・§10.9 参照。削除実施までの間はデグレさせない）:
 
 - **ステータス選択**（`StatusSegment` を再利用した3値、既定 `in_stock`）を品名の次に追加。
 - **個数を任意入力化**（未入力可・ラベルを「個数（任意）」）。視覚的な優先度も下げる。
 - `FormItemFields` / `FieldName` に `status` を追加。
 - 「＋追加」ボタンの緑（現状 `bg-green-*`）を廃し、**中立色 or アウトライン**へ。緑はステータス専用（役割分離）に統一する。
 - 保存ボタンはコーラル（`bg-accent`）へ寄せる。
+
+### 5.8 登録画面の戻る導線（2026-07-24 追加）
+
+- 登録完了後は `items.index`（一覧）へリダイレクトする方針に変更したため（`docs/03` §7.13）、`Items/Create.tsx` のヘッダー左上に一覧へ戻るリンクを設置する。
+- アイコンは `MdArrowBack`（`react-icons/md`、§10.4）。遷移先は `items.index` 固定（ブラウザ履歴の `back()` には依存しない）。
 
 ## 6. 全画面への展開（共通トンマナ）
 
@@ -334,6 +340,8 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 | `resources/js/Components/BuyButton.tsx`          | 新規                                                           |
 | `resources/js/Pages/Items/Partials/ItemCard.tsx` | 新規                                                           |
 | `resources/js/Pages/Items/Partials/Form.tsx`     | status追加・個数任意化・＋追加ボタン中立化                     |
+| `resources/js/Pages/Items/Create.tsx`            | ヘッダーに戻る導線を追加（§5.8）                               |
+| `resources/js/utils/toast.tsx`                   | `showBuyUndoToast` のサイズ・自動消滅時間を調整（§5.6,§10.7）  |
 
 ## 8. 実装時の遵守事項
 
@@ -342,7 +350,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - **ダーク両対応。** トークン経由で必ず両テーマ成立を確認。
 - **色の役割を越えない。** 緑＝ステータス、コーラル＝アクション、danger＝破壊的操作のみ。緑をボタンに、コーラルを状態に使わない（§6.2）。
 - **アクセシビリティ。** フォーカスリング・`aria-pressed`・`prefers-reduced-motion` 尊重・コントラスト確保。
-- **デグレ禁止。** 音声入力（`VoiceInput.tsx` / `api.voice.transcribe`）とグループ機能の挙動を壊さない（`docs/02` §5）。
+- **デグレ禁止。** グループ機能の挙動を壊さない（`docs/02` §5）。音声入力（`VoiceInput.tsx` / `api.voice.transcribe`）は削除予定のためこの限りではないが、削除実施（`docs/05` Phase 11）までは現状のデグレさせない扱いを維持する。
 
 ## 9. やらないこと
 
@@ -401,6 +409,7 @@ const lastBuyText = (d: number | null) =>
 
 - **個数**: `quantity` が `null` は**チップ非表示**。数値のみ「残り {quantity}」（単位なし）。定性表記はしない（モックの「少/十分/約2kg」は演出であり実データは整数）。
 - **買い足しの一言**: `status` が `out` / `low` のとき、前回購入の末尾に `・ そろそろ買い足し`（`text-accent`/700）を付す。
+- **登録直後の表示**（2026-07-24 追記）: 登録時に購入履歴が自動作成される（`docs/03` §7.14）ため、登録直後のアイテムは `days_since_purchase = 0` となり「前回購入 今日」と表示される。「購入記録なし」分岐は将来的な履歴削除経路のための防御的な表示として残るが、通常の登録フローでは到達しない。
 
 ### 10.4 アイコン（`react-icons` v5 を使用・CDN不可）
 
@@ -410,6 +419,7 @@ const lastBuyText = (d: number | null) =>
 | 買った（カゴ）   | `MdOutlineShoppingCart`（`react-icons/md`） |
 | 登録FAB / ＋追加 | `MdAdd`（`react-icons/md`）                 |
 | ソートの▾        | `MdKeyboardArrowDown`（`react-icons/md`）   |
+| 登録画面の戻る   | `MdArrowBack`（`react-icons/md`）           |
 
 ### 10.5 コンポーネント インターフェース
 
@@ -468,7 +478,7 @@ router.get(
 
 `preserveScroll` で一覧位置を保ち、redirect back により props が最新化される。楽観更新は任意（実装時は失敗で元に戻す）。`prefers-reduced-motion` を尊重。
 
-### 10.7 Undo トースト（`react-toastify` v11 ／ `utils/toast.ts` に1関数追加）
+### 10.7 Undo トースト（`react-toastify` v11 ／ `utils/toast.tsx` に1関数追加）
 
 既存 `showSuccessToast/showErrorToast` と同じ `toast()` を使い、アクション付きトーストを追加:
 
@@ -476,7 +486,7 @@ router.get(
 export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
   toast(
     ({ closeToast }) => (
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2 text-sm">
         <span>「{item.name}」を買ったに記録しました</span>
         <button
           className="font-bold text-accent"
@@ -489,11 +499,15 @@ export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
         </button>
       </div>
     ),
-    { autoClose: 6000, position: 'bottom-center' },
+    {
+      autoClose: 3500, // 2026-07-24 変更: 6000 → 3500（主張が強すぎるとの指摘のため短縮）
+      position: 'bottom-center',
+      className: '!min-h-0 !py-2 !px-3', // 2026-07-24 追加: 他トーストより小さめのコンパクト表示
+    },
   );
 ```
 
-トーストの見た目は `bg-ink / text-surface` に寄せる（`toastClassName` か CSS で上書き。既存 `defaultOptions` は踏襲）。
+トーストの見た目は `bg-ink / text-surface` に寄せる（`toastClassName` か CSS で上書き。既存 `defaultOptions` は踏襲）。`className` によるサイズ調整はこの Undo トーストのみに適用し、`showSuccessToast`/`showErrorToast` の見た目には影響させない。
 
 ### 10.8 一覧レイアウト・空状態・ソート
 
@@ -505,7 +519,7 @@ export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
 
 - `status` 初期値: 新規=`"in_stock"`、編集=既存値。`StatusSegment` を流用し `FieldName` に `"status"` を追加。
 - `quantity`: `value={data.quantity ?? ""}`、未入力は送信時 `null`。ラベルは「個数（任意）」。
-- 音声入力 `onResult` は現状維持（name/quantity セット）。status はユーザー操作のみで変更。
+- 音声入力 `onResult` は現状維持（name/quantity セット）。status はユーザー操作のみで変更。※音声入力機能自体は削除予定（`docs/02` §5、`docs/05` Phase 11）。削除実施までの間はこの挙動を維持する。
 
 ---
 

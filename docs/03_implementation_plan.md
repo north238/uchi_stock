@@ -116,14 +116,28 @@
 - [ ] `ItemCreateRequest` / `ItemUpdateRequest`: `quantity` を `nullable|integer|min:0` に変更。status を `nullable|in:in_stock,low,out`（未指定は `in_stock`）で受ける。
 - [ ] `ItemController@store` / `@update`: `status` を保存対象に追加（未指定は `in_stock`）。
 - [ ] `Form.tsx`: status 選択（3値, default `in_stock`）を追加。`quantity` を任意入力化（未入力可、default 強制をやめる）。`FormItemFields` / `FieldName` 型に `status` 追加。
-- [ ] 音声入力フローは現状維持（`name`/`quantity` セットのまま。デグレなし）。
+- [ ] 音声入力フローは現状維持（`name`/`quantity` セットのまま。デグレなし）。※音声入力自体は削除予定（§4 参照）。削除実施までの間は維持する。
+- [ ] `ItemController@store`: 成功時のリダイレクト先を `items.create`（フォームリセット）から `items.index` に変更し、`with('success', "{$item->name}を登録しました")` を付与する（§7.13）。
+- [ ] `Items/Create.tsx`: ヘッダー左上に「戻る」導線を追加。遷移先は `items.index` 固定（§7.13）。
+- [ ] `ItemController@store`: アイテム作成と同一トランザクションで購入履歴を1件自動作成する（§7.14）。
 - コミット例: `改修：登録・編集フォームにステータス追加、数量を任意化`
+- コミット例: `改修：登録後の遷移をitems.indexに変更、登録時の購入履歴自動作成`
 
-### ステップ5: 音声入力デグレ確認・総仕上げ
+### ステップ5: 総仕上げ
 
-- [ ] 音声入力での登録が従来どおり動作すること（`VoiceInput.tsx` / whisper 別リポジトリ / `api.voice.transcribe` は変更しない）。
 - [ ] `php artisan test` グリーン。既存テスト維持。
 - [ ] 一覧をスマホ幅で開き「買ってよいか」が3秒で判断できる密度・速度を目視確認（要件 §9）。
+
+> **2026-07-24 変更**: 従来この工程には「音声入力での登録が従来どおり動作すること（`VoiceInput.tsx` / whisper 別リポジトリ / `api.voice.transcribe` は変更しない）」の確認が含まれていたが、音声入力機能は削除予定（§4 参照）となったため本ステップから除外した。音声入力の実削除は別タスク（`docs/05` Phase 11）で扱う。
+
+### ステップ6: 音声入力の削除（Phase 11・別タスク）
+
+削除の実施はドキュメント整備完了後に着手する。詳細手順は `docs/05` Phase 11 のチェックリストを正とする。概要:
+
+- [ ] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去する。
+- [ ] バックエンド: `api.voice.transcribe` ルート・対応コントローラ・Whisper 関連設定値（`.env.example` 含む）を削除する。
+- [ ] 不要になったパッケージ・設定を整理する。
+- [ ] 削除後、音声入力関連の参照が残っていないことをリポジトリ全体で確認する。
 
 ## 3. 変更予定ファイル一覧
 
@@ -135,19 +149,22 @@
 | enum       | `app/Enums/ItemStatus.php`                                          | 新規                                             |
 | model      | `app/Models/PurchaseHistory.php`                                    | 新規                                             |
 | model      | `app/Models/Item.php`                                               | 変更（fillable/casts/relation/withMax）          |
-| service    | `app/Services/ItemService.php`                                      | 変更（recordPurchase）                           |
-| controller | `app/Http/Controllers/ItemController.php`                           | 変更（index並び順, updateStatus, storePurchase） |
+| service    | `app/Services/ItemService.php`                                      | 変更（recordPurchase・createInitialPurchaseHistory）|
+| controller | `app/Http/Controllers/ItemController.php`                           | 変更（index並び順, updateStatus, storePurchase, store のリダイレクト先・購入履歴自動作成） |
 | request    | `app/Http/Requests/ItemCreateRequest.php` / `ItemUpdateRequest.php` | 変更（quantity/status）                          |
 | route      | `routes/web.php`                                                    | 変更（status/purchase ルート追加）               |
 | factory    | `database/factories/ItemFactory.php` / `PurchaseHistoryFactory.php` | 新規                                             |
 | front      | `resources/js/Pages/Items/Index.tsx`                                | 変更（カード型・操作）                           |
 | front      | `resources/js/Pages/Items/Partials/Form.tsx`                        | 変更（status追加・quantity任意）                 |
+| front      | `resources/js/Pages/Items/Create.tsx`                                | 変更（ヘッダーに戻る導線を追加）                 |
 | test       | `tests/Feature/ItemStatusTest.php` / `ItemPurchaseTest.php`         | 新規                                             |
 
 ## 4. 変更しないもの（要件 §5 / §6 再掲）
 
-認証（Breeze/Socialite）、音声入力（`VoiceInput.tsx`・whisper・`api.voice.transcribe`）、グループ機能、Docker 構成、ジャンル・保管場所管理。
+認証（Breeze/Socialite）、グループ機能、Docker 構成、ジャンル・保管場所管理。
 スコープ外: 賞味期限・厳密な数量増減・通知・PWA化・購入周期推定・確認回数カウント。
+
+> **2026-07-24 追記**: 音声入力（`VoiceInput.tsx`・whisper・`api.voice.transcribe`）は上記「変更しないもの」から除外し、削除予定に変更した（要件 `docs/02` §5 参照）。削除は別タスク（`docs/05` Phase 11）。
 
 ## 5. 完了の定義（要件 §9）
 
@@ -403,3 +420,20 @@ public function undoLatestPurchase(Item $item, ItemStatus $previous): void
 | `quantity`            | number \| null             | 数量（参考・null あり）             |
 
 ページ props に `sort`（`'status'\|'purchased'`）も渡す。
+
+### 7.13 登録後の遷移（`store`）
+
+2026-07-24 決定。従来の `redirect()->route('items.create')->with('success', ...)`（登録画面に留まりフォームをリセットする挙動）を変更する。
+
+- `ItemController@store` 成功時: `redirect()->route('items.index')->with('success', "{$item->name}を登録しました")`。
+- フロント `Items/Create.tsx`: ヘッダー左上に「戻る」リンクを追加。遷移先は `items.index` 固定とする（ブラウザ履歴の `back()` は使わない。ユーザー操作によっては意図しない画面に戻る可能性があるため）。
+- 一覧側で新規アイテムをハイライトする演出は任意（未実装で可）。
+- 完了フィードバックは既存の `AuthenticatedLayout` の `flash.success` → `showSuccessToast` の仕組みをそのまま使う（新規のトースト関数は不要）。
+
+### 7.14 登録時の購入履歴自動作成
+
+2026-07-24 決定。「登録＝購入」とみなし、アイテム新規登録時に購入履歴を1件自動作成する。
+
+- `ItemController@store` は、アイテム作成と**同一トランザクション内**で `purchase_histories` を1件作成する（`item_id` = 作成したアイテムのID、`user_id` = 登録ユーザー、`purchased_at` = `now()`）。
+- **ステータスは上書きしない**: フォームで選択された `status` をそのまま保存する。F-2 の `ItemService::recordPurchase`（§7.8）は `status` を `in_stock` に強制変更するため、そのまま流用すると「少ない/ない」を選んで登録するケースを壊す。そのため購入履歴の作成のみを行う専用処理を用意する（例: `ItemService::createInitialPurchaseHistory(Item $item, User $user): void` として `$item->purchaseHistories()->create(['user_id' => $user->id, 'purchased_at' => now()])` のみ行う。`recordPurchase` とはロジックを分離する）。
+- 「前回購入: 購入記録なし」の表示分岐（`docs/04` §10.3、`days_since_purchase === null`）はコードとして残す。本対応により通常到達しなくなるが、将来的に購入履歴が削除される経路（Undo・履歴削除機能等）で到達しうるため防御的に維持する。

@@ -23,7 +23,7 @@ export default function StatusSegment({ value, onChange, disabled }: StatusSegme
             aria-pressed={selected}
             disabled={disabled}
             onClick={() => !selected && onChange(status.value)}
-            className={`rounded-full px-3 py-1 text-sm font-medium transition motion-safe:active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-full px-3 py-1 text-sm font-medium transition motion-safe:active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50 ${
               selected ? STATUS_ACTIVE_CLASS[status.value] : "bg-transparent text-faint"
             }`}
           >
