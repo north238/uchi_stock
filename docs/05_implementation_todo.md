@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-23
-現在地: **Phase 6 完了。Phase 7 着手前**
+最終更新: 2026-07-24
+現在地: **Phase 7 完了。Phase 8 着手前**
 作業ブランチ: `feat/mvp_phase5`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -25,7 +25,7 @@
 | 4 | 共通部品トークン化 | 04 §6.3,§6.5,§6.6 | ✅ 完了 |
 | 5 | レイアウト2種 | 04 §6.4 | ✅ 完了 |
 | 6 | Items 一覧カード | 03 ステップ3 / 04 §5,§10 | ✅ 完了 |
-| 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ⬜ 未着手 |
+| 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ✅ 完了 |
 | 8 | 他画面トンマナ | 04 §6.7 | ⬜ 未着手 |
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ⬜ 未着手 |
 
@@ -105,10 +105,10 @@
 
 ## Phase 7: Items フォーム [03 ステップ4 / 04 §10.9]
 
-- [ ] `Form.tsx`: status 選択（`StatusSegment` 流用）追加、`FieldName` に status [04 §10.9]
-- [ ] quantity 任意化（`?? ""`・未入力null）・ラベル「個数（任意）」[04 §10.9]
-- [ ] ＋追加ボタン中立化 / 保存ボタンを accent へ [04 §5.7,§6.2]
-- [ ] 音声入力デグレなし確認（onResult 現状維持）[04 §10.9]
+- [x] `Form.tsx`: status 選択（`StatusSegment` 流用）追加、`FieldName` に status [04 §10.9]
+- [x] quantity 任意化（`?? ""`・未入力null）・ラベル「個数（任意）」[04 §10.9]
+- [x] ＋追加ボタン中立化 / 保存ボタンを accent へ（Phase4で対応済みを確認。合わせてForm.tsxのパネル/エラー表示の残存旧配色もトークン化）[04 §5.7,§6.2]
+- [x] 音声入力デグレなし確認（onResult 現状維持、name/quantityのみセット・status不変）[04 §10.9]
 
 ## Phase 8: 他画面トンマナ [04 §6.7]
 
@@ -129,8 +129,20 @@
 
 ---
 
+## 気になる挙動（要検討）
+
+Phase 7 完了時点でユーザーから指摘のあった、仕様として未確定の挙動。修正は対応せず、タスク整理時に改めて検討する。
+
+- [ ] **アイテム登録後の遷移先**: 現状は `items.create` にとどまり入力欄がリセットされる（連続登録を想定した挙動）。一覧（`items.index`）へ遷移する方が良いのではという指摘あり。要UX方針決定。
+- [ ] **登録時点の購入日時が不明**: アイテム新規登録時に `purchase_histories` が作成されないため、登録直後は「前回購入: 購入記録なし」と表示される。登録＝購入とみなして初回の購入履歴を自動作成するか、現状のままにするか要仕様決定（`docs/03`側の修正が必要になる可能性あり）。
+- [ ] **買った取り消しトーストの主張が強い**: `showBuyUndoToast`（`utils/toast.tsx`）の見た目・サイズが目立ちすぎるとの指摘。デザイン調整が必要（`docs/04` §5.6,§10.7）。
+- [ ] **音声入力を削除したいという要望**: 対応する音声解析APIが現状ないため実質使用不可。ただし `VoiceInput.tsx` / `api.voice.transcribe` は `CLAUDE.md` §8 および `docs/02` §5 で明示的に「変更禁止」とされている項目のため、**現時点では対応保留**（ユーザー判断により今回は手を付けない）。将来的に削除・非表示化する場合は、先に `CLAUDE.md` と `docs/02`〜`04` の当該記述を更新してから着手すること。
+
+---
+
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-24: Phase 7（Items フォーム）完了。`Pages/Items/Partials/Form.tsx`: `FormItemFields`/`FieldName` に `status` を追加し、品名の次に `StatusSegment`（Phase6で作成済み）を再利用したステータス選択UIを追加（既定は編集時=既存値／新規時=`in_stock`）。`quantity` の型を `number` → `number | null` に変更し、空入力は `null` を送信するよう変更、ラベルを「個数」→「個数（任意）」に変更。フォームパネルの残存旧配色（`bg-white dark:bg-gray-800`・`shadow-md`・`rounded-lg`・エラー文言の`text-red-500`）もトークン化（`bg-surface`・`shadow-card`・`rounded-[20px]`・`text-danger`）。＋追加ボタン（`AddButton`＝ghost）・保存ボタン（`PrimaryButton`＝`bg-accent`）は Phase4 で既に是正済みであることを確認。`Pages/Items/Create.tsx`/`Edit.tsx` の `useForm` 初期値に `status` を追加（Create既定`in_stock`・Edit既存値）、`quantity` 初期値を `1` → `null` に変更、`Edit.tsx` の `Item` 型にも `status`/`quantity: number | null` を追加。音声入力 `VoiceInput` の `onResult` は変更せず現状維持（name/quantityのみセット、statusは不変）で音声入力デグレなしを確認。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のみ）、`vite build`成功、`php artisan test`で回帰なし（24件パス、既存7件失敗はAuth系・環境起因で同一）、開発DB（users/items件数）もテスト実行前後で保持されることを確認。**ブラウザでの実見た目確認（フォームでのステータス切替・個数任意入力の挙動）は本セッションのツール制約により未実施**。
 - 2026-07-23: 【環境修正】テスト実行が開発DBを破壊していた問題を修正。原因は、`docker-compose.yml` の `app` サービスの `env_file: .env`（リポジトリルートの `.env`。`DB_CONNECTION`/`DB_HOST`/`DB_DATABASE`等を含む）がコンテナの実OS環境変数として注入され、Laravelの環境変数解決順序（`$_SERVER`優先）により `phpunit.xml` 側のテスト用DB指定が上書きされず、Feature テストの `RefreshDatabase` が開発DB（`uchistock-db`）に対して `migrate:fresh` 相当を実行し、データが消えていたこと。対応: (1) `docker-compose.yml` の `app` サービスから `env_file: .env` を削除（`db`サービスは対象外）、要 `docker-compose up -d --force-recreate app`。(2) `uchistock-db-testing` DBを新設し `db-user` に権限付与。(3) `htdocs/.env.testing` を新規作成（`DB_DATABASE=uchistock-db-testing`・`APP_ENV=testing`・array/syncドライバ等）し `.gitignore` に追加。(4) `phpunit.xml` は `APP_ENV=testing` のみ残し他は `.env.testing` に一本化。検証: `php artisan test` を複数回実行しても開発DB（users/items件数）が保持され、テストは `uchistock-db-testing` に対して実行されることを確認（migrate:fresh後は空、テスト後も開発DBは無傷）。**なお `Item::getItemsByGroupId` は MySQL固有の `FIELD()` 関数を使用しているため、SQLite化は見送りMySQLのテストDBを採用（ユーザー指摘により方針転換）**。
 - 2026-07-23: 【環境整備】開発時に毎回ユーザー登録する手間を省くため、`database/seeders/UserSeeder.php`（開発用グループ＋`test@example.com`/`password`のログイン可能ユーザー）と `database/seeders/ItemSeeder.php`（ジャンル4種・保管場所4種・在庫状態/購入履歴のバリエーションを持つアイテム8件）を新規作成し `DatabaseSeeder` に登録。`migrate:fresh --seed` で開発DBに投入済み。
 - 2026-07-23: Phase 6（Items 一覧カード）完了。`resources/js/constants/itemStatus.ts` 新規（`ItemStatusValue`/`ITEM_STATUS`/`STATUS_ACTIVE_CLASS`、単一の真実）。`Components/StatusSegment.tsx` 新規（3値segmented control・1タップ変更・`role="group"`/`aria-pressed`・`motion-safe:active:scale-95`）。`Components/BuyButton.tsx` 新規（`in_stock`時はghost表示、`react-icons/md`のカートアイコン）。`Pages/Items/Partials/ItemCard.tsx` 新規（品名+個数チップ/ジャンル・保管場所メタ/前回購入表示+そろそろ買い足し/StatusSegment+BuyButtonの操作段。ステータス変更・買った・Undoの通信ロジック（`router.patch`/`post`/`delete`）を内包）。`Items/Index.tsx` を全面刷新（旧テーブル廃止→1カラム`max-w-xl`のカード一覧、ソート切替は既存`Dropdown`コンポーネントを再利用してInertia `preserveScroll`/`preserveState`付きLinkで実装、空状態カード、右下固定FAB追加）。`Item`型は`Items/Index.tsx`からexportし`ItemCard.tsx`で`import type`により参照（循環参照はTypeScriptの型消去により実害なし）。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のエラーのみ、StatusSegment.tsxに既存コードと同種の未使用引数warning1件のみ発生も許容範囲と判断）、`vite build`成功、`php artisan test`で新規追加分含め回帰なし（Item関連6件パス、既存の7件失敗はAuth系・環境起因で変更前と同一）。**ブラウザでの実見た目確認（状態順ソート/前回購入表示/個数チップのnull非表示）は本セッションのツール制約により未実施**、次回実機/ブラウザでの目視確認を推奨。
