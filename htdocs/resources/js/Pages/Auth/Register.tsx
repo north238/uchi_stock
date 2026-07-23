@@ -132,7 +132,7 @@ export default function Register() {
           </PrimaryButton>
           <Link
             href={route("login")}
-            className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+            className="underline text-sm text-accent hover:text-ink"
           >
             登録済みの方はこちら
           </Link>

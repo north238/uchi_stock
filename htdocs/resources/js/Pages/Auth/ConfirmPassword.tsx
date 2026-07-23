@@ -27,9 +27,7 @@ export default function ConfirmPassword() {
     <GuestLayout>
       <Head title="Confirm Password" />
 
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        パスワードを再度ご入力してください
-      </div>
+      <div className="mb-4 text-sm text-muted">パスワードを再度ご入力してください</div>
 
       <form onSubmit={submit} className="space-y-3">
         <div>

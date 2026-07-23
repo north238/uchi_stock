@@ -151,7 +151,9 @@ export default function Form({
               name="quantity"
               className="mt-1 block w-full"
               isFocused={false}
-              value={data.quantity === null || data.quantity === undefined ? "" : String(data.quantity)}
+              value={
+                data.quantity === null || data.quantity === undefined ? "" : String(data.quantity)
+              }
               error={!!errors?.quantity}
               onChange={handleQuantityChange}
               disabled={voiceProcessing || processing}

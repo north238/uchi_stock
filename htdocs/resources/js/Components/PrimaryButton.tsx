@@ -18,7 +18,7 @@ export default function PrimaryButton({
                 ${
                   disabled
                     ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-surface hover:text-accent hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+                    : "hover:bg-surface hover:text-accent hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
                 }
                 ${className}
             `}

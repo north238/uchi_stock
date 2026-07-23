@@ -70,7 +70,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
             {canResetPassword && (
               <Link
                 href={route("password.request")}
-                className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+                className="underline text-sm text-accent hover:text-ink"
               >
                 パスワードを忘れた場合
               </Link>
@@ -102,9 +102,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
               checked={data.remember}
               onChange={(e) => setData("remember", e.target.checked)}
             />
-            <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-              ログインを維持する
-            </span>
+            <span className="ms-2 text-sm text-muted">ログインを維持する</span>
           </label>
         </div>
 
@@ -112,7 +110,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
           <PrimaryButton disabled={processing}>ログイン</PrimaryButton>
           <Link
             href={route("register")}
-            className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+            className="underline text-sm text-accent hover:text-ink"
           >
             新規登録はお済みですか？
           </Link>

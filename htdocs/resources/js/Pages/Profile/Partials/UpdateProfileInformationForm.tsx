@@ -33,9 +33,9 @@ export default function UpdateProfileInformation({
   return (
     <section className={className}>
       <header>
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">プロフィール情報</h2>
+        <h2 className="text-lg font-medium text-ink">プロフィール情報</h2>
 
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-muted">
           プロフィール情報を更新できます。
           <br />
         </p>
@@ -90,22 +90,20 @@ export default function UpdateProfileInformation({
         )}
         {mustVerifyEmail && user.email_verified_at === null && (
           <div>
-            <p className="text-sm mt-2 text-gray-800 dark:text-gray-200">
+            <p className="text-sm mt-2 text-ink">
               メールアドレスの確認が必要です
               <Link
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                className="underline text-sm text-muted hover:text-ink rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 メールを再送信
               </Link>
             </p>
 
             {status === "verification-link-sent" && (
-              <div className="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
-                メールを再送信しました
-              </div>
+              <div className="mt-2 font-medium text-sm text-ink">メールを再送信しました</div>
             )}
           </div>
         )}

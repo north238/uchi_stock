@@ -41,9 +41,9 @@ export default function UpdateGroupForm({
   return (
     <section className={className}>
       <header>
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">グループ編集</h2>
+        <h2 className="text-lg font-medium text-ink">グループ編集</h2>
 
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-muted">
           グループ名、説明、公開設定を編集できます。
           <br />
         </p>

@@ -29,18 +29,16 @@ export default function Create({ auth }: PageProps) {
     <Authenticated
       user={auth.user}
       header={
-        <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          グループ作成
-        </h2>
+        <h2 className="font-semibold text-xl text-ink leading-tight">グループ作成</h2>
       }
     >
       <Head title="グループ作成" />
       <div className="py-12">
-        <div className="bg-white max-w-xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-gray-200 shadow-md sm:rounded-lg">
+        <div className="bg-surface max-w-xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-line shadow-card sm:rounded-[20px]">
           <header>
-            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">グループ作成</h2>
+            <h2 className="text-lg font-medium text-ink">グループ作成</h2>
 
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-sm text-muted">
               グループ名、説明、公開設定を設定できます。
               <br />
             </p>
