@@ -3,23 +3,26 @@ import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
+import StatusSegment from "@/Components/StatusSegment";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import InputError from "@/Components/InputError";
 import { TextArea } from "@/Components/TextArea";
 import { useFormOptions } from "@/hooks/useFormOptions";
 import SelectableWithAdd from "./SelectableWithAdd";
 import { addGenre, addPlace } from "@/api/optionsApi";
+import { ItemStatusValue } from "@/constants/itemStatus";
 
 type FormItemFields = {
   name: string;
-  quantity: number;
+  status: ItemStatusValue;
+  quantity: number | null;
   genre_id: number | null;
   place_id: number | null;
   memo: string | null;
 };
 
 // 明示的なフィールド名ユニオンで型安全にする
-type FieldName = "name" | "quantity" | "genre_id" | "place_id" | "memo";
+type FieldName = "name" | "status" | "quantity" | "genre_id" | "place_id" | "memo";
 
 /* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
 interface ItemFormProps {
@@ -51,9 +54,13 @@ export default function Form({
     setData("name", e.target.value);
   };
 
+  const handleStatusChange = (next: ItemStatusValue) => {
+    setData("status", next);
+  };
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const q = Number(e.target.value) || 0;
-    setData("quantity", q);
+    const raw = e.target.value;
+    setData("quantity", raw === "" ? null : Number(raw));
   };
 
   const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -104,8 +111,8 @@ export default function Form({
 
   return (
     <div className="py-6">
-      <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-md sm:rounded-lg">
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+      <div className="p-4 sm:p-8 bg-surface max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-card sm:rounded-[20px]">
+        {error && <div className="text-danger mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-2">
           <div>
             <InputLabel htmlFor="name" value="品名" />
@@ -126,14 +133,25 @@ export default function Form({
           </div>
 
           <div>
-            <InputLabel htmlFor="quantity" value="個数" />
+            <InputLabel htmlFor="status" value="ステータス" />
+            <div className="mt-1">
+              <StatusSegment
+                value={data.status ?? "in_stock"}
+                onChange={handleStatusChange}
+                disabled={voiceProcessing || processing}
+              />
+            </div>
+          </div>
+
+          <div>
+            <InputLabel htmlFor="quantity" value="個数（任意）" />
             <TextInput
               type="number"
               id="quantity"
               name="quantity"
               className="mt-1 block w-full"
               isFocused={false}
-              value={String(data?.quantity ?? 1)}
+              value={data.quantity === null || data.quantity === undefined ? "" : String(data.quantity)}
               error={!!errors?.quantity}
               onChange={handleQuantityChange}
               disabled={voiceProcessing || processing}
