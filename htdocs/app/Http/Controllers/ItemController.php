@@ -97,6 +97,9 @@ class ItemController extends Controller
                 throw new Exception('アイテムの保存に失敗しました。');
             }
 
+            // 登録＝購入とみなし、初回の購入履歴を1件作成する（ステータスは上書きしない）
+            $this->itemService->createInitialPurchaseHistory($item, $request->user());
+
             Log::info('【アイテム】作成処理完了', [
                 'user_id' => $request->user()->id,
                 'item_id' => $item->id,
@@ -106,8 +109,8 @@ class ItemController extends Controller
 
             // 成功メッセージを表示
             return redirect()
-                ->route('items.create')
-                ->with('success', 'アイテムが追加されました。');
+                ->route('items.index')
+                ->with('success', "{$item->name}を登録しました");
         } catch (Exception $e) {
             DB::rollBack();
 
