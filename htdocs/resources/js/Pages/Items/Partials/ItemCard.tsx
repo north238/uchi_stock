@@ -1,4 +1,4 @@
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { MdOutlineAccessTime } from "react-icons/md";
 import StatusSegment from "@/Components/StatusSegment";
 import BuyButton from "@/Components/BuyButton";
@@ -41,7 +41,12 @@ export default function ItemCard({ item }: ItemCardProps) {
   return (
     <div className="rounded-[20px] bg-surface p-3.5 shadow-card">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-[17px] font-bold text-ink">{item.name}</h3>
+        <Link
+          href={route("items.edit", item.id)}
+          className="text-[17px] font-bold text-ink underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-accent rounded-sm"
+        >
+          {item.name}
+        </Link>
         {item.quantity !== null && (
           <span className="shrink-0 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-xs tabular-nums text-muted">
             残り {item.quantity}

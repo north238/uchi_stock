@@ -81,7 +81,7 @@ export default function Index({ auth }: PageProps) {
 
       <Link
         href={route("items.create")}
-        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-1 rounded-2xl bg-ink px-5 py-3 text-sm font-bold text-surface shadow-card motion-safe:active:scale-95"
+        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-1 rounded-2xl bg-accent px-5 py-3 text-sm font-bold text-accent-ink shadow-card motion-safe:active:scale-95"
       >
         <MdAdd className="h-5 w-5" />
         登録
