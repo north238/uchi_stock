@@ -163,10 +163,12 @@ fontFamily: {
 
 構成（上→下）:
 
-1. **上段**: 品名（17px/700）＋ 右上に個数チップ `残り {目安}`（`bg-surface-2` / `border-line` / 12px / `text-muted`）。個数が無ければチップ非表示。
+1. **上段**: 品名（17px/700）＋ 右上に個数チップ `残り {目安}`（`bg-surface-2` / `border-line` / 12px / `text-muted`）。個数が無ければチップ非表示。品名は `Link`（`route('items.edit', item.id)`）とし、タップで編集画面へ遷移する（ジャンル・保管場所・メモ・quantity の確認・修正手段はこの導線のみのため必須。§10.6 参照）
 2. **メタ**: `ジャンル ・ 保管場所`（12px / `text-faint`）。両方無ければ省略（空セパレータを出さない）。
 3. **前回購入**: 時計アイコン＋「前回購入 **{N}日前**」。記録なしは「購入記録なし」（`text-faint`）。`out`/`low` は末尾に `・ そろそろ買い足し`（`text-accent`/700）。
 4. **操作段**: 左に**ステータス セグメント**、右に**買ったボタン**。
+
+> **2026-07-25 追記**: 初期実装（Phase 6）では品名への編集導線が漏れており、一覧カードから編集画面へ一切遷移できない状態だった（Phase 9 受け入れ確認で発覚）。品名を `Link` 化して修正済み。
 
 ### 5.2 ステータス セグメント `StatusSegment`（F-1）
 
@@ -444,6 +446,9 @@ interface ItemCardProps {
 ### 10.6 サーバ通信（Inertia `router`）
 
 ```ts
+// 編集画面への遷移（品名タップ。§5.1）
+<Link href={route('items.edit', item.id)}>{item.name}</Link>
+
 // ステータス変更（F-1）
 router.patch(
   route('items.status.update', item.id),

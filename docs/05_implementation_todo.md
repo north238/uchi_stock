@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-24
-現在地: **Phase 8 完了。Phase 9 着手前**（Phase 10/11 はドキュメント整備のみ完了。実装は未着手）
-作業ブランチ: `feat/mvp_phase5`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕として順次`development`へマージ済み）
+最終更新: 2026-07-25
+現在地: **Phase 9 一部完了**（機械的に確認可能な項目は完了。全画面ライト/ダーク目視確認・スマホ実機での3秒判断確認はユーザー側での実施待ち）。Phase 10/11 はドキュメント整備のみ完了で実装は未着手
+作業ブランチ: `feat/mvp_phase9`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -27,7 +27,7 @@
 | 6 | Items 一覧カード | 03 ステップ3 / 04 §5,§10 | ✅ 完了 |
 | 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ✅ 完了 |
 | 8 | 他画面トンマナ | 04 §6.7 | ✅ 完了 |
-| 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ⬜ 未着手 |
+| 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | 🟡 着手中（目視・実機確認待ち） |
 | 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ⬜ 未着手 |
 | 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | 🟡 着手中（ドキュメント更新のみ完了） |
 
@@ -122,12 +122,19 @@
 
 ## Phase 9: 総仕上げ・受け入れ [03 §5, ステップ5]
 
-- [ ] 全画面をライト/ダークで目視確認
-- [ ] デグレ確認: 音声入力（`api.voice.transcribe`）/ グループ機能 [03 ステップ5]
-- [ ] `php artisan test` 最終グリーン
-- [ ] スマホ実機で「開いて3秒で判断」を確認（要件 §9）
-- [ ] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]
-- [ ] 変更禁止事項に差分がないことを確認 [02 §5]
+- [ ] 全画面をライト/ダークで目視確認（本セッションのブラウザ確認ツール制約により未実施。要ユーザー確認）
+- [x] デグレ確認: 音声入力（`api.voice.transcribe`）/ グループ機能 [03 ステップ5]（コードレベルで確認: `VoiceInput.tsx`・`api.voice.transcribe`ルートは現存、`origin/development`との差分で認証/グループ/Docker/ジャンル・保管場所関連ファイルに変更なしを確認。実機での動作確認は未実施）
+- [x] `php artisan test` 最終グリーン（24 passed / 既存7件失敗はAuth系・環境起因の既知の失敗で全フェーズ通じて同一、回帰なし）
+- [ ] スマホ実機で「開いて3秒で判断」を確認（要件 §9）（要ユーザー確認・本ツールでは実施不可）
+- [x] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]（コードレビューで確認。F-1: `updateStatus`で1タップ即時保存。F-2: `recordPurchase`で購入履歴作成+status更新、Undo実装済み。F-3: `getItemsByGroupId`のソートがstatus順(out→low→in_stock)/purchased順いずれもNULL先頭で仕様通り。F-4: status選択・quantity任意化は実装済み。**ただし2026-07-24追記分（登録後`items.index`遷移・戻る導線・購入履歴自動作成）はPhase 10未着手のため未充足** — `store()`は現状`items.create`へリダイレクトする旧仕様のまま)
+- [x] 変更禁止事項に差分がないことを確認 [02 §5]（`git diff origin/development...HEAD`で認証/グループ/Docker/ジャンル・保管場所関連ファイルに差分なしを確認。現ブランチ`feat/mvp_phase9`は`origin/development`と同一コミットから開始）
+
+### Phase 9 内で発見・修正した不具合
+
+- [x] `htdocs/.env.testing` の `APP_KEY` が空になっており（Phase 8のコミット`87e71b8`で発生。LINE認証情報と同様に機密情報と誤認し手動で削除されたと推測）、全Featureテストが`MissingAppKeyException`で失敗する状態だった。`php artisan key:generate --show`でテスト専用の新規キーを生成し復旧（`base64:6/rLfwl1pO4BioLzoSIYriZjO2ltf18e52H6N9rKrTM=`）。復旧後は既知のベースライン（24 passed / 7 failed）に一致することを確認。
+- [x] `Pages/Items/Index.tsx` のFAB（＋登録ボタン）が `bg-ink text-surface`（黒系）になっており、`04 §6.2` の「主アクション＝accent」ルールに反していた（ユーザー指摘）。`bg-accent text-accent-ink` に修正 [04 §6.2]
+- [x] 一覧カードから編集画面への導線が一切なく（Phase 6のカード型リデザインで旧テーブル表示にあった編集リンクが引き継がれずに欠落）、ジャンル・保管場所・メモ・quantityの確認/修正手段が失われていた（ユーザー指摘、「個数を再修正できない」報告の真因）。`Pages/Items/Partials/ItemCard.tsx` の品名を `Link`（`route('items.edit', item.id)`）化し復旧。`docs/04` §5.1・§10.6に導線を明記 [04 §5.1,§10.6]
+- [ ] 上記の編集導線に対するFeatureテストを追加（`GET items/{id}` エディット画面が200で表示されること・他グループのアイテムは404になることを検証。現状 `items.edit` ルートを直接検証するテストが存在しないため新規追加が必要）
 
 ## Phase 10: 登録UX改善（遷移・購入履歴自動記録・トースト）[03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7]
 
@@ -160,6 +167,8 @@
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-25: Phase 9 目視確認（ユーザー実施）で新たに2件の不具合を発見・修正。(1) ライトモードでFAB（＋登録ボタン）が`bg-ink`（黒系）になっており§6.2のトンマナに反していたため`bg-accent text-accent-ink`に修正。(2) 一覧カードから編集画面へ遷移する導線が存在せず（Phase 6のリデザイン時に旧テーブルの編集リンクが引き継がれず欠落）、「個数を一度修正すると再修正できない」という報告の真因だったことが判明（そもそも編集画面へ到達できなかった）。`ItemCard.tsx`の品名を`Link`化し`items.edit`へ遷移できるよう修正、ユーザーが遷移可能なことを確認済み。`docs/04`§5.1・§10.6に導線仕様を追記。**残タスク**: この編集導線に対するFeatureテスト（`items.edit`のGET確認・他グループ404）を追加すること。なお、ログイン後の遷移先（`intended()`によるIntended URL復元）とダークモードのLINEログインボタン文字色の非対称（accent/danger-inkのコントラスト反転設計との対比）についてもユーザーに確認したが、いずれも現状維持で確定。
+- 2026-07-25: Phase 9（総仕上げ・受け入れ）着手。機械的に確認可能な項目を実施: (1) `git diff origin/development...HEAD` で認証/グループ機能/Docker構成/ジャンル・保管場所管理に差分がないことを確認（現ブランチ`feat/mvp_phase9`は`origin/development`と同一コミットから分岐、コード変更は未着手）。(2) 音声入力・グループ機能のコードレベルでのデグレ確認（`VoiceInput.tsx`/`api.voice.transcribe`ルートの現存を確認。実機動作確認は別途要）。(3) `php artisan test` 実行時に `htdocs/.env.testing` の `APP_KEY` が空になっており全Featureテストが `MissingAppKeyException` で失敗する不具合を発見。原因はPhase 8のコミット(`87e71b8`)でLINE認証情報と同様に機密情報と誤認され手動で削除されたものと推測。`php artisan key:generate --show` でテスト専用キーを新規生成し復旧（`base64:6/rLfwl1pO4BioLzoSIYriZjO2ltf18e52H6N9rKrTM=`）。復旧後は24 passed / 既存7件失敗（Auth系・環境起因、全フェーズ通じて同一の既知の失敗）で回帰なしを確認。(4) F-1〜F-4の受け入れ条件をコードレビューで確認: F-1〜F-3は実装済みで要件を満たす。F-4は基本部分（status選択・quantity任意化）は実装済みだが、2026-07-24追記の登録後遷移・購入履歴自動作成はPhase 10未着手のため未充足（想定通り、Phase 10で対応予定）。**残タスク**: 全画面のライト/ダーク目視確認、スマホ実機での「開いて3秒で判断」確認 — いずれも本セッションのツール制約により未実施、ユーザー側での確認が必要。開発DBのデータ（9 items / 1 user）はテスト実行前後で保持されることを確認済み。
 - 2026-07-24: 【ドキュメント更新のみ・コード変更なし】「気になる挙動」4件についてユーザーと方針を検討し、`CLAUDE.md`・`docs/02`・`docs/03`・`docs/04`・`docs/05` を更新。(1) 登録後の遷移: `items.store` 成功時のリダイレクト先を `items.index` に変更し「〇〇を登録しました」のフラッシュ表示、`Items/Create.tsx` ヘッダーに戻る導線（`items.index`固定）を追加する方針を `docs/03` §7.13・`docs/04` §5.8 に明記。(2) 登録時の購入履歴自動作成: `ItemController@store` で同一トランザクション内に購入履歴を1件自動作成（ステータスは上書きしない。`recordPurchase`とは別処理として`ItemService::createInitialPurchaseHistory`を新設）する方針を `docs/03` §7.14・`docs/02` §3.2 に明記。「購入記録なし」分岐は将来の防御として維持。(3) Undoトースト: `autoClose`を6000→3500に短縮し、コンパクトな`className`を追加する方針を `docs/04` §5.6,§10.7 に明記。(4) 音声入力削除: `CLAUDE.md` §8・`docs/02` §5・`docs/03` §4/ステップ5/6・`docs/04` §8,§5.7,§10.9 から音声入力を「変更禁止」対象外とし「削除予定」に変更（Whisper API未整備で実質使用不可のため）。ドキュメント更新を完了条件とする削除手順を `docs/05` Phase 11 に整理。上記いずれも本セッションでは**ドキュメントのみ更新し、実装コードには一切手を加えていない**。新規タスクは `docs/05` Phase 10（登録UX改善）・Phase 11（音声入力削除）として追加。次回はこれらの実装から着手可能。
 - 2026-07-24: Phase 8（他画面トンマナ）完了。**Auth6画面**（Login/Register/ForgotPassword/ConfirmPassword/VerifyEmail/ResetPassword）: `text-LINK01`/`hover:text-blue-*`/`visited:text-LINK02` のリンク色を `text-accent hover:text-ink` に統一、説明文・補助文言の `text-gray-*` を `text-muted`/`text-ink` に置換。ステータス系メッセージ（メール確認送信済み等）の緑色は「緑はステータス専用」ルールに従い`text-ink`の中立表示に変更。LINEログインボタン（`LINE01`）は指示通り維持。**Group**（Create/Edit＋UpdateGroupForm/DeleteGroupForm/LeaveGroupForm）: パネルを`bg-surface shadow-card sm:rounded-[20px]`に、見出し`text-ink`・本文`text-muted`に統一。既存の主=`PrimaryButton`(accent)・削除=`DangerButton`・脱退=`DangerButton`の割り当てはそのまま維持（§6.2準拠を確認）。DeleteGroupFormのパスワード未設定時リンクも`text-accent`へ。**Profile**（Edit＋4partials）: 同様にパネル・見出し・本文をトークン化、メール確認リンク・送信済みメッセージも整合。**Welcome.tsx**: 未定義だった`bg-dots-*`ユーティリティ（tailwind.config.js未登録で無効化していた）を`bg-paper`に置換、リンク文言・selectionカラーをトークン化。**Dashboard.tsx**: 残す/削除の意思決定はスコープ外のため保留し、現状維持前提でパネル・文字色のみトークン化。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のみ）、`vite build`成功、`php artisan test`で回帰なし（24件パス、既存7件失敗はAuth系・環境起因で同一）、開発DBのデータもテスト前後で保持。**ブラウザでの実見た目確認は本セッションのツール制約により未実施**、Phase 9で全画面のライト/ダーク目視確認を行う。
 - 2026-07-24: Phase 7（Items フォーム）完了。`Pages/Items/Partials/Form.tsx`: `FormItemFields`/`FieldName` に `status` を追加し、品名の次に `StatusSegment`（Phase6で作成済み）を再利用したステータス選択UIを追加（既定は編集時=既存値／新規時=`in_stock`）。`quantity` の型を `number` → `number | null` に変更し、空入力は `null` を送信するよう変更、ラベルを「個数」→「個数（任意）」に変更。フォームパネルの残存旧配色（`bg-white dark:bg-gray-800`・`shadow-md`・`rounded-lg`・エラー文言の`text-red-500`）もトークン化（`bg-surface`・`shadow-card`・`rounded-[20px]`・`text-danger`）。＋追加ボタン（`AddButton`＝ghost）・保存ボタン（`PrimaryButton`＝`bg-accent`）は Phase4 で既に是正済みであることを確認。`Pages/Items/Create.tsx`/`Edit.tsx` の `useForm` 初期値に `status` を追加（Create既定`in_stock`・Edit既存値）、`quantity` 初期値を `1` → `null` に変更、`Edit.tsx` の `Item` 型にも `status`/`quantity: number | null` を追加。音声入力 `VoiceInput` の `onResult` は変更せず現状維持（name/quantityのみセット、statusは不変）で音声入力デグレなしを確認。検証: `npm run tsc`/`npm run lint`で新規エラーなし（既存の`ssr.tsx`起因のみ）、`vite build`成功、`php artisan test`で回帰なし（24件パス、既存7件失敗はAuth系・環境起因で同一）、開発DB（users/items件数）もテスト実行前後で保持されることを確認。**ブラウザでの実見た目確認（フォームでのステータス切替・個数任意入力の挙動）は本セッションのツール制約により未実施**。
