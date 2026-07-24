@@ -141,23 +141,23 @@
 
 ## 3. 変更予定ファイル一覧
 
-| 種別       | ファイル                                                            | 変更                                             |
-| ---------- | ------------------------------------------------------------------- | ------------------------------------------------ |
-| migration  | `database/migrations/2025_04_12_000500_create_items_table.php`      | 変更（quantityをnullable化・直接編集済み）       |
-| migration  | `database/migrations/xxxx_add_status_to_items.php`                  | 新規                                             |
-| migration  | `database/migrations/xxxx_create_purchase_histories_table.php`      | 新規                                             |
-| enum       | `app/Enums/ItemStatus.php`                                          | 新規                                             |
-| model      | `app/Models/PurchaseHistory.php`                                    | 新規                                             |
-| model      | `app/Models/Item.php`                                               | 変更（fillable/casts/relation/withMax）          |
-| service    | `app/Services/ItemService.php`                                      | 変更（recordPurchase・createInitialPurchaseHistory）|
+| 種別       | ファイル                                                            | 変更                                                                                       |
+| ---------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| migration  | `database/migrations/2025_04_12_000500_create_items_table.php`      | 変更（quantityをnullable化・直接編集済み）                                                 |
+| migration  | `database/migrations/xxxx_add_status_to_items.php`                  | 新規                                                                                       |
+| migration  | `database/migrations/xxxx_create_purchase_histories_table.php`      | 新規                                                                                       |
+| enum       | `app/Enums/ItemStatus.php`                                          | 新規                                                                                       |
+| model      | `app/Models/PurchaseHistory.php`                                    | 新規                                                                                       |
+| model      | `app/Models/Item.php`                                               | 変更（fillable/casts/relation/withMax）                                                    |
+| service    | `app/Services/ItemService.php`                                      | 変更（recordPurchase・createInitialPurchaseHistory）                                       |
 | controller | `app/Http/Controllers/ItemController.php`                           | 変更（index並び順, updateStatus, storePurchase, store のリダイレクト先・購入履歴自動作成） |
-| request    | `app/Http/Requests/ItemCreateRequest.php` / `ItemUpdateRequest.php` | 変更（quantity/status）                          |
-| route      | `routes/web.php`                                                    | 変更（status/purchase ルート追加）               |
-| factory    | `database/factories/ItemFactory.php` / `PurchaseHistoryFactory.php` | 新規                                             |
-| front      | `resources/js/Pages/Items/Index.tsx`                                | 変更（カード型・操作）                           |
-| front      | `resources/js/Pages/Items/Partials/Form.tsx`                        | 変更（status追加・quantity任意）                 |
-| front      | `resources/js/Pages/Items/Create.tsx`                                | 変更（ヘッダーに戻る導線を追加）                 |
-| test       | `tests/Feature/ItemStatusTest.php` / `ItemPurchaseTest.php`         | 新規                                             |
+| request    | `app/Http/Requests/ItemCreateRequest.php` / `ItemUpdateRequest.php` | 変更（quantity/status）                                                                    |
+| route      | `routes/web.php`                                                    | 変更（status/purchase ルート追加）                                                         |
+| factory    | `database/factories/ItemFactory.php` / `PurchaseHistoryFactory.php` | 新規                                                                                       |
+| front      | `resources/js/Pages/Items/Index.tsx`                                | 変更（カード型・操作）                                                                     |
+| front      | `resources/js/Pages/Items/Partials/Form.tsx`                        | 変更（status追加・quantity任意）                                                           |
+| front      | `resources/js/Pages/Items/Create.tsx`                               | 変更（ヘッダーに戻る導線を追加）                                                           |
+| test       | `tests/Feature/ItemStatusTest.php` / `ItemPurchaseTest.php`         | 新規                                                                                       |
 
 ## 4. 変更しないもの（要件 §5 / §6 再掲）
 
