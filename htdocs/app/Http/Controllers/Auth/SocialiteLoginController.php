@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use App\Services\LineMessengerService;
@@ -103,7 +104,7 @@ class SocialiteLoginController extends Controller
             'email' => $user->getEmail(),
             'password' => null, // パスワードは不要
             'group_id' => null, // グループは未設定
-            'role_id' => 2, // 一般ユーザー
+            'role_id' => Role::where('name', 'user')->value('id'), // 一般ユーザー
             'line_id' => $user->getId(),
             'line_access_token' => $user->token,
             'line_refresh_token' => $user->refreshToken,
