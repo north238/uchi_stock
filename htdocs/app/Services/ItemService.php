@@ -16,6 +16,17 @@ class ItemService
     }
 
     /**
+     * 登録時の初回購入履歴を1件作成する（ステータスは上書きしない）
+     */
+    public function createInitialPurchaseHistory(Item $item, User $user): void
+    {
+        $item->purchaseHistories()->create([
+            'user_id' => $user->id,
+            'purchased_at' => now(),
+        ]);
+    }
+
+    /**
      * 購入履歴を記録し、ステータスを「ある」に更新する
      */
     public function recordPurchase(Item $item, User $user): void

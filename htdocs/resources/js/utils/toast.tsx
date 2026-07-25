@@ -21,7 +21,7 @@ export const showErrorToast = (message: string) => {
 export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
   toast(
     ({ closeToast }) => (
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2 text-sm">
         <span>「{item.name}」を買ったに記録しました</span>
         <button
           className="font-bold text-accent"
@@ -34,5 +34,10 @@ export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
         </button>
       </div>
     ),
-    { ...defaultOptions, autoClose: 6000, position: "bottom-center" }
+    {
+      ...defaultOptions,
+      autoClose: 3500,
+      position: "bottom-center",
+      className: "!min-h-0 !py-2 !px-3",
+    }
   );

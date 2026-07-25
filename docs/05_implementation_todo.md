@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-07-25
-現在地: **Phase 9 完了**。Phase 10/11 はドキュメント整備のみ完了で実装は未着手
-作業ブランチ: `feat/mvp_phase9`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕として順次`development`へマージ済み）
+現在地: **Phase 10 完了。Phase 11 は未着手**（ドキュメント整備のみ完了）
+作業ブランチ: `worktree-mvp_phase10`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -28,7 +28,7 @@
 | 7 | Items フォーム | 03 ステップ4 / 04 §10.9 | ✅ 完了 |
 | 8 | 他画面トンマナ | 04 §6.7 | ✅ 完了 |
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ✅ 完了 |
-| 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ⬜ 未着手 |
+| 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ✅ 完了 |
 | 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | 🟡 着手中（ドキュメント更新のみ完了） |
 
 状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
@@ -126,7 +126,7 @@
 - [x] デグレ確認: 音声入力（`api.voice.transcribe`）/ グループ機能 [03 ステップ5]（コードレベルで確認: `VoiceInput.tsx`・`api.voice.transcribe`ルートは現存、`origin/development`との差分で認証/グループ/Docker/ジャンル・保管場所関連ファイルに変更なしを確認。実機での動作確認は未実施）
 - [x] `php artisan test` 最終グリーン（24 passed / 既存7件失敗はAuth系・環境起因の既知の失敗で全フェーズ通じて同一、回帰なし）
 - [x] スマホ実機で「開いて3秒で判断」を確認（要件 §9）（ユーザーが実機で確認済み）
-- [x] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]（コードレビューで確認。F-1: `updateStatus`で1タップ即時保存。F-2: `recordPurchase`で購入履歴作成+status更新、Undo実装済み。F-3: `getItemsByGroupId`のソートがstatus順(out→low→in_stock)/purchased順いずれもNULL先頭で仕様通り。F-4: status選択・quantity任意化は実装済み。**ただし2026-07-24追記分（登録後`items.index`遷移・戻る導線・購入履歴自動作成）はPhase 10未着手のため未充足** — `store()`は現状`items.create`へリダイレクトする旧仕様のまま)
+- [x] 受け入れ条件 F-1〜F-4 を全て満たすことを確認 [02 §4]（コードレビューで確認。F-1: `updateStatus`で1タップ即時保存。F-2: `recordPurchase`で購入履歴作成+status更新、Undo実装済み。F-3: `getItemsByGroupId`のソートがstatus順(out→low→in_stock)/purchased順いずれもNULL先頭で仕様通り。F-4: status選択・quantity任意化は実装済み。2026-07-24追記分（登録後`items.index`遷移・戻る導線・購入履歴自動作成）はPhase 9時点では未着手だったが、Phase 10（2026-07-25）で対応済み）
 - [x] 変更禁止事項に差分がないことを確認 [02 §5]（`git diff origin/development...HEAD`で認証/グループ/Docker/ジャンル・保管場所関連ファイルに差分なしを確認。現ブランチ`feat/mvp_phase9`は`origin/development`と同一コミットから開始）
 
 ### Phase 9 内で発見・修正した不具合
@@ -138,15 +138,15 @@
 
 ## Phase 10: 登録UX改善（遷移・購入履歴自動記録・トースト）[03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7]
 
-2026-07-24 にユーザーとの検討で方針決定済み（ドキュメント更新済み、実装は未着手）。
+2026-07-24 にユーザーとの検討で方針決定し、2026-07-25 に実装完了。
 
-- [ ] `ItemController@store`: リダイレクト先を `items.create` → `items.index` に変更し、`with('success', "{$item->name}を登録しました")` を付与 [03 §7.13]
-- [ ] `Items/Create.tsx`: ヘッダー左上に「戻る」導線を追加（遷移先は `items.index` 固定、`MdArrowBack`）[03 §7.13 / 04 §5.8,§10.4]
-- [ ] `ItemController@store`: アイテム作成と同一トランザクションで購入履歴を1件自動作成（`purchased_at`=登録日時、status上書きなし）[03 §7.14]
-- [ ] `ItemService`: `createInitialPurchaseHistory(Item, User)` を追加し `recordPurchase` とロジックを分離 [03 §7.14]
-- [ ] 「購入記録なし」分岐（`days_since_purchase === null`）はコードとして維持（削除しない）[04 §10.3]
-- [ ] `utils/toast.tsx`: `showBuyUndoToast` を `autoClose: 3500` ・コンパクトな `className` に調整 [04 §5.6,§10.7]
-- [ ] Feature テスト: `store` のリダイレクト先変更・購入履歴自動作成を検証するテストを追加/更新
+- [x] `ItemController@store`: リダイレクト先を `items.create` → `items.index` に変更し、`with('success', "{$item->name}を登録しました")` を付与 [03 §7.13]
+- [x] `Items/Create.tsx`: ヘッダー左上に「戻る」導線を追加（遷移先は `items.index` 固定、`MdArrowBack`）[03 §7.13 / 04 §5.8,§10.4]
+- [x] `ItemController@store`: アイテム作成と同一トランザクションで購入履歴を1件自動作成（`purchased_at`=登録日時、status上書きなし）[03 §7.14]
+- [x] `ItemService`: `createInitialPurchaseHistory(Item, User)` を追加し `recordPurchase` とロジックを分離 [03 §7.14]
+- [x] 「購入記録なし」分岐（`days_since_purchase === null`）はコードとして維持（削除しない）[04 §10.3]
+- [x] `utils/toast.tsx`: `showBuyUndoToast` を `autoClose: 3500` ・コンパクトな `className` に調整 [04 §5.6,§10.7]
+- [x] Feature テスト: `store` のリダイレクト先変更・購入履歴自動作成を検証するテストを追加/更新（`tests/Feature/ItemStoreTest.php` 新規作成）
 
 ## Phase 11: 音声入力の削除 [02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8]
 
@@ -167,6 +167,7 @@
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-25: Phase 10（登録UX改善）完了。**バックエンド**: `ItemController@store` の成功時リダイレクト先を `items.create` → `items.index` に変更し、`with('success', "{$item->name}を登録しました")` に差し替え（フラッシュメッセージは既存の `AuthenticatedLayout` の `flash.success` → `showSuccessToast` の仕組みをそのまま利用、新規実装なし）。同メソッド内でアイテム保存と同一トランザクション内に `ItemService::createInitialPurchaseHistory(Item, User)`（新設）を呼び出し、購入履歴を1件自動作成（`recordPurchase` とはロジックを分離し、ステータスは上書きしない設計を踏襲）。**フロント**: `Pages/Items/Create.tsx` のヘッダー上部に `items.index` 固定で戻る `Link`（`MdArrowBack` アイコン）を追加。`utils/toast.tsx` の `showBuyUndoToast` を `autoClose: 6000→3500`、`className: "!min-h-0 !py-2 !px-3"` でコンパクト化（`showSuccessToast`/`showErrorToast` には影響させず、Undoトーストのみに適用）。`ItemCard.tsx` 側の「購入記録なし」分岐（`days_since_purchase === null`）はコードとして変更せず維持（将来の履歴削除経路への防御）。**テスト**: `tests/Feature/ItemStoreTest.php` を新規作成し、(1) `store` 後に `items.index` へリダイレクトしフラッシュメッセージが含まれること、(2) 購入履歴が1件自動作成されフォームで選択した `status`（`low` 等）が上書きされないこと、の2ケースを追加。**検証について**: 本セッションでは Docker コンテナ名が固定（`uchistock-app` 等）でありメインチェックアウト側の起動中コンテナと衝突したため、ユーザーとの相談の結果 `php artisan test`/`npm run tsc`/`npm run lint`/ブラウザでの目視確認は本セッションでは実施せず、コードレビューでの整合性確認のみで完了とした。次回セッションでの実機検証を推奨。
 - 2026-07-25: Phase 9 完了。本セッションでは、別セッション（メインリポジトリ側）で先行して行われていたPhase 9作業（コミット `c802907`, PR #89でdevelopmentへマージ済み）にこのworktreeを`git merge --ff-only origin/development`で追随させた上で、残タスクを実施。(1) ユーザーが実機/ブラウザで「全画面ライト/ダーク目視確認」「スマホ実機での3秒判断確認」を完了したことを確認し、該当2チェックボックスを`[x]`に変更。(2) 既に修正済みだった不具合2件（FAB配色のトンマナ違反・一覧カードから編集画面への導線欠落）に対する回帰防止として`tests/Feature/ItemEditTest.php`を新規作成（自グループの`items.edit`が200＋Inertia `Items/Edit`をレンダーすること／他グループのアイテムは404になることを検証）。`php artisan test`全体で26 passed（新規2件含む）・既存7件失敗（Auth系・環境起因、全フェーズ通じて同一）で回帰なしを確認。(3) Phase 9の全チェック項目が完了したため進捗サマリを✅完了に更新。**残タスク**: Phase 10（登録UX改善）・Phase 11（音声入力削除の実装）は引き続き未着手。
 
 - 2026-07-25: Phase 9 目視確認（ユーザー実施）で新たに2件の不具合を発見・修正。(1) ライトモードでFAB（＋登録ボタン）が`bg-ink`（黒系）になっており§6.2のトンマナに反していたため`bg-accent text-accent-ink`に修正。(2) 一覧カードから編集画面へ遷移する導線が存在せず（Phase 6のリデザイン時に旧テーブルの編集リンクが引き継がれず欠落）、「個数を一度修正すると再修正できない」という報告の真因だったことが判明（そもそも編集画面へ到達できなかった）。`ItemCard.tsx`の品名を`Link`化し`items.edit`へ遷移できるよう修正、ユーザーが遷移可能なことを確認済み。`docs/04`§5.1・§10.6に導線仕様を追記。**残タスク**: この編集導線に対するFeatureテスト（`items.edit`のGET確認・他グループ404）を追加すること。なお、ログイン後の遷移先（`intended()`によるIntended URL復元）とダークモードのLINEログインボタン文字色の非対称（accent/danger-inkのコントラスト反転設計との対比）についてもユーザーに確認したが、いずれも現状維持で確定。
