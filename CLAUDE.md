@@ -17,8 +17,7 @@
 
 - **モノリシック Laravel アプリ**。ソースはすべて `htdocs/` 配下にある（`frontend/` ディレクトリは存在しない）。
 - UI は **Inertia.js + React (TypeScript)**。フロントは `htdocs/resources/js` に実装。
-- 音声認識（Whisper）は **別リポジトリ**（voice-analyzer-api）で管理。このリポジトリ内に whisper サービスは含まれない。
-  - <https://github.com/north238/voice-analyzer-api>
+- 音声入力機能は Phase 11（2026-07-26）で削除済み。旧音声認識連携先だった別リポジトリ（voice-analyzer-api）はこのリポジトリからは参照していない。
 - ローカル開発は **Docker Compose**。主要サービスは以下（`docker-compose.yml`）:
 
   | サービス | 役割                 | ポート（ホスト） |
@@ -49,7 +48,6 @@
 
 - 画面遷移系（Inertia）は `routes/web.php`。セッション認証（Breeze）。
 - 内部APIは `routes/api.php` で **`auth:sanctum` ミドルウェア**を使用（例: `/api/genres`, `/api/places`）。
-- 音声解析: `POST /api/voice/transcribe`（`api.voice.transcribe`）→ 別リポジトリの Whisper API と連携。**削除予定**（§8参照）。
 - LINE Webhook: `POST /api/line/webhook`。
 - CSRF / Cookie: 同一アプリ内フロント→バックでは基本的に session/CSRF で完結。CORS や認証方式を変更する際は `config/cors.php` と `.env`（`SANCTUM_STATEFUL_DOMAINS` / `SESSION_DOMAIN`）を確認する。
 
@@ -57,7 +55,6 @@
 
 - フォームオプション取得: `resources/js/hooks/useFormOptions.ts`（`/api/genres`, `/api/places`）
 - フォーム制御: `resources/js/Pages/Items/`（Inertia `useForm` を親に置く）
-- 音声入力: `resources/js/Components/VoiceInput.tsx`（解析中フラグを親へ通知。解析中は保存ボタン無効化）。**削除予定**（§8参照）
 - APIコントローラ例: `app/Http/Controllers/Api/GenreController.php`（返却は常に配列。空なら空配列 + message）
 - Pages 構成: `resources/js/Pages/{Auth, Dashboard, Group, Items, Profile}`
 
@@ -86,18 +83,18 @@ docker-compose exec app npm run format                 # Format
 
 アクセス: <http://localhost:8080>
 
-## 8. 進行中の改修（MVP / フェーズ0）※未実装
+## 8. MVP / フェーズ0 の改修（完了）
 
-`docs/02_requirements.md` の要件は **まだコードに反映されていない**（2026-07 時点）。現状は数量（`quantity`）ベースの在庫台帳。今後、以下へ移行する計画:
+`docs/02_requirements.md` の要件は Phase 0〜11 を通じて実装済み（2026-07-26 時点、詳細は `docs/05_implementation_todo.md` を参照）。以下へ移行済み:
 
 - `items.status`（`in_stock` / `low` / `out`）を追加し、**status を主役**に。`quantity` は任意の参考情報へ降格。
 - `purchase_histories` テーブルを新規作成し、「買った」ワンタップで購入履歴を記録。
 - 一覧をテーブル型からカード型（品名・ステータス・前回購入○日前）へリデザイン。
+- 音声入力機能（`VoiceInput.tsx` / Whisper 別リポジトリ連携 / `api.voice.transcribe`）は Phase 11 で削除済み。
 
 実装時の注意（詳細は要件書 §5, §6 を参照）:
 
 - **変更禁止**: 認証（Breeze/Socialite）、グループ機能、Docker 構成、ジャンル・保管場所管理。
-- **削除予定**: 音声入力（`VoiceInput.tsx` / Whisper 別リポジトリ / `api.voice.transcribe`）。対応する Whisper API が用意されておらず実質使用不可のため、変更禁止対象から除外し、今後の別タスクで機能ごと削除する方針に変更した（2026-07-24）。削除の実施はドキュメント整備完了後に着手する。詳細は `docs/02` §5・`docs/05` Phase 11 を参照。
 - **スコープ外**: 賞味期限管理、厳密な数量増減、通知、PWA化、購入周期推定 など。
 - 既存マイグレーションは編集せず、新規マイグレーションを追加する。
 - 前回購入日の算出で N+1 を出さない。F-1 / F-2 は Feature テストを追加する。

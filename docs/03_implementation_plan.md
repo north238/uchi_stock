@@ -116,7 +116,7 @@
 - [ ] `ItemCreateRequest` / `ItemUpdateRequest`: `quantity` を `nullable|integer|min:0` に変更。status を `nullable|in:in_stock,low,out`（未指定は `in_stock`）で受ける。
 - [ ] `ItemController@store` / `@update`: `status` を保存対象に追加（未指定は `in_stock`）。
 - [ ] `Form.tsx`: status 選択（3値, default `in_stock`）を追加。`quantity` を任意入力化（未入力可、default 強制をやめる）。`FormItemFields` / `FieldName` 型に `status` 追加。
-- [ ] 音声入力フローは現状維持（`name`/`quantity` セットのまま。デグレなし）。※音声入力自体は削除予定（§4 参照）。削除実施までの間は維持する。
+- [x] 音声入力フローは Phase 4〜10 の間は現状維持しデグレなしを確認していた。※音声入力機能自体は Phase 11 で削除済み（§4 参照）。
 - [ ] `ItemController@store`: 成功時のリダイレクト先を `items.create`（フォームリセット）から `items.index` に変更し、`with('success', "{$item->name}を登録しました")` を付与する（§7.13）。
 - [ ] `Items/Create.tsx`: ヘッダー左上に「戻る」導線を追加。遷移先は `items.index` 固定（§7.13）。
 - [ ] `ItemController@store`: アイテム作成と同一トランザクションで購入履歴を1件自動作成する（§7.14）。
@@ -130,14 +130,14 @@
 
 > **2026-07-24 変更**: 従来この工程には「音声入力での登録が従来どおり動作すること（`VoiceInput.tsx` / whisper 別リポジトリ / `api.voice.transcribe` は変更しない）」の確認が含まれていたが、音声入力機能は削除予定（§4 参照）となったため本ステップから除外した。音声入力の実削除は別タスク（`docs/05` Phase 11）で扱う。
 
-### ステップ6: 音声入力の削除（Phase 11・別タスク）
+### ステップ6: 音声入力の削除（Phase 11・完了）
 
-削除の実施はドキュメント整備完了後に着手する。詳細手順は `docs/05` Phase 11 のチェックリストを正とする。概要:
+詳細な実施記録は `docs/05` Phase 11 のチェックリスト・進捗メモを正とする。概要:
 
-- [ ] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去する。
-- [ ] バックエンド: `api.voice.transcribe` ルート・対応コントローラ・Whisper 関連設定値（`.env.example` 含む）を削除する。
-- [ ] 不要になったパッケージ・設定を整理する。
-- [ ] 削除後、音声入力関連の参照が残っていないことをリポジトリ全体で確認する。
+- [x] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去する。
+- [x] バックエンド: `api.voice.transcribe` ルート・対応コントローラ・Whisper 関連設定値（`.env.example` 含む）を削除する。
+- [x] 不要になったパッケージ・設定を整理する。
+- [x] 削除後、音声入力関連の参照が残っていないことをリポジトリ全体で確認する。
 
 ## 3. 変更予定ファイル一覧
 

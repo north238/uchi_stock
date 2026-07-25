@@ -14,7 +14,7 @@ interface Item {
 }
 
 export default function Edit({ auth }: PageProps) {
-  const { apiUrl, item } = usePage<{ apiUrl: string; item: Item }>().props;
+  const { item } = usePage<{ item: Item }>().props;
 
   const form = useForm({
     name: item?.name ?? "",
@@ -42,7 +42,6 @@ export default function Edit({ auth }: PageProps) {
         data={data}
         setData={setData}
         onSubmit={handleSubmit}
-        apiUrl={apiUrl}
         errors={errors}
         processing={processing}
       />

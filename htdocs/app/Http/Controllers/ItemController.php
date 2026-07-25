@@ -62,10 +62,7 @@ class ItemController extends Controller
      */
     public function create()
     {
-        $apiUrl = route('api.voice.transcribe');
-        return Inertia::render('Items/Create', [
-            'apiUrl' => $apiUrl,
-        ]);
+        return Inertia::render('Items/Create');
     }
 
     /**
@@ -132,12 +129,9 @@ class ItemController extends Controller
      */
     public function edit(string $id)
     {
-        $apiUrl = route('api.voice.transcribe');
-
         $item = $this->findOwnedItem($id);
 
         return Inertia::render('Items/Edit', [
-            'apiUrl' => $apiUrl,
             'item' => $item,
         ]);
     }
