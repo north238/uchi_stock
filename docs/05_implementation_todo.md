@@ -165,6 +165,25 @@
 
 ---
 
+## 保留中の検討事項（バックログ）
+
+本フェーズの計画には含まれていないが、実装中に見つかり将来判断が必要な事項をここに記録する。着手前に必ずこの節を確認し、対応した項目は削除するかチェック済みとして残す。
+
+### Color関連（未使用の色分け機能）— 2026-07-26発見
+
+- **発見の経緯**: `RegisteredUserController`/`SocialiteLoginController`の`role_id`ハードコード修正（テスト回収作業）の過程で、`Api/GenreController::store()`に全く同じ「マジックID直書き」パターン（`'color_id' => 1, // デフォルトカラーID`）があることに気づき、ユーザーから「ColorsTable関連はどこかで使われているか」と質問され調査した。
+- **現状の実装**:
+  - `Genre`モデルが`belongsTo(Color::class, 'color_id')`を持ち、`getGenresListByGroupId()`で`with('color')`により毎回eager loadしている。
+  - `Api/GenreController::store()`が新規ジャンル作成時に`color_id => 1`を固定値で設定している。
+  - `colors`テーブルは`ColorsTableSeeder`（143行、色名+16進カラーコードのパレット）で投入され、`DatabaseSeeder`から呼ばれている。
+- **利用実態**: バックエンドは`color`情報を取得しAPIレスポンスに含めているが、フロントエンド（`resources/js/api/optionsApi.ts`の`BackendOption`型は`{ id, name }`のみ）が受け取った時点で`color`を破棄しており、**画面上でジャンルの色が表示・選択される箇所は現状ゼロ**（grep・目視で確認済み）。`docs/04_frontend_design_guide.md`が定義する色設計（緑＝ステータス／コーラル＝アクション／danger＝破壊的操作の固定トークンパレット）にも、ジャンルごとの任意色分けは登場しない。
+- **今後の選択肢**:
+  - (a) ジャンルごとの色分け表示ニーズが顕在化した場合、`Color`/`colors`をそのまま活用してUIを実装する。
+  - (b) 恒久的に不要と判断した場合、`Color`モデル・`colors`テーブル・`ColorsTableSeeder`・`Genre.color_id`カラム・リレーションを削除する（新規migrationでdrop、既存migrationは編集しない）。
+- **注意**: `Genre`関連ファイルは CLAUDE.md §8「変更禁止: ジャンル・保管場所の管理機能」の対象に含まれる。(b)を実施する場合も含め、着手前に必ずユーザーの明示的な合意を取ること。
+
+---
+
 ## 進捗メモ（新しいものを上に）
 
 - 2026-07-26: Phase 11（音声入力の削除）実装完了。**削除したファイル**: `htdocs/app/Http/Controllers/VoiceController.php`、`htdocs/resources/js/Components/VoiceInput.tsx`、`htdocs/resources/js/hooks/useVoiceRecorder.ts`、`htdocs/resources/js/utils/audioUtils.ts`。**バックエンド**: `routes/api.php` から `POST /voice/transcribe`（`api.voice.transcribe`）ルートと `VoiceController` の import を削除、`routes/web.php` の未使用 import も削除。`config/services.php` から `whisper` 設定ブロックを削除。`ItemController::create`/`edit` で行っていた `route('api.voice.transcribe')` の生成・`apiUrl` プロパティの Inertia への受け渡しを削除。`.env.example`/`.env.testing` から `WHISPER_URL` を削除。**フロント**: `Pages/Items/Partials/Form.tsx` から `VoiceInput` の呼び出し・`voiceProcessing` state・`apiUrl` prop を除去（各入力の `disabled` 条件も `processing` のみに簡素化）。`Pages/Items/Create.tsx`/`Edit.tsx` から `apiUrl` の受け取り・`Form` への受け渡しを削除。`README.md` の「主要機能」「技術スタック」からも音声入力・Whisper API の記載を削除。**検証**: `grep -rniE "voice|whisper"` でコード側（`docs/`・`CLAUDE.md` 以外）に参照が残っていないことを確認。このworktreeは `composer install`/`npm install`/`vite build` 未実施の状態だったため一式実行した上で `php artisan test` を実行し、7 failed / 28 passed（既知のAuth系・環境起因の失敗のみ、Phase 10までと同一で回帰なし）を確認。`npm run tsc` は既知の `ssr.tsx` エラーのみ、`npm run lint` は削除により警告数が減少（VoiceInput.tsx分の警告が消滅）し新規の指摘なしを確認。Phase 11 完了により MVP フェーズ0 の実装 TODO は全フェーズ完了。
