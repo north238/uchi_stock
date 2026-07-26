@@ -15,22 +15,26 @@ UchiStockは、家庭の在庫管理を効率化するためのWebアプリケ�
 ## 技術スタック
 
 ### バックエンド
+
 - Laravel 10.x
 - PHP 8.2+
 - MySQL 8.0+
 
 ### フロントエンド
+
 - TypeScript
 - React
 - Inertia.js
 - TailwindCSS
 
 ### その他
+
 - Docker（開発環境）
 
 ## 環境構築
 
 ### 必要要件
+
 - Docker Desktop
 - Docker Compose v2.x
 - Node.js 18+
@@ -41,6 +45,7 @@ UchiStockは、家庭の在庫管理を効率化するためのWebアプリケ�
 #### Dockerを使用する場合
 
 1. Docker環境の構築
+
 ```bash
 # Dockerイメージのビルドと起動
 docker-compose up -d
@@ -55,12 +60,14 @@ docker-compose exec app php artisan migrate --seed
 #### ローカル環境を使用する場合
 
 1. リポジトリのクローン
+
 ```bash
 git clone git@github.com:north238/uchi_stock.git
 cd uchi_stock
 ```
 
-2. 環境設定（Dockerを使用する場合はappコンテナ内で実行）
+1. 環境設定（Dockerを使用する場合はappコンテナ内で実行）
+
 ```bash
 # 環境設定ファイルのコピー
 cp .env.example .env
@@ -76,12 +83,14 @@ npm install
 # LINE_CHANNEL_SECRET=xxxxx
 ```
 
-3. アプリケーションキーの生成
+1. アプリケーションキーの生成
+
 ```bash
 php artisan key:generate
 ```
 
-4. データベースのセットアップ
+1. データベースのセットアップ
+
 ```bash
 # マイグレーションの実行
 php artisan migrate
@@ -90,7 +99,8 @@ php artisan migrate
 php artisan db:seed
 ```
 
-5. 開発サーバーの起動
+1. 開発サーバーの起動
+
 ```bash
 # Vite（別ターミナルで）
 npm run dev
@@ -102,12 +112,14 @@ open http://localhost:8080
 ## 開発ガイドライン
 
 ### コーディング規約
+
 - PSR-12に準拠
 - TypeScriptの型定義を厳密に
 - コンポーネント単位での開発
 - テストカバレッジの維持
 
 ### アーキテクチャ
+
 - Controller-Service-Modelパターン
 - Repositoryパターン（一部）
 - Inertiaによるモノリシック構成
@@ -121,6 +133,7 @@ php artisan test
 ```
 
 ## JSファイル（記述チェック・フォーマット）
+
 ```bash
 npm run lint
 npm run format
@@ -131,4 +144,5 @@ npm run format
 MIT License
 
 ## 作者
+
 north238

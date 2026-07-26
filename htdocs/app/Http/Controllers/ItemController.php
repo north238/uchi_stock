@@ -141,9 +141,9 @@ class ItemController extends Controller
      */
     public function update(ItemUpdateRequest $request, string $id)
     {
-        try {
-            $item = $this->findOwnedItem($id);
+        $item = $this->findOwnedItem($id);
 
+        try {
             DB::beginTransaction();
 
             $validatedData = $request->validated();
