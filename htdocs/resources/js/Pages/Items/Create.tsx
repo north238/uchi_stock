@@ -1,12 +1,11 @@
 import Form from "./Partials/Form";
-import { usePage, useForm, Head, Link } from "@inertiajs/react";
+import { useForm, Head, Link } from "@inertiajs/react";
 import { MdArrowBack } from "react-icons/md";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
 import { ItemStatusValue } from "@/constants/itemStatus";
 
 export default function Create({ auth }: PageProps) {
-  const { apiUrl } = usePage<{ apiUrl: string }>().props;
   const form = useForm({
     name: "",
     status: "in_stock" as ItemStatusValue,
@@ -45,7 +44,6 @@ export default function Create({ auth }: PageProps) {
         data={data}
         setData={setData}
         onSubmit={handleSubmit}
-        apiUrl={apiUrl}
         errors={errors}
         processing={processing}
       />

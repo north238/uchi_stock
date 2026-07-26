@@ -1,8 +1,8 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-25
-現在地: **Phase 10 完了。Phase 11 は未着手**（ドキュメント整備のみ完了）
-作業ブランチ: `worktree-mvp_phase10`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
+最終更新: 2026-07-26
+現在地: **Phase 11 完了**（音声入力機能の削除まで完了）
+作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
 このファイルは**実装の進捗を一元管理する唯一の場所**。セッションをまたいでも「どこまで完了したか」がここだけで分かるようにする。
@@ -29,7 +29,7 @@
 | 8 | 他画面トンマナ | 04 §6.7 | ✅ 完了 |
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ✅ 完了 |
 | 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ✅ 完了 |
-| 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | 🟡 着手中（ドキュメント更新のみ完了） |
+| 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | ✅ 完了 |
 
 状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
 
@@ -156,17 +156,37 @@
 - [x] ドキュメント更新: `docs/02` §5 の変更禁止事項から音声入力を除外し削除予定の注記を追加 [02 §5]
 - [x] ドキュメント更新: `docs/03` §4「変更しないもの」・ステップ5 から音声入力を除外し、ステップ6（削除タスク概要）を追加 [03 §4, ステップ6]
 - [x] ドキュメント更新: `docs/04` §8 デグレ禁止・§5.7・§10.9 の音声入力記述に削除予定の注記を追加 [04 §8,§5.7,§10.9]
-- [ ] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去
-- [ ] バックエンド: `api.voice.transcribe` ルート・対応コントローラを削除
-- [ ] バックエンド: Whisper 関連設定値（`.env`/`.env.example`/`.env.testing` の `WHISPER_URL` 等）を削除
-- [ ] 不要になったパッケージ・設定（`useVoiceRecorder.ts` 等の関連フック含む）を整理
-- [ ] 削除後、リポジトリ全体で音声入力関連の参照が残っていないことを確認（grep等）
-- [ ] `php artisan test` グリーンを再確認
+- [x] フロント: `VoiceInput.tsx` を削除し、`Form.tsx` 等の呼び出し元から参照を除去
+- [x] バックエンド: `api.voice.transcribe` ルート・対応コントローラ（`VoiceController.php`）を削除
+- [x] バックエンド: Whisper 関連設定値（`config/services.php` の `whisper` / `.env.example`・`.env.testing` の `WHISPER_URL`）を削除
+- [x] 不要になったパッケージ・設定（`useVoiceRecorder.ts`・`utils/audioUtils.ts` を削除、`ItemController::create`/`edit` の `apiUrl` 受け渡しと `Create.tsx`/`Edit.tsx`/`Form.tsx` 側の `apiUrl` props を除去）を整理
+- [x] 削除後、リポジトリ全体で音声入力関連の参照が残っていないことを確認（`grep -rniE "voice|whisper"` でコード側の残存なしを確認。`docs/`・`CLAUDE.md` は削除の経緯を記録する historical な記述として意図的に残置）
+- [x] `php artisan test` グリーンを再確認（7 failed / 28 passed。既知のAuth系・環境起因の失敗のみで全フェーズ通じて同一、回帰なし）
+
+---
+
+## 保留中の検討事項（バックログ）
+
+本フェーズの計画には含まれていないが、実装中に見つかり将来判断が必要な事項をここに記録する。着手前に必ずこの節を確認し、対応した項目は削除するかチェック済みとして残す。
+
+### Color関連（未使用の色分け機能）— 2026-07-26発見
+
+- **発見の経緯**: `RegisteredUserController`/`SocialiteLoginController`の`role_id`ハードコード修正（テスト回収作業）の過程で、`Api/GenreController::store()`に全く同じ「マジックID直書き」パターン（`'color_id' => 1, // デフォルトカラーID`）があることに気づき、ユーザーから「ColorsTable関連はどこかで使われているか」と質問され調査した。
+- **現状の実装**:
+  - `Genre`モデルが`belongsTo(Color::class, 'color_id')`を持ち、`getGenresListByGroupId()`で`with('color')`により毎回eager loadしている。
+  - `Api/GenreController::store()`が新規ジャンル作成時に`color_id => 1`を固定値で設定している。
+  - `colors`テーブルは`ColorsTableSeeder`（143行、色名+16進カラーコードのパレット）で投入され、`DatabaseSeeder`から呼ばれている。
+- **利用実態**: バックエンドは`color`情報を取得しAPIレスポンスに含めているが、フロントエンド（`resources/js/api/optionsApi.ts`の`BackendOption`型は`{ id, name }`のみ）が受け取った時点で`color`を破棄しており、**画面上でジャンルの色が表示・選択される箇所は現状ゼロ**（grep・目視で確認済み）。`docs/04_frontend_design_guide.md`が定義する色設計（緑＝ステータス／コーラル＝アクション／danger＝破壊的操作の固定トークンパレット）にも、ジャンルごとの任意色分けは登場しない。
+- **今後の選択肢**:
+  - (a) ジャンルごとの色分け表示ニーズが顕在化した場合、`Color`/`colors`をそのまま活用してUIを実装する。
+  - (b) 恒久的に不要と判断した場合、`Color`モデル・`colors`テーブル・`ColorsTableSeeder`・`Genre.color_id`カラム・リレーションを削除する（新規migrationでdrop、既存migrationは編集しない）。
+- **注意**: `Genre`関連ファイルは CLAUDE.md §8「変更禁止: ジャンル・保管場所の管理機能」の対象に含まれる。(b)を実施する場合も含め、着手前に必ずユーザーの明示的な合意を取ること。
 
 ---
 
 ## 進捗メモ（新しいものを上に）
 
+- 2026-07-26: Phase 11（音声入力の削除）実装完了。**削除したファイル**: `htdocs/app/Http/Controllers/VoiceController.php`、`htdocs/resources/js/Components/VoiceInput.tsx`、`htdocs/resources/js/hooks/useVoiceRecorder.ts`、`htdocs/resources/js/utils/audioUtils.ts`。**バックエンド**: `routes/api.php` から `POST /voice/transcribe`（`api.voice.transcribe`）ルートと `VoiceController` の import を削除、`routes/web.php` の未使用 import も削除。`config/services.php` から `whisper` 設定ブロックを削除。`ItemController::create`/`edit` で行っていた `route('api.voice.transcribe')` の生成・`apiUrl` プロパティの Inertia への受け渡しを削除。`.env.example`/`.env.testing` から `WHISPER_URL` を削除。**フロント**: `Pages/Items/Partials/Form.tsx` から `VoiceInput` の呼び出し・`voiceProcessing` state・`apiUrl` prop を除去（各入力の `disabled` 条件も `processing` のみに簡素化）。`Pages/Items/Create.tsx`/`Edit.tsx` から `apiUrl` の受け取り・`Form` への受け渡しを削除。`README.md` の「主要機能」「技術スタック」からも音声入力・Whisper API の記載を削除。**検証**: `grep -rniE "voice|whisper"` でコード側（`docs/`・`CLAUDE.md` 以外）に参照が残っていないことを確認。このworktreeは `composer install`/`npm install`/`vite build` 未実施の状態だったため一式実行した上で `php artisan test` を実行し、7 failed / 28 passed（既知のAuth系・環境起因の失敗のみ、Phase 10までと同一で回帰なし）を確認。`npm run tsc` は既知の `ssr.tsx` エラーのみ、`npm run lint` は削除により警告数が減少（VoiceInput.tsx分の警告が消滅）し新規の指摘なしを確認。Phase 11 完了により MVP フェーズ0 の実装 TODO は全フェーズ完了。
 - 2026-07-26: Phase 10の実機検証を実施（前回セッションではDockerコンテナ名衝突により未実施だった分）。本体`uchistock-*`スタックを停止し、このworktreeで`docker-compose up -d`（コンテナ名はデフォルトの`uchistock-*`のまま、ポートも本体と同一。同時起動しない運用に変更したため名前・ポートは変更不要）→ `migrate --seed`実行→検証。**結果**: (1) `php artisan test`: 28 passed / 7 failed（既知のAuth系・環境起因の失敗で全フェーズ通じて同一、回帰なし。Phase9時点の26 passedからPhase10で追加した`ItemStoreTest`2件が加わり28 passedへ）。(2) `npm run tsc`: エラーは`ssr.tsx`のみ（`b9ab2d4`時点からの既存エラーでPhase10とは無関係）。(3) `npm run lint`: 1 error/11 warningsだが全て`UpdateProfileInformationForm.tsx`（Phase8由来）・`VoiceInput.tsx`・`ssr.tsx`等の既存箇所でPhase10の変更ファイルには新規の指摘なし。(4) `curl`でnginx→php-fpm→mysqlの疎通確認（`/login`が200）。**ブラウザ確認（ユーザー実施、2026-07-26）**: 登録後の`items.index`遷移・トースト表示・購入履歴自動作成を含め目視確認完了。Phase 10の実機検証がすべて完了。
 - 2026-07-25: Phase 10（登録UX改善）完了。**バックエンド**: `ItemController@store` の成功時リダイレクト先を `items.create` → `items.index` に変更し、`with('success', "{$item->name}を登録しました")` に差し替え（フラッシュメッセージは既存の `AuthenticatedLayout` の `flash.success` → `showSuccessToast` の仕組みをそのまま利用、新規実装なし）。同メソッド内でアイテム保存と同一トランザクション内に `ItemService::createInitialPurchaseHistory(Item, User)`（新設）を呼び出し、購入履歴を1件自動作成（`recordPurchase` とはロジックを分離し、ステータスは上書きしない設計を踏襲）。**フロント**: `Pages/Items/Create.tsx` のヘッダー上部に `items.index` 固定で戻る `Link`（`MdArrowBack` アイコン）を追加。`utils/toast.tsx` の `showBuyUndoToast` を `autoClose: 6000→3500`、`className: "!min-h-0 !py-2 !px-3"` でコンパクト化（`showSuccessToast`/`showErrorToast` には影響させず、Undoトーストのみに適用）。`ItemCard.tsx` 側の「購入記録なし」分岐（`days_since_purchase === null`）はコードとして変更せず維持（将来の履歴削除経路への防御）。**テスト**: `tests/Feature/ItemStoreTest.php` を新規作成し、(1) `store` 後に `items.index` へリダイレクトしフラッシュメッセージが含まれること、(2) 購入履歴が1件自動作成されフォームで選択した `status`（`low` 等）が上書きされないこと、の2ケースを追加。**検証について**: 本セッションでは Docker コンテナ名が固定（`uchistock-app` 等）でありメインチェックアウト側の起動中コンテナと衝突したため、ユーザーとの相談の結果 `php artisan test`/`npm run tsc`/`npm run lint`/ブラウザでの目視確認は本セッションでは実施せず、コードレビューでの整合性確認のみで完了とした。次回セッションでの実機検証を推奨。
 - 2026-07-25: Phase 9 完了。本セッションでは、別セッション（メインリポジトリ側）で先行して行われていたPhase 9作業（コミット `c802907`, PR #89でdevelopmentへマージ済み）にこのworktreeを`git merge --ff-only origin/development`で追随させた上で、残タスクを実施。(1) ユーザーが実機/ブラウザで「全画面ライト/ダーク目視確認」「スマホ実機での3秒判断確認」を完了したことを確認し、該当2チェックボックスを`[x]`に変更。(2) 既に修正済みだった不具合2件（FAB配色のトンマナ違反・一覧カードから編集画面への導線欠落）に対する回帰防止として`tests/Feature/ItemEditTest.php`を新規作成（自グループの`items.edit`が200＋Inertia `Items/Edit`をレンダーすること／他グループのアイテムは404になることを検証）。`php artisan test`全体で26 passed（新規2件含む）・既存7件失敗（Auth系・環境起因、全フェーズ通じて同一）で回帰なしを確認。(3) Phase 9の全チェック項目が完了したため進捗サマリを✅完了に更新。**残タスク**: Phase 10（登録UX改善）・Phase 11（音声入力削除の実装）は引き続き未着手。

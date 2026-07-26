@@ -203,7 +203,7 @@ fontFamily: {
 
 ### 5.7 登録・編集フォーム調整（F-4）
 
-`resources/js/Pages/Items/Partials/Form.tsx` を調整（音声入力フローは現状維持・デグレ禁止。※音声入力自体は削除予定。§8・§10.9 参照。削除実施までの間はデグレさせない）:
+`resources/js/Pages/Items/Partials/Form.tsx` を調整（音声入力機能は Phase 11 で削除済み。§8・§10.9 参照）:
 
 - **ステータス選択**（`StatusSegment` を再利用した3値、既定 `in_stock`）を品名の次に追加。
 - **個数を任意入力化**（未入力可・ラベルを「個数（任意）」）。視覚的な優先度も下げる。
@@ -352,7 +352,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - **ダーク両対応。** トークン経由で必ず両テーマ成立を確認。
 - **色の役割を越えない。** 緑＝ステータス、コーラル＝アクション、danger＝破壊的操作のみ。緑をボタンに、コーラルを状態に使わない（§6.2）。
 - **アクセシビリティ。** フォーカスリング・`aria-pressed`・`prefers-reduced-motion` 尊重・コントラスト確保。
-- **デグレ禁止。** グループ機能の挙動を壊さない（`docs/02` §5）。音声入力（`VoiceInput.tsx` / `api.voice.transcribe`）は削除予定のためこの限りではないが、削除実施（`docs/05` Phase 11）までは現状のデグレさせない扱いを維持する。
+- **デグレ禁止。** グループ機能の挙動を壊さない（`docs/02` §5）。音声入力機能は Phase 11 で削除済み。
 
 ## 9. やらないこと
 
@@ -524,7 +524,7 @@ export const showBuyUndoToast = (item: { name: string }, onUndo: () => void) =>
 
 - `status` 初期値: 新規=`"in_stock"`、編集=既存値。`StatusSegment` を流用し `FieldName` に `"status"` を追加。
 - `quantity`: `value={data.quantity ?? ""}`、未入力は送信時 `null`。ラベルは「個数（任意）」。
-- 音声入力 `onResult` は現状維持（name/quantity セット）。status はユーザー操作のみで変更。※音声入力機能自体は削除予定（`docs/02` §5、`docs/05` Phase 11）。削除実施までの間はこの挙動を維持する。
+- 音声入力機能は Phase 11 で削除済み（`docs/02` §5、`docs/05` Phase 11）。status はユーザー操作のみで変更する。
 
 ---
 

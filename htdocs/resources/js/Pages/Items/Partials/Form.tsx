@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import VoiceInput from "@/Components/VoiceInput";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -29,7 +28,6 @@ interface ItemFormProps {
   data: FormItemFields;
   setData: (field: FieldName, value?: string | number | null) => void;
   onSubmit: () => void | Promise<void>;
-  apiUrl: string;
   errors?: Partial<Record<keyof FormItemFields, string>>;
   processing: boolean;
 }
@@ -39,11 +37,9 @@ export default function Form({
   data,
   setData,
   onSubmit,
-  apiUrl,
   errors,
   processing,
 }: ItemFormProps) {
-  const [voiceProcessing, setVoiceProcessing] = useState(false);
   const [isGenreModalOpen, setIsGenreModalOpen] = useState(false);
   const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
@@ -127,7 +123,7 @@ export default function Form({
               error={!!errors?.name}
               ref={nameRef}
               onChange={handleNameChange}
-              disabled={voiceProcessing || processing}
+              disabled={processing}
             />
             <InputError message={errors?.name} className="mt-2" />
           </div>
@@ -138,7 +134,7 @@ export default function Form({
               <StatusSegment
                 value={data.status ?? "in_stock"}
                 onChange={handleStatusChange}
-                disabled={voiceProcessing || processing}
+                disabled={processing}
               />
             </div>
           </div>
@@ -156,7 +152,7 @@ export default function Form({
               }
               error={!!errors?.quantity}
               onChange={handleQuantityChange}
-              disabled={voiceProcessing || processing}
+              disabled={processing}
             />
             <InputError message={errors?.quantity} className="mt-2" />
           </div>
@@ -172,7 +168,7 @@ export default function Form({
               onChange={handleGenreChange}
               onAdd={handleAddGenre}
               error={errors?.genre_id}
-              disabled={voiceProcessing || processing || loading}
+              disabled={processing || loading}
             />
           </div>
 
@@ -187,7 +183,7 @@ export default function Form({
               onChange={handlePlaceChange}
               onAdd={handleAddPlace}
               error={errors?.place_id}
-              disabled={voiceProcessing || processing || loading}
+              disabled={processing || loading}
             />
           </div>
 
@@ -201,28 +197,12 @@ export default function Form({
               onChange={handleMemoChange}
               error={!!errors?.memo}
               className="mt-1 block w-full"
-              disabled={voiceProcessing || processing}
+              disabled={processing}
             />
             <InputError message={errors?.memo} className="mt-2" />
           </div>
 
-          {/* 音声入力コンポーネント */}
-          <VoiceInput
-            onResult={(result) => {
-              if (result.status === "success") {
-                const itemName = result.items[0]?.item || "";
-                const itemQuantity = result.items[0]?.quantity || 1;
-                setData("name", itemName);
-                setData("quantity", itemQuantity);
-              } else {
-                showErrorToast(result.message || "音声認識に失敗しました。");
-              }
-            }}
-            apiUrl={apiUrl}
-            onProcessingChange={(p) => setVoiceProcessing(p)}
-          />
-
-          <PrimaryButton type="submit" disabled={processing || voiceProcessing || nameEmpty}>
+          <PrimaryButton type="submit" disabled={processing || nameEmpty}>
             保存
           </PrimaryButton>
         </form>
