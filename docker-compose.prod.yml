@@ -1,0 +1,73 @@
+services:
+  db:
+    container_name: uchistock-db-prod
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - TZ=${TZ}
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    # ports は公開しない（内部ネットワークのみ）
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - uchistock_prod_network
+    restart: unless-stopped
+
+  redis:
+    container_name: uchistock-redis-prod
+    image: redis:6.2.14
+    # ports は公開しない
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - uchistock_prod_network
+    restart: unless-stopped
+
+  app:
+    container_name: uchistock-app-prod
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile.prod
+    # 本番イメージには .env を焼き込まない（.dockerignore で除外）。
+    # ラズパイ上の htdocs/.env（gitignore対象・実ファイル）をコンテナ起動時の環境変数として注入する。
+    env_file:
+      - ./htdocs/.env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    # 判断 B: アバターは LINE ログイン毎に再生成される揮発データのため永続化 volume なし
+    depends_on:
+      - db
+      - redis
+    networks:
+      - uchistock_prod_network
+    restart: unless-stopped
+
+  web:
+    container_name: uchistock-web-prod
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile.prod
+    # cloudflared（ホスト）からのみ到達。ローカルホストにのみバインド。
+    ports:
+      - '127.0.0.1:8080:80'
+    depends_on:
+      - app
+    networks:
+      - uchistock_prod_network
+    restart: unless-stopped
+
+networks:
+  uchistock_prod_network:
+    driver: bridge
+
+volumes:
+  mysql_data_prod:
+  redis_data_prod:
