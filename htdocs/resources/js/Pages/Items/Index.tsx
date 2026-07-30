@@ -1,108 +1,91 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { MdAdd, MdKeyboardArrowDown } from "react-icons/md";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import Dropdown from "@/Components/Dropdown";
+import ItemCard from "@/Pages/Items/Partials/ItemCard";
+import { ItemStatusValue } from "@/constants/itemStatus";
 import { PageProps } from "@/types";
 
-interface Item {
+export interface Item {
   id: number;
   name: string;
-  quantity: number;
-  memo?: string | null;
+  status: ItemStatusValue;
+  quantity: number | null;
+  days_since_purchase: number | null;
+  last_purchased_at: string | null;
   genre?: { id: number; name: string } | null;
   place?: { id: number; name: string } | null;
-  created_at?: string;
 }
 
+type SortValue = "status" | "purchased";
+
+const SORT_LABEL: Record<SortValue, string> = {
+  status: "状態順",
+  purchased: "前回購入が古い順",
+};
+
 export default function Index({ auth }: PageProps) {
-  const { items = [] } = usePage<{ items?: Item[] }>().props;
+  const { items = [], sort = "status" } = usePage<{ items?: Item[]; sort?: SortValue }>().props;
 
   return (
-    <Authenticated
-      user={auth.user}
-    >
+    <Authenticated user={auth.user}>
       <Head title="アイテム一覧" />
 
-      <div className="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">在庫一覧</h3>
-          <Link
-            href={route("items.create")}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            新規登録
-          </Link>
+      <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-ink">在庫一覧</h1>
+
+          <Dropdown>
+            <Dropdown.Trigger>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded-full border border-line-strong bg-surface px-3 py-1 text-[12.5px] text-ink"
+              >
+                並び替え {SORT_LABEL[sort]}
+                <MdKeyboardArrowDown className="h-4 w-4" />
+              </button>
+            </Dropdown.Trigger>
+            <Dropdown.Content align="right" width="48">
+              <Dropdown.Link href={route("items.index", { sort: "status" })} preserveScroll preserveState>
+                状態順
+              </Dropdown.Link>
+              <Dropdown.Link
+                href={route("items.index", { sort: "purchased" })}
+                preserveScroll
+                preserveState
+              >
+                前回購入が古い順
+              </Dropdown.Link>
+            </Dropdown.Content>
+          </Dropdown>
         </div>
 
         {items.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <p className="text-gray-600 dark:text-gray-300">登録されたアイテムはありません。</p>
-            <div className="mt-4">
-              <Link
-                href={route("items.create")}
-                className="text-blue-600 dark:text-blue-400 underline"
-              >
-                アイテムを登録する
-              </Link>
-            </div>
+          <div className="rounded-[20px] bg-surface p-6 text-center shadow-card">
+            <p className="text-muted">登録されたアイテムはありません。</p>
+            <Link
+              href={route("items.create")}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-ink"
+            >
+              アイテムを登録する
+            </Link>
           </div>
         ) : (
-          <>
-            {/* デスクトップ: テーブル表示 */}
-            <div className="hidden md:block bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">品名</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">個数</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ジャンル</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">保管場所</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">メモ</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{item.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.genre?.name ?? '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.place?.name ?? '-'}</td>
-                      <td className="px-6 py-4 max-w-xs text-sm text-gray-600 dark:text-gray-300 truncate">{item.memo ?? '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link href={route("items.edit", item.id)} className="text-indigo-600 hover:text-indigo-900">
-                          編集
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* モバイル: カード表示 */}
-            <div className="mt-4 grid grid-cols-1 gap-4 md:hidden">
-              {items.map((item) => (
-                <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-md font-semibold text-gray-900 dark:text-gray-100">{item.name}</h4>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">{item.genre?.name ?? ''} ・ {item.place?.name ?? ''}</div>
-                    </div>
-                    <div className="text-sm text-gray-700 dark:text-gray-300">{item.quantity} 個</div>
-                  </div>
-
-                  {item.memo && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{item.memo}</p>}
-
-                  <div className="mt-3 flex justify-end">
-                    <Link href={route("items.edit", item.id)} className="text-indigo-600 hover:text-indigo-900">
-                      編集
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+          <div className="flex flex-col gap-3">
+            {items.map((item) => (
+              <ItemCard key={item.id} item={item} />
+            ))}
+          </div>
         )}
       </div>
+
+      <Link
+        href={route("items.create")}
+        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-1 rounded-2xl bg-accent px-5 py-3 text-sm font-bold text-accent-ink shadow-card motion-safe:active:scale-95"
+      >
+        <MdAdd className="h-5 w-5" />
+        登録
+      </Link>
     </Authenticated>
   );
 }

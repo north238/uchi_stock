@@ -55,9 +55,9 @@ export default function DeleteUserForm({
   return (
     <section className={`space-y-6 ${className}`}>
       <header>
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">アカウント削除</h2>
+        <h2 className="text-lg font-medium text-ink">アカウント削除</h2>
 
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-muted">
           アカウントを削除すると、すべてのリソースとデータが完全に削除されます。
           <br />
           削除したアカウントは復元できませんのでご注意ください。
@@ -67,7 +67,7 @@ export default function DeleteUserForm({
       </header>
 
       {auth.user.is_password_set === false ? (
-        <p className="mt-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm font-semibold text-muted">
           アカウントを削除するには、まずパスワードを設定してください。
         </p>
       ) : (
@@ -76,11 +76,9 @@ export default function DeleteUserForm({
 
       <Modal show={confirmingUserDeletion} onClose={closeModal} maxWidth="md">
         <form onSubmit={deleteUser} className="p-6">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            アカウント削除を実行しますか？
-          </h2>
+          <h2 className="text-lg font-medium text-ink">アカウント削除を実行しますか？</h2>
 
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted">
             アカウントを削除すると、すべてのリソースとデータが完全に削除されます。
             <br />
             削除したアカウントは復元できませんのでご注意ください。

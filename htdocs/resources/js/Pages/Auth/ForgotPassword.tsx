@@ -21,13 +21,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
     <GuestLayout>
       <Head title="パスワード再設定" />
 
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      <div className="mb-4 text-sm text-muted">
         パスワード再設定用のメールアドレスを入力してください。
       </div>
 
-      {status && (
-        <div className="mb-4 font-medium text-sm text-green-600 dark:text-green-400">{status}</div>
-      )}
+      {status && <div className="mb-4 font-medium text-sm text-ink">{status}</div>}
 
       <form onSubmit={submit} className="space-y-3">
         <InputLabel htmlFor="email" value="メールアドレス" />
@@ -54,7 +52,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
           </PrimaryButton>
           <Link
             href={route("login")}
-            className="underline text-sm text-LINK01 hover:text-blue-700 dark:hover:text-blue-100 visited:text-LINK02"
+            className="underline text-sm text-accent hover:text-ink"
           >
             ログイン画面に戻る
           </Link>

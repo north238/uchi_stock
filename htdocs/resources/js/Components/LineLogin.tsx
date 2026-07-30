@@ -10,7 +10,7 @@ export default function LineLogin({
     <button
       {...props}
       className={
-        `relative inline-flex justify-center w-full p-2 h-10 hover:opacity-90 bg-LINE01 text-white font-bold rounded-md ${
+        `relative inline-flex justify-center w-full p-2 h-10 hover:opacity-90 bg-LINE01 text-white font-bold text-base rounded-md ${
           disabled && "opacity-25"
         } ` + className
       }

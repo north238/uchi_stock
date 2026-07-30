@@ -1,13 +1,15 @@
 import Form from "./Partials/Form";
-import { usePage, useForm, Head } from "@inertiajs/react";
+import { useForm, Head, Link } from "@inertiajs/react";
+import { MdArrowBack } from "react-icons/md";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
+import { ItemStatusValue } from "@/constants/itemStatus";
 
 export default function Create({ auth }: PageProps) {
-  const { apiUrl } = usePage<{ apiUrl: string }>().props;
   const form = useForm({
     name: "",
-    quantity: 1,
+    status: "in_stock" as ItemStatusValue,
+    quantity: null as number | null,
     memo: "",
     genre_id: null,
     place_id: null,
@@ -19,7 +21,7 @@ export default function Create({ auth }: PageProps) {
     post(route("items.store"), {
       preserveScroll: true,
       onSuccess: () => {
-        reset("name", "quantity", "memo", "genre_id", "place_id");
+        reset("name", "status", "quantity", "memo", "genre_id", "place_id");
       },
     });
   };
@@ -29,11 +31,19 @@ export default function Create({ auth }: PageProps) {
       user={auth.user}
     >
       <Head title="アイテム登録" />
+      <div className="mx-auto max-w-xl px-4 pt-6 sm:px-6 lg:px-8">
+        <Link
+          href={route("items.index")}
+          className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink"
+        >
+          <MdArrowBack className="h-4 w-4" />
+          戻る
+        </Link>
+      </div>
       <Form
         data={data}
         setData={setData}
         onSubmit={handleSubmit}
-        apiUrl={apiUrl}
         errors={errors}
         processing={processing}
       />

@@ -23,8 +23,8 @@ export default function Guest({ children }: PropsWithChildren) {
     }
   }, [flash]);
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-sm sm:p-6 p-4 sm:mx-0 mx-2 bg-white dark:bg-gray-800 rounded-md shadow-lg">
+    <div className="flex items-center justify-center min-h-screen bg-paper">
+      <div className="w-full max-w-sm sm:p-6 p-4 sm:mx-0 mx-2 bg-surface rounded-[20px] shadow-card border border-line">
         {children}
       </div>
     </div>

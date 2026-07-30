@@ -3,7 +3,6 @@
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +60,9 @@ Route::middleware(['auth', 'check.group'])->group(function () {
         Route::get('/{id}', [ItemController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/{id}', [ItemController::class, 'destroy'])->name('destroy');
+        Route::patch('/{id}/status', [ItemController::class, 'updateStatus'])->name('status.update');
+        Route::post('/{id}/purchase', [ItemController::class, 'storePurchase'])->name('purchase.store');
+        Route::delete('/{id}/purchase/latest', [ItemController::class, 'destroyLatestPurchase'])->name('purchase.destroy');
     });
 });
 

@@ -28,9 +28,9 @@ export default function LeaveGroupForm({
   return (
     <section className={`space-y-6 ${className}`}>
       <header>
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">グループ脱退</h2>
+        <h2 className="text-lg font-medium text-ink">グループ脱退</h2>
 
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-muted">
           グループを脱退すると、作成したアイテムの情報は管理できなくなります。
           <br />
           脱退後は、グループのメンバーとしての権限がなくなります。

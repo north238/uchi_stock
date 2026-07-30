@@ -17,7 +17,7 @@ export default function SaveButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      variant="success"
+      variant="primary"
     >
       {label}
     </Button>

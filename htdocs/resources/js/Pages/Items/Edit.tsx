@@ -2,21 +2,24 @@ import Form from "./Partials/Form";
 import { usePage, useForm, Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
+import { ItemStatusValue } from "@/constants/itemStatus";
 
 interface Item {
   id: number;
   name: string;
-  quantity: number;
+  status: ItemStatusValue;
+  quantity: number | null;
   genre_id: number | null;
   place_id: number | null;
 }
 
 export default function Edit({ auth }: PageProps) {
-  const { apiUrl, item } = usePage<{ apiUrl: string; item: Item }>().props;
+  const { item } = usePage<{ item: Item }>().props;
 
   const form = useForm({
     name: item?.name ?? "",
-    quantity: item?.quantity ?? 1,
+    status: item?.status ?? ("in_stock" as ItemStatusValue),
+    quantity: item?.quantity ?? null,
     memo: "",
     genre_id: item?.genre_id ?? null,
     place_id: item?.place_id ?? null,
@@ -39,7 +42,6 @@ export default function Edit({ auth }: PageProps) {
         data={data}
         setData={setData}
         onSubmit={handleSubmit}
-        apiUrl={apiUrl}
         errors={errors}
         processing={processing}
       />

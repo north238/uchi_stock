@@ -18,7 +18,7 @@ createInertiaApp({
 
     root.render(
       <>
-        <ToastContainer />
+        <ToastContainer toastClassName="!bg-ink !text-surface !rounded-lg" />
         <App {...props} />
       </>
     );

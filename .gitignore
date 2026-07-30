@@ -2,3 +2,6 @@
 whisper/__pycache__/
 *.pyc
 .DS_Store
+
+# LLM
+.claude

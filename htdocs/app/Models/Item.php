@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ItemStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,6 +13,7 @@ class Item extends Model
 
     protected $fillable = [
         'name',
+        'status',
         'quantity',
         'is_favorite',
         'memo',
@@ -19,6 +21,10 @@ class Item extends Model
         'place_id',
         'group_id',
         'created_by',
+    ];
+
+    protected $casts = [
+        'status' => ItemStatus::class,
     ];
 
     protected $dates = [
@@ -40,6 +46,10 @@ class Item extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function purchaseHistories()
+    {
+        return $this->hasMany(PurchaseHistory::class);
     }
 
     /**
@@ -66,16 +76,30 @@ class Item extends Model
 
     /**
      * グループIDに基づくアイテムデータの取得
+     *
+     * @param int|null $groupId グループID
+     * @param string $sort 並び順（'status'=状態順（既定） / 'purchased'=前回購入が古い順）
      */
-    public function getItemsByGroupId(?int $groupId)
+    public function getItemsByGroupId(?int $groupId, string $sort = 'status')
     {
         if (is_null($groupId)) {
-            return null;
+            return collect();
         }
 
-        return $this->with(['genre', 'place'])
-            ->where('group_id', $groupId)
-            ->get();
+        $query = $this->with(['genre', 'place'])
+            ->withMax('purchaseHistories as last_purchased_at', 'purchased_at')
+            ->where('group_id', $groupId);
+
+        if ($sort === 'purchased') {
+            // 前回購入が古い順（記録なし=NULL を先頭）
+            $query->orderByRaw('last_purchased_at IS NOT NULL, last_purchased_at ASC');
+        } else {
+            // 状態順（out→low→in_stock）、同状態は前回購入が古い順（NULL 先頭）
+            $query->orderByRaw("FIELD(status, 'out', 'low', 'in_stock')")
+                ->orderByRaw('last_purchased_at IS NOT NULL, last_purchased_at ASC');
+        }
+
+        return $query->get();
     }
 
     /**

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('アイテム名');
-            $table->integer('quantity')->default(1)->comment('数量');
+            $table->integer('quantity')->nullable()->default(null)->comment('数量(任意)');
             $table->integer('is_favorite')->default(0)->comment('お気に入りフラグ');
             $table->string('memo')->nullable()->comment('メモ');
             $table->foreignId('genre_id')->nullable()->constrained('genres')->nullOnDelete()->comment('ジャンルID'); // ジャンル削除時 NULL にする
