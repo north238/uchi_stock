@@ -17,7 +17,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 OUTFILE="$BACKUP_DIR/uchistock_${TIMESTAMP}.sql.gz"
 
 echo "==> dump 開始: $OUTFILE"
-docker compose -f docker-compose.prod.yml exec -T db \
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T db \
   mysqldump -u"${DB_USERNAME}" -p"${DB_PASSWORD}" \
   --single-transaction --quick --lock-tables=false \
   "${DB_DATABASE}" | gzip > "$OUTFILE"

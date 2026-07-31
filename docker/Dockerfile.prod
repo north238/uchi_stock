@@ -11,12 +11,13 @@ COPY ./htdocs/composer.json ./htdocs/composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # ---- Build stage: フロントエンド（Vite）----
+# 【必須】vendor を入れること。Ziggy（tightenco/ziggy）は composer パッケージで、
+# tsc が ../../vendor/tightenco/ziggy を型解決に使うため、無いと TS2307 でビルド失敗する。
 FROM node:18-alpine AS frontend
 WORKDIR /app
 COPY ./htdocs/package.json ./htdocs/package-lock.json ./
 RUN npm ci
 COPY ./htdocs ./
-# vendor を先に入れておく（ビルドで参照される場合に備える）
 COPY --from=vendor /app/vendor ./vendor
 RUN npm run build
 
@@ -65,3 +66,20 @@ RUN chown -R www-data:www-data /var/www/html \
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.prod.sh"]
 CMD ["php-fpm", "-F"]
+
+# ---- Final stage: 本番 Nginx ----
+FROM nginx:stable-alpine AS nginx
+
+WORKDIR /var/www/html
+
+COPY ./docker/nginx/default.prod.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/nginx/nginx.prod.conf   /etc/nginx/nginx.conf
+
+# 静的配信対象：public 本体 ＋ 上の frontend ステージのビルド成果物
+COPY ./htdocs/public /var/www/html/public
+COPY --from=frontend /app/public/build /var/www/html/public/build
+
+RUN adduser -s /bin/sh -D -G www-data www-data 2>/dev/null || true \
+    && chown -R www-data:www-data /var/www/html
+
+CMD ["nginx", "-g", "daemon off;"]
