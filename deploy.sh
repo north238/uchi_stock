@@ -17,7 +17,7 @@ docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml build
 echo "==> コンテナ起動（storage:link・キャッシュ最適化は entrypoint が実行）"
 # 判断 A: アセットはイメージ内に焼き込み済みのため volume 削除の小細工は不要。
 # opcache.validate_timestamps=0 のため、再ビルド＋recreate で確実に新コードへ差し替わる。
-docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml up -d --build
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml up -d --force-recreate
 
 echo "==> マイグレーション"
 docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T app php artisan migrate --force
