@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-08-02
-現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一、アイテム編集の遷移先修正、「アイテム」→「ストック」表記統一、ボタン表記とアクションの整合性修正も完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
+現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一、アイテム編集の遷移先修正、「アイテム」→「ストック」表記統一、ボタン表記とアクションの整合性修正、ナビゲーション崩れの根本修正も完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
 作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -237,6 +237,8 @@
 ---
 
 ## 進捗メモ（新しいものを上に）
+
+- 2026-08-02: 本番PR受け入れ後、ユーザーから「ナビヘッダーの幅変更（Phase 12・`max-w-page`）によりユーザー名が長い場合にPC表示でアバター画像が崩れる」との報告を受け、根本原因を調査・修正。**根本原因**: `AuthenticatedLayout.tsx`のデスクトップナビ行に、Flexboxの既定挙動（`min-width: auto`によりtruncateが効かない、CJKテキストの既定折り返し）に対するガードが元々欠けており、`max-w-7xl`(1280px)の余裕で潜在していたのが`max-w-page`(576px)で顕在化したもの。**ユーザーとの検討**: 幅を戻す対症療法ではなく根本修正を選択。その過程で「在庫管理」`NavLink`がロゴ（`/`）と遷移先重複であることが判明し、デスクトップ側は削除（モバイルの`ResponsiveNavLink`は維持）と決定。**対応**: `NavLink.tsx`を削除、アバターラッパーに`shrink-0`、ドロップダウンのトリガー`button`を`flex w-full min-w-0`に変更し冗長な`span`ラッパーを除去、グループ名/ユーザー名の`truncate`要素に`w-full`、チェブロンアイコンに`shrink-0`を付与。これにより横幅不足時は常にグループ名/ユーザー名側だけが省略記号で縮む構成に統一。`docs/04`§6.4に反映。**検証**: `php artisan test`全49件パス、`npm run tsc`/`lint`（既存9件のみ）/`build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 
 - 2026-08-02: ボタン表記とアクションの整合性をユーザー指摘により調査・修正。**発見事項**: 全画面の見出し・ボタンラベルを一覧化した結果、「登録」「作成」系の見出しなのに保存ボタンが「保存」のままになっている箇所が2件（`Items/Create.tsx`→共有`Form.tsx`、`Group/Create.tsx`）、加えて`SelectableWithAdd.tsx`の「新規追加」モーダルも`SaveButton`のデフォルト値「保存」のままで同種の不整合があった。他の編集(Update)・削除(Delete)系画面（`UpdateGroupForm`・`Profile`配下・`DeleteGroupForm`・`LeaveGroupForm`）はすべて「動詞+する」で見出しとボタンが一致していることを確認。**対応**: `Items/Partials/Form.tsx`の`ItemFormProps`に`submitLabel`propを追加しボタン文言のハードコードを廃止、`Items/Create.tsx`は「登録する」、`Items/Edit.tsx`は他の編集系画面と揃えて「更新する」を渡すよう変更（ユーザー確認済み）。`Group/Create.tsx`は「保存」→「作成する」に変更。`SelectableWithAdd.tsx`の`SaveButton`に`label="追加する"`を明示指定。ボタンの色・トークンは変更せず文言のみの修正。**検証**: `grep`でボタン文言をアサートするテストが存在しないことを確認済み。`php artisan test`全49件パス（回帰なし）、`npm run tsc`/`lint`（既存9件のみ）/`build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 

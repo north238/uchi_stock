@@ -284,7 +284,9 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - 背景 `bg-gray-100 dark:bg-gray-900` → `bg-paper`。
 - ナビ／ヘッダー `bg-white dark:bg-gray-800` → `bg-surface`、境界 `border-line`。
 - アクティブ `NavLink` の下線・強調を `accent` に（現状 indigo/blue）。
+  - **2026-08-02 追記**: デスクトップ用の「在庫管理」`NavLink`はロゴ（`/`）と遷移先が重複する単一機能アプリのため削除し、`Components/NavLink.tsx`も削除済み。モバイルのハンバーガーメニュー（`ResponsiveNavLink`）には引き続き「在庫管理」の項目を残す。
 - ドロップダウン起点ボタン・アバターもトークン化。グループ未所属の強制モーダルは §6.6 の Modal 規定に従う（ボタンは §6.2 準拠）。
+  - **2026-08-02 追記（ナビの崩れ対策）**: ユーザー名・グループ名が長い場合、Flexboxの既定挙動（`min-width: auto`）により`truncate`が効かずアバターが圧縮される不具合があった。アバターのラッパーに`shrink-0`、ドロップダウンのトリガー`button`とその子孫チェーンに`min-w-0`／各`truncate`要素に`w-full`、チェブロンアイコンに`shrink-0`を付与し、横幅が不足した際は常にグループ名/ユーザー名側だけが省略記号で縮む構成に統一した。
 - **スクロール構造（Phase 12 で確定・禁止事項）**: ルート要素は `min-h-screen`（ドキュメントスクロール）とする。`h-screen` ＋ `main` の内部スクロール（`overflow-y-auto`）は、内部スクロールが機能しない条件下で画面下部に到達できなくなる不具合を起こすため**禁止**。ナビは `sticky top-0 z-30` で固定し、ナビ内側の最大幅は `max-w-page`（§2.2）。
 
 **`header` prop は廃止済み（Phase 12）**。全画面は §6.10 の `PageContainer` + `PageHeading` でページ骨格を組む。
