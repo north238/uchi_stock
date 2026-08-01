@@ -55,6 +55,7 @@ export default function Edit({ auth }: PageProps) {
             onSubmit={handleSubmit}
             errors={errors}
             processing={processing}
+            submitLabel="更新する"
           />
         </div>
       </PageContainer>

@@ -93,7 +93,7 @@ export default function SelectableWithAdd({
           />
           <div className="mt-4 flex justify-end gap-2">
             <CancelButton onClick={() => setIsOpen(false)} />
-            <SaveButton onClick={handleSubmit} />
+            <SaveButton onClick={handleSubmit} label="追加する" />
           </div>
         </div>
       </Modal>

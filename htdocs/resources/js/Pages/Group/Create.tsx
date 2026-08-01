@@ -90,7 +90,7 @@ export default function Create({ auth }: PageProps) {
               <InputError message={errors.status} className="mt-2" />
             </div>
             <div className="mt-8">
-              <PrimaryButton disabled={processing}>保存</PrimaryButton>
+              <PrimaryButton disabled={processing}>作成する</PrimaryButton>
             </div>
           </form>
         </div>

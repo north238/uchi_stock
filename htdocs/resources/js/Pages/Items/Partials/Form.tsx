@@ -30,6 +30,7 @@ interface ItemFormProps {
   onSubmit: () => void | Promise<void>;
   errors?: Partial<Record<keyof FormItemFields, string>>;
   processing: boolean;
+  submitLabel: string;
 }
 /* eslint-enable @typescript-eslint/no-unused-vars, no-unused-vars */
 
@@ -39,6 +40,7 @@ export default function Form({
   onSubmit,
   errors,
   processing,
+  submitLabel,
 }: ItemFormProps) {
   const [isGenreModalOpen, setIsGenreModalOpen] = useState(false);
   const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
@@ -208,7 +210,7 @@ export default function Form({
         </div>
 
         <PrimaryButton type="submit" disabled={processing || nameEmpty}>
-          保存
+          {submitLabel}
         </PrimaryButton>
       </form>
     </div>

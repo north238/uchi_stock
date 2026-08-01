@@ -47,6 +47,7 @@ export default function Create({ auth }: PageProps) {
             onSubmit={handleSubmit}
             errors={errors}
             processing={processing}
+            submitLabel="登録する"
           />
         </div>
       </PageContainer>
