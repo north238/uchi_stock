@@ -44,8 +44,8 @@ export default function Authenticated({
   }, [user]);
 
   return (
-    <div className="flex flex-col h-screen bg-paper">
-      <nav className="bg-surface border-b border-line">
+    <div className="flex flex-col min-h-screen bg-paper">
+      <nav className="bg-surface border-b border-line sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -174,7 +174,7 @@ export default function Authenticated({
         </header>
       )}
 
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1">{children}</main>
 
       {forceModal && (
         <Modal
