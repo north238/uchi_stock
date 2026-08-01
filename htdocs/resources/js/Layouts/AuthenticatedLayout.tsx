@@ -46,7 +46,7 @@ export default function Authenticated({
   return (
     <div className="flex flex-col min-h-screen bg-paper">
       <nav className="bg-surface border-b border-line sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="shrink-0 flex items-center">
@@ -146,23 +146,25 @@ export default function Authenticated({
         </div>
 
         <div className={(showingNavigationDropdown ? "block" : "hidden") + " sm:hidden"}>
-          <div className="pt-2 pb-3 space-y-1">
-            <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
-              在庫管理
-            </ResponsiveNavLink>
-          </div>
-
-          <div className="pt-4 pb-1 border-t border-line">
-            <div className="px-4">
-              <div className="font-medium text-base text-ink">{user.name}</div>
-              <div className="font-medium text-sm text-muted">{user.email}</div>
+          <div className="max-w-page mx-auto">
+            <div className="pt-2 pb-3 space-y-1">
+              <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
+                在庫管理
+              </ResponsiveNavLink>
             </div>
 
-            <div className="mt-3 space-y-1">
-              <ResponsiveNavLink href={route("profile.edit")}>プロフィール</ResponsiveNavLink>
-              <ResponsiveNavLink method="post" href={route("logout")} as="button">
-                ログアウト
-              </ResponsiveNavLink>
+            <div className="pt-4 pb-1 border-t border-line">
+              <div className="px-4">
+                <div className="font-medium text-base text-ink">{user.name}</div>
+                <div className="font-medium text-sm text-muted">{user.email}</div>
+              </div>
+
+              <div className="mt-3 space-y-1">
+                <ResponsiveNavLink href={route("profile.edit")}>プロフィール</ResponsiveNavLink>
+                <ResponsiveNavLink method="post" href={route("logout")} as="button">
+                  ログアウト
+                </ResponsiveNavLink>
+              </div>
             </div>
           </div>
         </div>
