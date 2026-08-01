@@ -112,7 +112,7 @@ export default function Form({
   };
 
   return (
-    <div className="p-4 sm:p-8 bg-surface shadow-card sm:rounded-[20px]">
+    <div className="p-4 sm:p-8 bg-surface shadow-card rounded-[20px]">
       {error && <div className="text-danger mb-4">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-2">
         <div>

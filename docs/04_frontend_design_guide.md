@@ -293,6 +293,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 
 - 背景 `bg-gray-50 dark:bg-gray-900` → `bg-paper`。
 - カード `bg-white dark:bg-gray-800 rounded-md shadow-lg` → `bg-surface rounded-[20px] shadow-card border border-line`。`max-w-sm` は維持。
+- **パディングは `p-4 sm:p-8`（2026-08-02 確定）**。他画面のパネル（`PageContainer` 配下）と揃える。`border border-line` はダイアログ的な強調として維持し、他パネルとは統一しない（Modal と同じ扱い）。
 
 ### 6.5 共通入力・フォーム部品
 
@@ -354,6 +355,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - **`Components/PageContainer.tsx`**: `mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-8`。本文の外側コンテナは常にこれを使う。個別の余白調整は `className` で追記する（例: Items一覧の `pb-24`）。
 - **`Components/PageHeading.tsx`**: `<h1 className="text-xl font-bold text-ink">`。ページタイトルは常にこれを使う。
 - パネル（カード）要素のパディングは **`p-4 sm:p-8` のみ**とする。`p-*` と `px-*`/`py-*` を同一要素に併記しない（Tailwindの生成順で後勝ちになり、意図しないクラスが無効化される事故のもと）。
+- **パネルの角丸は `rounded-[20px]` をブレークポイント問わず常時適用する**（2026-08-02 確定）。`PageContainer` は全ブレークポイントで `px-4` 以上の余白を確保しており、パネルが画面端に接すること（フルブリード）はないため、`sm:rounded-[20px]` のようにモバイルのみ直角にする理由がない。過去の実装で `sm:` を付けたまま踏襲された箇所があったため、以後は付けない。
 - 1000px 級の1カラムは採らない（`docs/02` §7「3秒で判断」に反するため）。本文幅は576px（`max-w-page`）に統一。カードの2カラム化（`lg`以上）は将来の選択肢として保留。
 
 **z-index の対応表**（衝突防止のため明文化）:

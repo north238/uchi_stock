@@ -32,7 +32,7 @@ export default function Create({ auth }: PageProps) {
       <Head title="グループ作成" />
       <PageContainer>
         <PageHeading>グループ作成</PageHeading>
-        <div className="mt-4 p-4 sm:p-8 bg-surface border border-line shadow-card sm:rounded-[20px]">
+        <div className="mt-4 p-4 sm:p-8 bg-surface border border-line shadow-card rounded-[20px]">
           <header>
             <p className="text-sm text-muted">
               グループ名、説明、公開設定を設定できます。

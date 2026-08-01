@@ -20,7 +20,7 @@ export default function Edit({
       <PageContainer>
         <PageHeading>プロフィール</PageHeading>
         <div className="mt-4 space-y-6">
-          <div className="p-4 sm:p-8 bg-surface shadow-card sm:rounded-[20px]">
+          <div className="p-4 sm:p-8 bg-surface shadow-card rounded-[20px]">
             <UpdateProfileInformationForm
               mustVerifyEmail={mustVerifyEmail}
               status={status}
@@ -30,17 +30,17 @@ export default function Edit({
 
           {auth.user.is_password_set === false ? (
             // パスワード未設定なら「新規登録フォーム」を表示
-            <div className="p-4 sm:p-8 bg-surface shadow-card sm:rounded-[20px]">
+            <div className="p-4 sm:p-8 bg-surface shadow-card rounded-[20px]">
               <RegisterPasswordForm className="max-w-xl" />
             </div>
           ) : (
             // すでにパスワードがあるなら「パスワード更新フォーム」を表示
-            <div className="p-4 sm:p-8 bg-surface shadow-card sm:rounded-[20px]">
+            <div className="p-4 sm:p-8 bg-surface shadow-card rounded-[20px]">
               <UpdatePasswordForm className="max-w-xl" />
             </div>
           )}
 
-          <div className="p-4 sm:p-8 bg-surface border-2 border-danger shadow-card sm:rounded-[20px]">
+          <div className="p-4 sm:p-8 bg-surface border-2 border-danger shadow-card rounded-[20px]">
             <DeleteUserForm className="max-w-xl" auth={auth} />
           </div>
         </div>

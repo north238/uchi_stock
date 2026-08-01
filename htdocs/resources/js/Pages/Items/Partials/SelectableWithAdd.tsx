@@ -88,7 +88,7 @@ export default function SelectableWithAdd({
             name={name}
             onChange={(e) => setNewValue(e.target.value)}
             placeholder={`${label}名を入力`}
-            className="border rounded w-full"
+            className="w-full"
             isFocused={true}
           />
           <div className="mt-4 flex justify-end gap-2">
