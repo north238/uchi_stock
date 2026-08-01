@@ -33,8 +33,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
     e.preventDefault();
     setDisabled(true);
 
-    const baseUrl = import.meta.env.VITE_APP_URL || "http://localhost:8080";
-    window.location.href = `${baseUrl}/login/line/redirect`;
+    window.location.href = "/login/line/redirect";
   };
 
   return (
@@ -108,10 +107,7 @@ export default function Login({ canResetPassword }: { canResetPassword: boolean 
 
         <div className="flex flex-col items-center justify-center gap-2">
           <PrimaryButton disabled={processing}>ログイン</PrimaryButton>
-          <Link
-            href={route("register")}
-            className="underline text-sm text-accent hover:text-ink"
-          >
+          <Link href={route("register")} className="underline text-sm text-accent hover:text-ink">
             新規登録はお済みですか？
           </Link>
         </div>
