@@ -18,6 +18,12 @@ services:
     networks:
       - uchistock_prod_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", 'mysqladmin ping -h 127.0.0.1 -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   redis:
     container_name: uchistock-redis-prod
@@ -45,8 +51,10 @@ services:
       - REDIS_PORT=6379
     # 判断 B: アバターは LINE ログイン毎に再生成される揮発データのため永続化 volume なし
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - uchistock_prod_network
     restart: unless-stopped
