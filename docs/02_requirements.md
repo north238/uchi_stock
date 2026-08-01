@@ -106,9 +106,11 @@ UchiStock は「日用品の購入時に『家にまだあるか』を家族に�
 - 認証まわり（Laravel Breeze / セッション認証）
 - グループ機能（自動生成の仕組み含む）
 - Docker 構成（docker-compose、各 Dockerfile）
-- ジャンル・保管場所の管理機能
+- 保管場所の管理機能
 
 > **2026-07-24 追記**: 音声入力機能（`VoiceInput.tsx`、whisper サービス、`api.voice.transcribe`）は、対応する Whisper API が用意されておらず実質使用不可であることが判明したため、上記の変更禁止対象から除外し、**削除予定**の扱いに変更した。削除の実施は本書・`docs/03`・`docs/04`・`CLAUDE.md` のドキュメント更新が完了した後、別タスク（`docs/05` Phase 11）として着手する。ドキュメント更新前にコードを削除しないこと。
+>
+> **2026-08-01 追記**: ジャンルの管理機能（`Genre` / `Api/GenreController` / `colors`）は、画面上でColorが一切利用されていないことが判明したため、上記の変更禁止対象から除外した（開発者本人合意済み）。Color切り離しとジャンル登録APIの改修は `docs/08_genre_color_removal.md`（Phase 13）として実施する。保管場所（`Place` / `Api/PlaceController`）は引き続き変更禁止のまま。
 
 ## 6. スコープ外（作らないもの）
 

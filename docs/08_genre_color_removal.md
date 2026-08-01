@@ -177,7 +177,7 @@ public function store(Request $request)
 
 ### 4-4. フロント
 
-`resources/js/api/optionsApi.ts` の `addGenre` / `addPlace` に戻り値の型を付ける（実装の詳細は `docs/07` §6-2 を参照）。
+`resources/js/api/optionsApi.ts` の `addGenre` / `addPlace` に戻り値の型を付ける（実装の詳細は `docs/09` §6-2 を参照）。
 
 ```ts
 export type AddOptionResponse = {

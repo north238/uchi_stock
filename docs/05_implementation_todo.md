@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
-最終更新: 2026-07-26
-現在地: **Phase 11 完了**（音声入力機能の削除まで完了）
+最終更新: 2026-08-01
+現在地: **Phase 13 着手中**（ジャンルのColor切り離し。完了後 Phase 12〔UI一貫性・不具合修正〕へ）
 作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -30,6 +30,8 @@
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ✅ 完了 |
 | 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ✅ 完了 |
 | 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | ✅ 完了 |
+| 13 | ジャンルのColor切り離し・登録API改修 | 08 | 🟡 着手中 |
+| 12 | UI一貫性・不具合修正 | 09 / 04（事後反映） | ⬜ 未着手（Phase 13完了待ち） |
 
 状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
 
@@ -181,6 +183,48 @@
   - (a) ジャンルごとの色分け表示ニーズが顕在化した場合、`Color`/`colors`をそのまま活用してUIを実装する。
   - (b) 恒久的に不要と判断した場合、`Color`モデル・`colors`テーブル・`ColorsTableSeeder`・`Genre.color_id`カラム・リレーションを削除する（新規migrationでdrop、既存migrationは編集しない）。
 - **注意**: `Genre`関連ファイルは CLAUDE.md §8「変更禁止: ジャンル・保管場所の管理機能」の対象に含まれる。(b)を実施する場合も含め、着手前に必ずユーザーの明示的な合意を取ること。
+- **決着（2026-08-01）**: 選択肢 (b) を採用。開発者本人の明示的な合意を取得済み。詳細は `docs/08_genre_color_removal.md`（Phase 13）を参照。CLAUDE.md §8・`docs/02` §5 の変更禁止事項からジャンルを除外済み（保管場所は引き続き変更禁止）。
+
+---
+
+## Phase 13: ジャンルのColor切り離し・登録API整理 [08]
+
+`docs/08_genre_color_removal.md` の指示書に基づく。ドキュメント先行更新（本節含む）はコード変更前の単独コミットとして完了済み。
+
+- [x] ドキュメント更新: `CLAUDE.md` §8 の変更禁止からジャンルを除外 [08 §1]
+- [x] ドキュメント更新: `docs/02` §5 に同旨を注記 [08 §1]
+- [x] ドキュメント更新: 本ファイルのバックログ「Color関連」に決着を追記、本節を新設 [08 §1]
+- [ ] マイグレーション追加: `genres.color_id` と `colors` テーブルを削除（新規migration、既存は編集しない）[08 §3]
+- [ ] `app/Models/Genre.php`: `color_id`（fillable）・`color()`リレーション・`with('color')`を削除 [08 §4-1]
+- [ ] `app/Models/Color.php` を削除 [08 §4-1]
+- [ ] `database/seeders/ColorsTableSeeder.php` を削除し `DatabaseSeeder.php` から呼び出しを削除 [08 §4-1]
+- [ ] `Api/GenreController::store()`: `color_id`削除・`data`返却・201化・文言修正 [08 §4-2]
+- [ ] `Api/PlaceController::store()`: `data`返却のみ追加（他は変更しない）[08 §4-3]
+- [ ] `resources/js/api/optionsApi.ts`: `addGenre`/`addPlace`に戻り値の型付与 [08 §4-4]
+- [ ] `tests/Feature/GenreApiTest.php` 新規作成（ジャンル・保管場所双方のFeatureテスト）[08 §5]
+- [ ] `php artisan migrate` / `migrate:fresh --seed` 成功、`genres.color_id`/`colors`不在を確認 [08 §8]
+- [ ] `grep -rn "color" htdocs/app htdocs/database htdocs/resources` で残存参照なしを確認 [08 §8]
+- [ ] ブラウザでジャンル・保管場所セレクトが従来通り動作することを確認 [08 §8]
+
+## Phase 12: UI一貫性・不具合修正 [09]
+
+`docs/09_ui_consistency_fixes.md` の指示書に基づく。§6-2（追加直後の自動選択）は Phase 13 完了後に着手する。
+
+> **注記（2026-08-01）**: 指示書は `Dashboard.tsx`・`Welcome.tsx` の存在を前提に変更対象としているが、この2ファイルは既に削除済みで現存しない（`resources/js/Pages/`配下は`Auth`/`Group`/`Items`/`Profile`のみ）。該当箇所の作業は対象外として扱う。
+
+- [ ] `AuthenticatedLayout.tsx`: `min-h-screen`化・`overflow-y-auto`削除・`<nav>`を`sticky top-0 z-30`に [09 §1]
+- [ ] `tailwind.config.js`: `maxWidth.page`（36rem）新設、ナビ内側幅を統一 [09 §3-0]
+- [ ] `Components/PageContainer.tsx` / `PageHeading.tsx` 新規作成 [09 §3-1,§3-2]
+- [ ] `header` prop廃止、Items/Group/Profile各画面を`PageContainer`+`PageHeading`へ統一（Dashboard/Welcomeは対象外）[09 §2,§3-3]
+- [ ] `Items/Partials/Form.tsx`: 外側`py-6`削除、パネルの競合クラス整理 [09 §3-4]
+- [ ] `Group/Create.tsx`: パネル内`<h2>`見出し重複解消、`lg:py:8`タイポ修正 [09 §2,§3-4]
+- [ ] `Items/Index.tsx`: `PageContainer`に`pb-24`を追加しFABとの重なりを解消 [09 §4]
+- [ ] モバイルメニューにグループ編集/作成の導線を追加 [09 §5]
+- [ ] `SelectableWithAdd.tsx`: `＋追加`をラベル行へ移動し`w-20`固定幅を撤廃 [09 §6-1]
+- [ ] `Items/Partials/Form.tsx`: 追加直後に該当オプションを自動選択（Phase 13完了後）[09 §6-2]
+- [ ] `docs/04_frontend_design_guide.md` へ事後反映（§2.2, §6.4, 新規§6.10, z-index対応表, §5.7, §5.5, §7）[09 §7]
+- [ ] `npm run tsc` / `npm run lint` / `npm run build` 成功、`php artisan test`回帰なし [09 §10]
+- [ ] 全画面でライト/ダーク・PC/スマホ実機を目視確認 [09 §10]
 
 ---
 
