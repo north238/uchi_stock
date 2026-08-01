@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-08-02
-現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一、アイテム編集の遷移先修正、「アイテム」→「ストック」表記統一、ボタン表記とアクションの整合性修正、ナビゲーション崩れの根本修正、画面見出しの「ストック」冗長表現の整理も完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
+現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一、アイテム編集の遷移先修正、「アイテム」→「ストック」表記統一、ボタン表記とアクションの整合性修正、ナビゲーション崩れの根本修正、画面見出しの「ストック」冗長表現の整理、メモ未反映バグの修正も完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
 作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -237,6 +237,8 @@
 ---
 
 ## 進捗メモ（新しいものを上に）
+
+- 2026-08-02: ユーザーから「メモが保存されていないように見える」との報告を受け調査したところ、実際にバグと判明（表示上の問題に留まらず実データ消失を伴う不具合）。**原因**: `Items/Edit.tsx`のローカル`Item`型に`memo`フィールドが定義されておらず、`useForm`の初期値も`memo: ""`にハードコードされていた（`item?.memo`を参照していない）。バックエンド（`ItemController`・`ItemCreateRequest`/`ItemUpdateRequest`・`Item::$fillable`）は`memo`を正しく扱っており問題なし。**実害**: 編集画面を開くと既存メモが常に空欄表示になり、そのままメモ欄に触れず他項目だけ変更して保存すると、空文字列が送信され既存メモが消去されていた。**対応**: `Edit.tsx`の`Item`型に`memo: string | null`を追加し、フォーム初期値を`item?.memo ?? ""`に修正。回帰防止として`tests/Feature/ItemEditTest.php`に編集画面が既存メモを`item.memo`として返すことを検証するテスト、`tests/Feature/ItemUpdateTest.php`に既存メモを保持したまま更新できること・メモを変更できることを検証するテストを追加（このバグは既存テストでは`memo`に触れていなかったため検出できていなかった）。**検証**: `php artisan test`全52件パス（新規3件含む、回帰なし）、`npm run tsc`/`lint`（既存9件のみ）/`build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 
 - 2026-08-02: ナビ崩れ修正後、ユーザーから「単一機能アプリなのに画面見出しで毎回『ストック』を繰り返すのは冗長では」との指摘を受け対応。**方針**: 画面内の見出し（`PageHeading`）とブラウザタブのタイトル（`Head title`）を分離。このアプリはInertiaの`Head`が`resources/views/app.blade.php`の`<title inertia>`を丸ごと上書きしアプリ名サフィックスが付かない作りのため、`Head title`は他タブとの識別のため「ストック一覧」等を維持し、`PageHeading`（ロゴ・ナビが見えている文脈で自明）だけを「一覧」「登録」「編集」に短縮。**対応**: `Items/Index.tsx`・`Create.tsx`・`Edit.tsx`のPageHeadingを短縮（Head titleは無変更）。`AuthenticatedLayout.tsx`のモバイルメニュー`ResponsiveNavLink`も「在庫管理」→「一覧」に統一（遷移先`items.index`の見出しと表記を揃える）。Group/Profile等Items以外の画面は対象外（別ドメインのため）。`docs/04`§6.10に見出し分離の方針を追記。**検証**: `php artisan test`全49件パス、`npm run tsc`/`lint`（既存9件のみ）/`build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 

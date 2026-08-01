@@ -30,6 +30,23 @@ class ItemEditTest extends TestCase
         );
     }
 
+    public function test_edit_screen_includes_existing_memo(): void
+    {
+        $group = Group::create(['name' => 'テストグループ']);
+        $user = User::factory()->create(['group_id' => $group->id]);
+        $item = Item::factory()->create(['group_id' => $group->id, 'memo' => '既存のメモ']);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('items.edit', $item->id));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('Items/Edit')
+                ->where('item.memo', '既存のメモ')
+        );
+    }
+
     public function test_returns_404_for_other_groups_item(): void
     {
         $group = Group::create(['name' => 'テストグループ']);
