@@ -11,14 +11,9 @@ class Genre extends Model
 
     protected $fillable = [
         'name',
-        'color_id',
         'group_id',
     ];
 
-    public function color()
-    {
-        return $this->belongsTo(Color::class, 'color_id');
-    }
     public function group()
     {
         return $this->belongsTo(Group::class, 'group_id');
@@ -30,7 +25,6 @@ class Genre extends Model
     public function getGenresListByGroupId(int $groupId)
     {
         return $this->query()
-            ->with('color')
             ->where('group_id', $groupId)
             ->orderBy('created_at', 'asc')
             ->get();
