@@ -31,7 +31,7 @@ export default function LeaveGroupForm({
         <h2 className="text-lg font-medium text-ink">グループ脱退</h2>
 
         <p className="mt-1 text-sm text-muted">
-          グループを脱退すると、作成したアイテムの情報は管理できなくなります。
+          グループを脱退すると、作成したストックの情報は管理できなくなります。
           <br />
           脱退後は、グループのメンバーとしての権限がなくなります。
           <br />

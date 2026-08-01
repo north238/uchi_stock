@@ -94,7 +94,8 @@ docker-compose exec app npm run format                 # Format
 
 実装時の注意（詳細は要件書 §5, §6 を参照）:
 
-- **変更禁止**: 認証（Breeze/Socialite）、グループ機能、Docker 構成、ジャンル・保管場所管理。
+- **変更禁止**: 認証（Breeze/Socialite）、グループ機能、Docker 構成、保管場所管理。
+  - **2026-08-01 追記**: ジャンル（`Genre` / `Api/GenreController` / `colors`）は Phase 13（`docs/08_genre_color_removal.md`）でColor切り離しのため変更禁止から除外した（開発者本人合意済み）。保管場所は引き続き変更禁止のまま。
 - **スコープ外**: 賞味期限管理、厳密な数量増減、通知、PWA化、購入周期推定 など。
 - 既存マイグレーションは編集せず、新規マイグレーションを追加する。
 - 前回購入日の算出で N+1 を出さない。F-1 / F-2 は Feature テストを追加する。

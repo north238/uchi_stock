@@ -58,6 +58,9 @@ export default {
             boxShadow: {
                 card: "0 1px 2px rgba(30,40,25,.04), 0 6px 20px rgba(30,40,25,.06)",
             },
+            maxWidth: {
+                page: "36rem", // 576px。本文とナビの共通幅
+            },
         },
     },
 

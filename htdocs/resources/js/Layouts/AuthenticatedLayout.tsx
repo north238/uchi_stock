@@ -1,4 +1,4 @@
-import { useEffect, useState, PropsWithChildren, ReactNode } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -21,9 +21,8 @@ type CustomPageProps = {
 
 export default function Authenticated({
   user,
-  header,
   children,
-}: PropsWithChildren<{ user: User; header?: ReactNode }>) {
+}: PropsWithChildren<{ user: User }>) {
   const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
   const [forceModal, setForceModal] = useState(false);
   const { flash, showGroupModal } = usePage<CustomPageProps>().props;
@@ -44,9 +43,9 @@ export default function Authenticated({
   }, [user]);
 
   return (
-    <div className="flex flex-col h-screen bg-paper">
-      <nav className="bg-surface border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col min-h-screen bg-paper">
+      <nav className="bg-surface border-b border-line sticky top-0 z-30">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="shrink-0 flex items-center">
@@ -146,35 +145,38 @@ export default function Authenticated({
         </div>
 
         <div className={(showingNavigationDropdown ? "block" : "hidden") + " sm:hidden"}>
-          <div className="pt-2 pb-3 space-y-1">
-            <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
-              在庫管理
-            </ResponsiveNavLink>
-          </div>
-
-          <div className="pt-4 pb-1 border-t border-line">
-            <div className="px-4">
-              <div className="font-medium text-base text-ink">{user.name}</div>
-              <div className="font-medium text-sm text-muted">{user.email}</div>
+          <div className="max-w-page mx-auto">
+            <div className="pt-2 pb-3 space-y-1">
+              <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
+                在庫管理
+              </ResponsiveNavLink>
             </div>
 
-            <div className="mt-3 space-y-1">
-              <ResponsiveNavLink href={route("profile.edit")}>プロフィール</ResponsiveNavLink>
-              <ResponsiveNavLink method="post" href={route("logout")} as="button">
-                ログアウト
-              </ResponsiveNavLink>
+            <div className="pt-4 pb-1 border-t border-line">
+              <div className="px-4">
+                <div className="font-medium text-base text-ink">{user.name}</div>
+                <div className="font-medium text-sm text-muted">{user.email}</div>
+              </div>
+
+              <div className="mt-3 space-y-1">
+                <ResponsiveNavLink href={route("profile.edit")}>プロフィール</ResponsiveNavLink>
+                {user.group_id ? (
+                  <ResponsiveNavLink href={route("groups.edit", user.group_id)}>
+                    グループ編集
+                  </ResponsiveNavLink>
+                ) : (
+                  <ResponsiveNavLink href={route("groups.create")}>グループ作成</ResponsiveNavLink>
+                )}
+                <ResponsiveNavLink method="post" href={route("logout")} as="button">
+                  ログアウト
+                </ResponsiveNavLink>
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
-      {header && (
-        <header className="bg-surface shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-        </header>
-      )}
-
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1">{children}</main>
 
       {forceModal && (
         <Modal

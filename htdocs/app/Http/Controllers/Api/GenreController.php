@@ -47,34 +47,29 @@ class GenreController extends Controller
     {
         $groupId = Auth::user()->group_id;
         $genreName = $request->input('name');
-        // 返却値を初期化
-        $status = 'success';
-        $message = 'ジャンルを登録しました';
-        $statusCode = 200;
-
-        // 登録データ作成
-        $data = [
-            'name' => $genreName,
-            'group_id' => $groupId,
-            'color_id' => 1, // デフォルトカラーID
-        ];
 
         try {
-            $this->genres->createGenre($data);
+            $genre = $this->genres->createGenre([
+                'name' => $genreName,
+                'group_id' => $groupId,
+            ]);
         } catch (Throwable $e) {
             Log::error('ジャンル登録エラー:', [
                 'message' => $e->getMessage(),
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
-            $status = 'error';
-            $message = 'ジャンルを登録に失敗しました';
-            $statusCode = 500;
+            return response()->json([
+                'status' => 'error',
+                'message' => 'ジャンルの登録に失敗しました',
+                'data' => null,
+            ], 500);
         }
 
         return response()->json([
-            'status' => $status,
-            'message' => $message,
-        ], $statusCode);
+            'status' => 'success',
+            'message' => 'ジャンルを登録しました',
+            'data' => ['id' => $genre->id, 'name' => $genre->name],
+        ], 201);
     }
 }

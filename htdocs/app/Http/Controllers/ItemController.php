@@ -120,7 +120,7 @@ class ItemController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'アイテムの保存に失敗しました。');
+                ->with('error', 'ストックの保存に失敗しました。');
         }
     }
 
@@ -164,8 +164,8 @@ class ItemController extends Controller
 
             // 成功メッセージを表示
             return redirect()
-                ->route('items.edit', ['id' => $id])
-                ->with('success', 'アイテムが更新されました。');
+                ->route('items.index')
+                ->with('success', 'ストックが更新されました。');
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -178,7 +178,7 @@ class ItemController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'アイテムの更新に失敗しました。');
+                ->with('error', 'ストックの更新に失敗しました。');
         }
     }
 
@@ -203,7 +203,7 @@ class ItemController extends Controller
                 'items_id' => $id,
             ]);
 
-            return redirect()->back()->with('success', 'アイテムを削除しました。');
+            return redirect()->back()->with('success', 'ストックを削除しました。');
         } catch (Throwable $e) {
             DB::rollBack();
 
@@ -214,7 +214,7 @@ class ItemController extends Controller
                 'items_id' => $id,
             ]);
 
-            return redirect()->back()->with('error', 'アイテムの削除に失敗しました。');
+            return redirect()->back()->with('error', 'ストックの削除に失敗しました。');
         }
     }
 

@@ -31,7 +31,7 @@ class ItemUpdateTest extends TestCase
                 'quantity' => 3,
             ]);
 
-        $response->assertRedirect(route('items.edit', ['id' => $item->id]));
+        $response->assertRedirect(route('items.index'));
         $response->assertSessionHas('success');
 
         $item->refresh();

@@ -78,6 +78,9 @@ COPY ./docker/nginx/nginx.prod.conf   /etc/nginx/nginx.conf
 # 静的配信対象：public 本体 ＋ 上の frontend ステージのビルド成果物
 COPY ./htdocs/public /var/www/html/public
 COPY --from=frontend /app/public/build /var/www/html/public/build
+# public/storage -> storage/app/public のシンボリックリンク（アバター等の配信用）
+# 実体は docker-compose.prod.yml の storage_public volume で app と共有する
+RUN ln -sfn /var/www/html/storage/app/public /var/www/html/public/storage
 
 RUN adduser -s /bin/sh -D -G www-data www-data 2>/dev/null || true \
     && chown -R www-data:www-data /var/www/html

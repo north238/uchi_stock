@@ -28,7 +28,7 @@ export default function Guest({ children }: PropsWithChildren) {
       <Link href="/" className="mb-6">
         <ApplicationLogo className="block h-10 w-auto text-ink" />
       </Link>
-      <div className="w-full max-w-sm sm:p-6 p-4 sm:mx-0 mx-2 bg-surface rounded-[20px] shadow-card border border-line">
+      <div className="w-full max-w-sm p-4 sm:p-8 sm:mx-0 mx-2 bg-surface rounded-[20px] shadow-card border border-line">
         {children}
       </div>
     </div>

@@ -52,6 +52,7 @@ class PlaceController extends Controller
         $status = 'success';
         $message = '保管場所を登録しました';
         $statusCode = 200;
+        $responseData = null;
 
         // 登録データ作成
         $data = [
@@ -60,7 +61,8 @@ class PlaceController extends Controller
         ];
 
         try {
-            $this->places->createPlace($data);
+            $place = $this->places->createPlace($data);
+            $responseData = ['id' => $place->id, 'name' => $place->name];
         } catch (Throwable $e) {
             Log::error('保管場所登録エラー:', [
                 'message' => $e->getMessage(),
@@ -75,6 +77,7 @@ class PlaceController extends Controller
         return response()->json([
             'status' => $status,
             'message' => $message,
+            'data' => $responseData,
         ], $statusCode);
     }
 }

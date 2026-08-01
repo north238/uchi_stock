@@ -66,7 +66,7 @@ Phase 1（ソロ実運用検証）の中で発見された UI の不整合・不
 
 | 画面                                                   | 現状                                                                                                             |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `Items/Index.tsx`                                      | `header` 未使用。本文内に `<h1 className="text-xl font-bold text-ink">在庫一覧</h1>`                             |
+| `Items/Index.tsx`                                      | `header` 未使用。本文内に `<h1 className="text-xl font-bold text-ink">ストック一覧</h1>`                         |
 | `Items/Create.tsx`                                     | `header` 未使用。本文先頭に「戻る」リンクのみでタイトルなし                                                      |
 | `Items/Edit.tsx`                                       | 「戻る」リンクは対応済み。タイトルなし                                                                           |
 | `Group/Create.tsx` `Group/Edit.tsx` `Profile/Edit.tsx` | `header` prop 使用。`bg-surface shadow` の帯（`max-w-7xl mx-auto py-6 px-4`）が出る                              |
@@ -110,9 +110,9 @@ Phase 1（ソロ実運用検証）の中で発見された UI の不整合・不
 
 | 画面           | タイトル     |
 | -------------- | ------------ |
-| `Items/Index`  | 在庫一覧     |
-| `Items/Create` | アイテム登録 |
-| `Items/Edit`   | アイテム編集 |
+| `Items/Index`  | ストック一覧 |
+| `Items/Create` | ストック登録 |
+| `Items/Edit`   | ストック編集 |
 | `Group/Create` | グループ作成 |
 | `Group/Edit`   | グループ設定 |
 | `Profile/Edit` | プロフィール |
@@ -121,7 +121,7 @@ Phase 1（ソロ実運用検証）の中で発見された UI の不整合・不
 
 ---
 
-## 3. パディングの統一（在庫一覧に合わせる）
+## 3. パディングの統一（ストック一覧に合わせる）
 
 ### 現状の不整合
 
@@ -161,7 +161,7 @@ maxWidth: {
 
 #### 3-1. 共通ページコンテナを新設
 
-`resources/js/Components/PageContainer.tsx` を新規作成し、在庫一覧の値を正とする。
+`resources/js/Components/PageContainer.tsx` を新規作成し、ストック一覧の値を正とする。
 
 ```tsx
 import { PropsWithChildren } from 'react';
@@ -222,7 +222,7 @@ export default function PageHeading({
 
 ### 症状
 
-在庫一覧で、右下固定の FAB（`fixed bottom-6 right-6`）が、最終カードの「買った」ボタン（カード右端配置）と重なって押せない。
+ストック一覧で、右下固定の FAB（`fixed bottom-6 right-6`）が、最終カードの「買った」ボタン（カード右端配置）と重なって押せない。
 
 ### 修正
 

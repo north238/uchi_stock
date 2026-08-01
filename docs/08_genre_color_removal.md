@@ -177,7 +177,7 @@ public function store(Request $request)
 
 ### 4-4. フロント
 
-`resources/js/api/optionsApi.ts` の `addGenre` / `addPlace` に戻り値の型を付ける（実装の詳細は `docs/07` §6-2 を参照）。
+`resources/js/api/optionsApi.ts` の `addGenre` / `addPlace` に戻り値の型を付ける（実装の詳細は `docs/09` §6-2 を参照）。
 
 ```ts
 export type AddOptionResponse = {
@@ -241,5 +241,5 @@ export type AddOptionResponse = {
 - `php artisan migrate:fresh --seed` が成功し、シードが通る（`ColorsTableSeeder` 削除の影響がない）。
 - `php artisan test` がグリーン（新規テストを含む。既知の Auth 系・環境起因の失敗のみ許容）。
 - `grep -rn "color" htdocs/app htdocs/database htdocs/resources` で、`docs/` 以外にジャンル由来の Color 参照が残っていない（`docs/04` のカラートークンは無関係なので対象外）。
-- ブラウザでアイテム登録画面を開き、ジャンル・保管場所のセレクトが従来どおり表示・選択・追加できる（表示上の変化がないこと）。
+- ブラウザでストック登録画面を開き、ジャンル・保管場所のセレクトが従来どおり表示・選択・追加できる（表示上の変化がないこと）。
 - `git diff` に、認証・グループ機能・Docker 構成の差分が含まれていない。保管場所は §4-3 の `data` 追加のみ。
