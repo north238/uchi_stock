@@ -351,6 +351,16 @@ services:
     networks:
       - uchistock_prod_network
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'mysqladmin ping -h 127.0.0.1 -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" --silent',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   redis:
     container_name: uchistock-redis-prod
@@ -378,8 +388,10 @@ services:
       - REDIS_PORT=6379
     # 判断 B: アバターは LINE ログイン毎に再生成される揮発データのため永続化 volume なし
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - uchistock_prod_network
     restart: unless-stopped
@@ -497,6 +509,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+COMPOSE="docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml"
+
 echo "==> git pull"
 git pull origin main
 
@@ -504,15 +518,15 @@ echo "==> デプロイ前 DB バックアップ"
 ./scripts/backup-db.sh || echo "warn: バックアップに失敗（デプロイは継続）"
 
 echo "==> イメージ再ビルド（public/build は app/web 各イメージに焼き込まれる）"
-docker compose -f docker-compose.prod.yml build
+$COMPOSE build
 
-echo "==> コンテナ起動（storage:link・キャッシュ最適化は entrypoint が実行）"
+echo "==> コンテナ起動（DB の healthcheck 通過を待ってから app が起動する）"
 # 判断 A: アセットはイメージ内に焼き込み済みのため volume 削除の小細工は不要。
 # opcache.validate_timestamps=0 のため、再ビルド＋recreate で確実に新コードへ差し替わる。
-docker compose -f docker-compose.prod.yml up -d --build
+$COMPOSE up -d --force-recreate
 
 echo "==> マイグレーション"
-docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+$COMPOSE exec -T app php artisan migrate --force
 
 echo "==> 完了"
 ```
@@ -520,6 +534,7 @@ echo "==> 完了"
 > - `migrate --force` は本番で対話プロンプトを飛ばすため必須。
 > - `storage:link` と `config/route/view:cache` は **entrypoint（§2-11）が起動ごとに実行**するので deploy.sh からは外した。`.env` 変更もコンテナ再起動で確実に反映される。
 > - デプロイ前に必ず DB バックアップを取る（§7-D）。
+> - **DB 起動待ち**: `depends_on` だけでは MySQL の接続受付を待たない（§5 参照）。`up -d --force-recreate` で db も作り直されるため、db の healthcheck が `healthy` になるまで app の起動が待機し、その後にマイグレーションを実行する。待機ループを deploy.sh 側に書く必要はない。
 
 ---
 
@@ -758,6 +773,7 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
    - **対処**: `protected $proxies = '*';`
    - **`'127.0.0.1'` では効かない**：PHP-FPM から見た接続元は cloudflared ではなく **Nginx コンテナ**であり、クライアント IP は Docker ブリッジのゲートウェイ（`172.x.x.1` 等）になるため。
    - `'*'` が妥当な理由：`web` は `127.0.0.1:8080` にのみバインドされ外部から直接叩けないため、ヘッダーを偽装できる第三者の経路が存在しない。
+6. **DB 起動待ち**: `depends_on` だけでは MySQL の接続受付を待たない。`--force-recreate` で db を作り直すデプロイでは、マイグレーションが Connection refused で失敗する。`healthcheck` ＋ `condition: service_healthy` で解決（2026-08-01 対応）。
 
 ---
 
