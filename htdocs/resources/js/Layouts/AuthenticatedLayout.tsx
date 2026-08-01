@@ -1,4 +1,4 @@
-import { useEffect, useState, PropsWithChildren, ReactNode } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -21,9 +21,8 @@ type CustomPageProps = {
 
 export default function Authenticated({
   user,
-  header,
   children,
-}: PropsWithChildren<{ user: User; header?: ReactNode }>) {
+}: PropsWithChildren<{ user: User }>) {
   const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
   const [forceModal, setForceModal] = useState(false);
   const { flash, showGroupModal } = usePage<CustomPageProps>().props;
@@ -169,12 +168,6 @@ export default function Authenticated({
           </div>
         </div>
       </nav>
-
-      {header && (
-        <header className="bg-surface shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-        </header>
-      )}
 
       <main className="flex-1">{children}</main>
 

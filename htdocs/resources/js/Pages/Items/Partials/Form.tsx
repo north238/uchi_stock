@@ -106,107 +106,105 @@ export default function Form({
   };
 
   return (
-    <div className="py-6">
-      <div className="p-4 sm:p-8 bg-surface max-w-xl mx-auto sm:py-6 lg:py-8 sm:px-6 lg:px-8 shadow-card sm:rounded-[20px]">
-        {error && <div className="text-danger mb-4">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-2">
-          <div>
-            <InputLabel htmlFor="name" value="品名" />
-            <TextInput
-              type="text"
-              id="name"
-              name="name"
-              placeholder="例：りんご"
-              className="mt-1 block w-full"
-              isFocused={true}
-              value={data.name ?? ""}
-              error={!!errors?.name}
-              ref={nameRef}
-              onChange={handleNameChange}
+    <div className="p-4 sm:p-8 bg-surface shadow-card sm:rounded-[20px]">
+      {error && <div className="text-danger mb-4">{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <div>
+          <InputLabel htmlFor="name" value="品名" />
+          <TextInput
+            type="text"
+            id="name"
+            name="name"
+            placeholder="例：りんご"
+            className="mt-1 block w-full"
+            isFocused={true}
+            value={data.name ?? ""}
+            error={!!errors?.name}
+            ref={nameRef}
+            onChange={handleNameChange}
+            disabled={processing}
+          />
+          <InputError message={errors?.name} className="mt-2" />
+        </div>
+
+        <div>
+          <InputLabel htmlFor="status" value="ステータス" />
+          <div className="mt-1">
+            <StatusSegment
+              value={data.status ?? "in_stock"}
+              onChange={handleStatusChange}
               disabled={processing}
             />
-            <InputError message={errors?.name} className="mt-2" />
           </div>
+        </div>
 
-          <div>
-            <InputLabel htmlFor="status" value="ステータス" />
-            <div className="mt-1">
-              <StatusSegment
-                value={data.status ?? "in_stock"}
-                onChange={handleStatusChange}
-                disabled={processing}
-              />
-            </div>
-          </div>
+        <div>
+          <InputLabel htmlFor="quantity" value="個数（任意）" />
+          <TextInput
+            type="number"
+            id="quantity"
+            name="quantity"
+            className="mt-1 block w-full"
+            isFocused={false}
+            value={
+              data.quantity === null || data.quantity === undefined ? "" : String(data.quantity)
+            }
+            error={!!errors?.quantity}
+            onChange={handleQuantityChange}
+            disabled={processing}
+          />
+          <InputError message={errors?.quantity} className="mt-2" />
+        </div>
 
-          <div>
-            <InputLabel htmlFor="quantity" value="個数（任意）" />
-            <TextInput
-              type="number"
-              id="quantity"
-              name="quantity"
-              className="mt-1 block w-full"
-              isFocused={false}
-              value={
-                data.quantity === null || data.quantity === undefined ? "" : String(data.quantity)
-              }
-              error={!!errors?.quantity}
-              onChange={handleQuantityChange}
-              disabled={processing}
-            />
-            <InputError message={errors?.quantity} className="mt-2" />
-          </div>
+        <div>
+          <SelectableWithAdd
+            id="genre_id"
+            name="genre_name"
+            label="ジャンル（任意）"
+            options={genres}
+            value={data.genre_id || ""}
+            isModalOpen={isGenreModalOpen}
+            onChange={handleGenreChange}
+            onAdd={handleAddGenre}
+            error={errors?.genre_id}
+            disabled={processing || loading}
+          />
+        </div>
 
-          <div>
-            <SelectableWithAdd
-              id="genre_id"
-              name="genre_name"
-              label="ジャンル（任意）"
-              options={genres}
-              value={data.genre_id || ""}
-              isModalOpen={isGenreModalOpen}
-              onChange={handleGenreChange}
-              onAdd={handleAddGenre}
-              error={errors?.genre_id}
-              disabled={processing || loading}
-            />
-          </div>
+        <div>
+          <SelectableWithAdd
+            id="place_id"
+            name="place_name"
+            label="保管場所（任意）"
+            options={places}
+            value={data.place_id || ""}
+            isModalOpen={isPlaceModalOpen}
+            onChange={handlePlaceChange}
+            onAdd={handleAddPlace}
+            error={errors?.place_id}
+            disabled={processing || loading}
+          />
+        </div>
 
-          <div>
-            <SelectableWithAdd
-              id="place_id"
-              name="place_name"
-              label="保管場所（任意）"
-              options={places}
-              value={data.place_id || ""}
-              isModalOpen={isPlaceModalOpen}
-              onChange={handlePlaceChange}
-              onAdd={handleAddPlace}
-              error={errors?.place_id}
-              disabled={processing || loading}
-            />
-          </div>
+        <div>
+          <InputLabel htmlFor="memo" value="メモ（任意）" />
+          <TextArea
+            id="memo"
+            name="memo"
+            value={data.memo || ""}
+            placeholder="フリー入力"
+            onChange={handleMemoChange}
+            error={!!errors?.memo}
+            className="mt-1 block w-full"
+            disabled={processing}
+          />
+          <InputError message={errors?.memo} className="mt-2" />
+        </div>
 
-          <div>
-            <InputLabel htmlFor="memo" value="メモ（任意）" />
-            <TextArea
-              id="memo"
-              name="memo"
-              value={data.memo || ""}
-              placeholder="フリー入力"
-              onChange={handleMemoChange}
-              error={!!errors?.memo}
-              className="mt-1 block w-full"
-              disabled={processing}
-            />
-            <InputError message={errors?.memo} className="mt-2" />
-          </div>
-
-          <PrimaryButton type="submit" disabled={processing || nameEmpty}>
-            保存
-          </PrimaryButton>
-        </form>
-      </div>
+        <PrimaryButton type="submit" disabled={processing || nameEmpty}>
+          保存
+        </PrimaryButton>
+      </form>
     </div>
   );
 }

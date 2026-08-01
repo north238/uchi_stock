@@ -2,6 +2,8 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import { MdAdd, MdKeyboardArrowDown } from "react-icons/md";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import Dropdown from "@/Components/Dropdown";
+import PageContainer from "@/Components/PageContainer";
+import PageHeading from "@/Components/PageHeading";
 import ItemCard from "@/Pages/Items/Partials/ItemCard";
 import { ItemStatusValue } from "@/constants/itemStatus";
 import { PageProps } from "@/types";
@@ -31,9 +33,9 @@ export default function Index({ auth }: PageProps) {
     <Authenticated user={auth.user}>
       <Head title="アイテム一覧" />
 
-      <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageContainer className="pb-24">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-ink">在庫一覧</h1>
+          <PageHeading>在庫一覧</PageHeading>
 
           <Dropdown>
             <Dropdown.Trigger>
@@ -77,7 +79,7 @@ export default function Index({ auth }: PageProps) {
             ))}
           </div>
         )}
-      </div>
+      </PageContainer>
 
       <Link
         href={route("items.create")}

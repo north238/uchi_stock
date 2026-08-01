@@ -5,6 +5,8 @@ import SelectInput from "@/Components/SelectInput";
 import { TextArea } from "@/Components/TextArea";
 import TextInput from "@/Components/TextInput";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import PageContainer from "@/Components/PageContainer";
+import PageHeading from "@/Components/PageHeading";
 import { PageProps } from "@/types";
 import { Head, useForm } from "@inertiajs/react";
 
@@ -26,19 +28,13 @@ export default function Create({ auth }: PageProps) {
   };
 
   return (
-    <Authenticated
-      user={auth.user}
-      header={
-        <h2 className="font-semibold text-xl text-ink leading-tight">グループ作成</h2>
-      }
-    >
+    <Authenticated user={auth.user}>
       <Head title="グループ作成" />
-      <div className="py-12">
-        <div className="bg-surface max-w-xl mx-auto sm:py-6 lg:py:8 sm:px-6 lg:px-8 border border-line shadow-card sm:rounded-[20px]">
+      <PageContainer>
+        <PageHeading>グループ作成</PageHeading>
+        <div className="mt-4 p-4 sm:p-8 bg-surface border border-line shadow-card sm:rounded-[20px]">
           <header>
-            <h2 className="text-lg font-medium text-ink">グループ作成</h2>
-
-            <p className="mt-1 text-sm text-muted">
+            <p className="text-sm text-muted">
               グループ名、説明、公開設定を設定できます。
               <br />
             </p>
@@ -98,7 +94,7 @@ export default function Create({ auth }: PageProps) {
             </div>
           </form>
         </div>
-      </div>
+      </PageContainer>
     </Authenticated>
   );
 }
