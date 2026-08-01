@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-08-02
-現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一フォローアップも完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
+現在地: **Phase 13・Phase 12 完了**（Auth画面パディング・パネル角丸の統一、アイテム編集の遷移先修正、「アイテム」→「ストック」表記統一も完了）。ブラウザでの実機/実見た目確認はツール制約により未実施
 作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -237,6 +237,8 @@
 ---
 
 ## 進捗メモ（新しいものを上に）
+
+- 2026-08-02: アイテム編集画面の不具合修正と「アイテム」→「ストック」表記統一を実施。**不具合**: `ItemController::update()`が成功時に`items.index`（在庫一覧）ではなく`items.edit`（自分自身の編集画面）へリダイレクトしていた（ユーザー報告により発覚）。`store()`はPhase 10で`items.index`へ変更済みだったが、`update()`は対象から漏れていた。`items.index`へのリダイレクトに修正し、`tests/Feature/ItemUpdateTest.php`の`assertRedirect`も合わせて更新。**表記統一**: UI上の呼称を「アイテム」から「ストック」に統一（一部画面は既に変更済みだったため残りを洗い出し）。フロント: `Items/Index.tsx`のHead title・空状態文言・登録CTA（3箇所）、`Group/Partials/LeaveGroupForm.tsx`の脱退説明文（1箇所）。バックエンド: `ItemController.php`のフラッシュメッセージ（保存/更新/削除の成功・失敗、計5箇所）。**スコープ外として維持**: `Log::info`/`Log::error`のログメッセージ、PHPDocコメント、ルート名（`items.*`）・モデル名（`Item`）・コントローラ名・ディレクトリ名などのコード識別子、`docs/*.md`（いずれも「画面」表示ではないため）。**検証**: `php artisan test`全49件パス（回帰なし）、`npm run tsc`/`lint`（既存9件のみ）/`build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 
 - 2026-08-02: Phase 12のフォローアップとして、Auth画面（GuestLayout）のパディングとパネル角丸の不統一をユーザー指摘により調査・修正。**発見事項**: (1) `GuestLayout.tsx`のカードパディングが`sm:p-6`で、他パネル（Items Form/Group/Profile）の`sm:p-8`と不統一だった。(2) パネルの角丸`rounded-[20px]`が`sm:`プレフィックス付き（モバイルは直角）のものと常時適用のものに分かれており、`PageContainer`が全ブレークポイントで`px-4`以上の余白を確保している（＝どのパネルもフルブリードにならない）ことを踏まえると意図的な設計ではなく踏襲ミスと判断。(3) 副次的に`SelectableWithAdd.tsx`のモーダル内`TextInput`に`className="border rounded w-full"`という重複・競合クラスを発見。ビルド済みCSSで`.rounded`より`.rounded-lg`が後に定義されていることを確認し、カスケードでは実害なし（表示上のバグではない）と判断した上でクリーンアップ。**対応**: `Group/Create.tsx`・`Group/Edit.tsx`（3箇所）・`Profile/Edit.tsx`（4箇所）・`Items/Partials/Form.tsx`の`sm:rounded-[20px]`を`rounded-[20px]`に統一、`GuestLayout.tsx`を`p-4 sm:p-8`に変更、`SelectableWithAdd.tsx`の重複クラスを`w-full`のみに整理。`GuestLayout`の`border border-line`（枚線）はユーザー確認の上、Modal同様の意図的な差別化として現状維持。`docs/04`§6.4・§6.10に規定を追記。**検証**: `npm run tsc`/`npm run lint`（既存9件のみ、新規なし）/`npm run build`成功。ブラウザでの目視確認は本セッションのツール制約により未実施。
 
