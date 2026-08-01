@@ -75,7 +75,7 @@ class SocialiteLoginController extends Controller
                 Auth::login($newUser, true);
 
                 // LINEにメッセージを送信
-                $text = 'ご登録いただきありがとうございます！アカウント登録が完了しました。これからもよろしくお願いいたします。';
+                $text = 'この度はUchiStockのアカウント登録をいただきありがとうございます。';
                 $this->lineMessengerService->sendMessage($LineId, $text);
 
                 DB::commit();

@@ -33,8 +33,7 @@ export default function Register() {
     e.preventDefault();
     setDisabled(true);
 
-    const baseUrl = import.meta.env.VITE_APP_URL || "http://localhost:8080";
-    window.location.href = `${baseUrl}/login/line/redirect`;
+    window.location.href = "/login/line/redirect";
   };
 
   return (
@@ -130,10 +129,7 @@ export default function Register() {
           <PrimaryButton className="" disabled={processing}>
             新規登録する
           </PrimaryButton>
-          <Link
-            href={route("login")}
-            className="underline text-sm text-accent hover:text-ink"
-          >
+          <Link href={route("login")} className="underline text-sm text-accent hover:text-ink">
             登録済みの方はこちら
           </Link>
         </div>
