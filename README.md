@@ -74,7 +74,22 @@ flowchart TB
 
 ### セットアップ手順
 
+#### 環境変数ファイルを雛形からコピー
+
+```bash
+cp .env.example .env                  # 開発用 compose の変数展開に使用
+cp htdocs/.env.example htdocs/.env    # Laravel アプリ用
+```
+
 #### Dockerを使用する場合
+
+1. Dockerネットワークの作成
+
+`docker-compose.yml` の network は `external: true` のため、事前作成が必要です。
+
+```bash
+docker network create uchistock_network
+```
 
 1. Docker環境の構築
 
@@ -177,13 +192,13 @@ npm run format
 
 設計・実装の詳細は `docs/` 配下を参照してください。
 
-| ドキュメント | 内容 |
-| --- | --- |
-| [docs/01_concept.md](docs/01_concept.md) | コンセプト・設計原則・検証計画 |
-| [docs/02_requirements.md](docs/02_requirements.md) | MVP（フェーズ0）改修要件 |
-| [docs/03_implementation_plan.md](docs/03_implementation_plan.md) | 実装計画・バックエンド詳細仕様 |
-| [docs/04_frontend_design_guide.md](docs/04_frontend_design_guide.md) | フロント全画面のデザイン指示書 |
-| [docs/05_implementation_todo.md](docs/05_implementation_todo.md) | 実装の進捗管理（TODOチェックリスト） |
+| ドキュメント                                                         | 内容                                 |
+| -------------------------------------------------------------------- | ------------------------------------ |
+| [docs/01_concept.md](docs/01_concept.md)                             | コンセプト・設計原則・検証計画       |
+| [docs/02_requirements.md](docs/02_requirements.md)                   | MVP（フェーズ0）改修要件             |
+| [docs/03_implementation_plan.md](docs/03_implementation_plan.md)     | 実装計画・バックエンド詳細仕様       |
+| [docs/04_frontend_design_guide.md](docs/04_frontend_design_guide.md) | フロント全画面のデザイン指示書       |
+| [docs/05_implementation_todo.md](docs/05_implementation_todo.md)     | 実装の進捗管理（TODOチェックリスト） |
 
 ## ライセンス
 

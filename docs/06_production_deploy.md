@@ -613,7 +613,7 @@ exec "$@"
 ```bash
 #!/bin/bash
 # UchiStock DB バックアップ（ホスト cron から日次実行）
-# crontab 例: 0 3 * * *  /path/to/uchistock/scripts/backup-db.sh >> /var/log/uchistock-backup.log 2>&1
+# crontab 例: 0 3 * * *  /path/to/uchistock/scripts/backup-db.sh >> /home/pi/uchistock-backup.log 2>&1
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -649,7 +649,7 @@ echo "==> 完了: $(ls -1 "$BACKUP_DIR"/uchistock_*.sql.gz | wc -l) 世代保持
 chmod +x scripts/backup-db.sh
 crontab -e
 # 毎日 03:00 に実行
-# 0 3 * * *  /home/pi/uchistock/scripts/backup-db.sh >> /var/log/uchistock-backup.log 2>&1
+# 0 3 * * *  /home/pi/uchistock/scripts/backup-db.sh >> /home/pi/uchistock-backup.log 2>&1
 ```
 
 #### リストア検証（この工程まで実施して初めて「バックアップができた」とみなす）
@@ -705,8 +705,19 @@ docker compose -f docker-compose.prod.yml run --rm app php artisan key:generate 
 # 3. 起動
 docker compose -f docker-compose.prod.yml up -d
 
-# 4. 初回マイグレーション（seed が必要なら --seed）
+# 4. 初回マイグレーション
 docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+
+# 4-1. マスタデータ投入（初回のみ・`--seed`は使わない）
+#   `migrate --seed` は DatabaseSeeder 全体（UserSeeder/ItemSeeder の開発用テストデータ含む）を
+#   本番に投入してしまうため使用しない。マスタ系シーダーのみ個別に実行する。
+#   RolesTableSeeder / ColorsTableSeeder はどちらも id を明示した insert で冪等ではないため、
+#   再実行すると主キー重複で失敗する。deploy.sh には含めず、初回のみ手動実行とする。
+#   ColorsTableSeeder を投入しないと、ジャンル新規作成時に colors への外部キー制約違反で失敗する。
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T app \
+  php artisan db:seed --class=RolesTableSeeder --force
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T app \
+  php artisan db:seed --class=ColorsTableSeeder --force
 
 # 5. キャッシュ最適化
 docker compose -f docker-compose.prod.yml exec -T app php artisan config:cache
@@ -731,6 +742,7 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 - [ ] LINE ログインが本番ドメインで成功する（コールバック URL 登録済み）
 - [ ] アイテム一覧・ステータス変更・「買った」ワンタップが動作
 - [ ] ラズパイ再起動後、`docker compose` と cloudflared が自動復帰する
+- [ ] `app/Http/Middleware/TrustProxies.php` の `$proxies` が `'*'` になっている（Cloudflare Tunnel構成で必須。§5-5参照）
 
 ---
 
