@@ -83,8 +83,11 @@ export default function Form({
 
   const handleAddGenre = async (genreName: string) => {
     try {
-      await addGenre(genreName);
-      await reloadGenres();
+      const res = await addGenre(genreName);
+      await reloadGenres(); // 先にオプションを更新する
+      if (res?.data?.id) {
+        setData("genre_id", String(res.data.id));
+      }
       setIsGenreModalOpen(false);
       showSuccessToast("ジャンルを追加しました");
     } catch (error) {
@@ -95,8 +98,11 @@ export default function Form({
 
   const handleAddPlace = async (placeName: string) => {
     try {
-      await addPlace(placeName);
-      await reloadPlaces();
+      const res = await addPlace(placeName);
+      await reloadPlaces(); // 先にオプションを更新する
+      if (res?.data?.id) {
+        setData("place_id", String(res.data.id));
+      }
       setIsPlaceModalOpen(false);
       showSuccessToast("保管場所を追加しました");
     } catch (error) {
