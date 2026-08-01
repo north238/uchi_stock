@@ -112,6 +112,16 @@ colors: {
 
 以降、色は `bg-surface` / `text-ink` / `bg-status-in` のようにトークン経由で指定する。テーマ差はトークンが吸収するため、原則 `dark:` を新規に書かない。
 
+**幅トークン（`theme.extend.maxWidth` に追記、Phase 12 で新設）**:
+
+```js
+maxWidth: {
+  page: '36rem', // 576px。本文とナビの共通幅
+},
+```
+
+本文コンテナ（`PageContainer`）とナビ内側の最大幅は、この `max-w-page` が単一の真実（single source of truth）。両者に個別の値（`max-w-xl`/`max-w-7xl` 等）を直書きしない。
+
 ### 2.3 ステータス色マッピング（確定事項）
 
 | 状態   | 値         | 濃淡           | 見え方                           |
@@ -193,6 +203,7 @@ fontFamily: {
 ### 5.5 FAB（新規登録）
 
 - 画面右下固定。`bg-ink text-surface`・`rounded-2xl`・＋アイコン＋「登録」。`items.create` へ遷移。
+- **一覧コンテナに `pb-24` を確保**する（Phase 12 で対応）。FABが最終カードの操作ボタン（「買った」等）と重なって押せなくなる不具合の対策。`PageContainer` の `className` で上書きする。
 
 ### 5.6 Undoトースト
 
@@ -210,6 +221,8 @@ fontFamily: {
 - `FormItemFields` / `FieldName` に `status` を追加。
 - 「＋追加」ボタンの緑（現状 `bg-green-*`）を廃し、**中立色 or アウトライン**へ。緑はステータス専用（役割分離）に統一する。
 - 保存ボタンはコーラル（`bg-accent`）へ寄せる。
+- **「＋追加」の配置（Phase 12 で変更）**: セレクト横の固定幅ボタンでは幅が狭い画面で折り返すため、ラベル行（ラベルと同じ行の右端）にテキストボタン（`text-accent`/`text-sm`/`font-bold`）として配置する。セレクトはその下に全幅で表示する。
+- **追加直後の自動選択（Phase 12 §6-2・Phase 13 完了後に実施）**: モーダルからジャンル/保管場所を追加すると、登録APIが返す `id` を使って追加直後にそのオプションを選択状態にする。オプション一覧の再取得（`reloadGenres`/`reloadPlaces`）が完了した後に選択状態を反映すること。
 
 ### 5.8 登録画面の戻る導線（2026-07-24 追加）
 
@@ -272,6 +285,9 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - ナビ／ヘッダー `bg-white dark:bg-gray-800` → `bg-surface`、境界 `border-line`。
 - アクティブ `NavLink` の下線・強調を `accent` に（現状 indigo/blue）。
 - ドロップダウン起点ボタン・アバターもトークン化。グループ未所属の強制モーダルは §6.6 の Modal 規定に従う（ボタンは §6.2 準拠）。
+- **スクロール構造（Phase 12 で確定・禁止事項）**: ルート要素は `min-h-screen`（ドキュメントスクロール）とする。`h-screen` ＋ `main` の内部スクロール（`overflow-y-auto`）は、内部スクロールが機能しない条件下で画面下部に到達できなくなる不具合を起こすため**禁止**。ナビは `sticky top-0 z-30` で固定し、ナビ内側の最大幅は `max-w-page`（§2.2）。
+
+**`header` prop は廃止済み（Phase 12）**。全画面は §6.10 の `PageContainer` + `PageHeading` でページ骨格を組む。
 
 **GuestLayout**（`resources/js/Layouts/GuestLayout.tsx`）
 
@@ -331,6 +347,23 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 
 各ステップは独立してレビュー可能な粒度でコミットを分ける。
 
+### 6.10 ページ骨格（Phase 12 で新設・確定事項）
+
+`header` prop方式は廃止した。全画面は本文先頭にタイトル行を置く方式に統一する。
+
+- **`Components/PageContainer.tsx`**: `mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-8`。本文の外側コンテナは常にこれを使う。個別の余白調整は `className` で追記する（例: Items一覧の `pb-24`）。
+- **`Components/PageHeading.tsx`**: `<h1 className="text-xl font-bold text-ink">`。ページタイトルは常にこれを使う。
+- パネル（カード）要素のパディングは **`p-4 sm:p-8` のみ**とする。`p-*` と `px-*`/`py-*` を同一要素に併記しない（Tailwindの生成順で後勝ちになり、意図しないクラスが無効化される事故のもと）。
+- 1000px 級の1カラムは採らない（`docs/02` §7「3秒で判断」に反するため）。本文幅は576px（`max-w-page`）に統一。カードの2カラム化（`lg`以上）は将来の選択肢として保留。
+
+**z-index の対応表**（衝突防止のため明文化）:
+
+| 要素 | z-index |
+| --- | --- |
+| ナビ（`AuthenticatedLayout` の `<nav>`） | `z-30` |
+| FAB（`Items/Index.tsx`） | `z-40` |
+| モーダル・トースト | 上記より上（個別のライブラリ/コンポーネント既定値に従う） |
+
 ## 7. 変更対象ファイル
 
 | ファイル                                         | 変更                                                           |
@@ -344,6 +377,8 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 | `resources/js/Pages/Items/Partials/Form.tsx`     | status追加・個数任意化・＋追加ボタン中立化                     |
 | `resources/js/Pages/Items/Create.tsx`            | ヘッダーに戻る導線を追加（§5.8）                               |
 | `resources/js/utils/toast.tsx`                   | `showBuyUndoToast` のサイズ・自動消滅時間を調整（§5.6,§10.7）  |
+| `resources/js/Components/PageContainer.tsx`      | 新規（Phase 12・§6.10）                                        |
+| `resources/js/Components/PageHeading.tsx`        | 新規（Phase 12・§6.10）                                        |
 
 ## 8. 実装時の遵守事項
 
