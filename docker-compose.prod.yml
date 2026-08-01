@@ -49,7 +49,10 @@ services:
       - DB_HOST=db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    # 判断 B: アバターは LINE ログイン毎に再生成される揮発データのため永続化 volume なし
+    # storage_public: 永続化目的ではなく、app/web間でstorage/app/publicを共有するための volume
+    # （アバターはLINEログイン毎に再生成される揮発データのため、バックアップ対象には含めない）
+    volumes:
+      - storage_public:/var/www/html/storage/app/public
     depends_on:
       db:
         condition: service_healthy
@@ -68,6 +71,8 @@ services:
     # cloudflared（ホスト）からのみ到達。ローカルホストにのみバインド。
     ports:
       - '127.0.0.1:8080:80'
+    volumes:
+      - storage_public:/var/www/html/storage/app/public:ro
     depends_on:
       - app
     networks:
@@ -81,3 +86,4 @@ networks:
 volumes:
   mysql_data_prod:
   redis_data_prod:
+  storage_public:

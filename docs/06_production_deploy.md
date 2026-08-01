@@ -31,7 +31,7 @@ Raspberry Pi（ARM64）上で、UchiStock を **本番構成の Docker** で常�
 本指示書は以下の 4 点を暫定回避ではなく確定設計として組み込む。詳細は §7 に集約。
 
 - **A. アセット共有**：volume 共有をやめ、**共通フロントビルドステージから app / web の両イメージへ `public/build` を焼き込む**。二重管理に見えるが単一成果物由来なので不整合は起きない。`deploy.sh` の volume 削除という不安定な小細工を排除。
-- **B. storage 揮発扱い**：アバター画像は `Storage::disk('public')` に保存されるが、**LINE ログインのたびに再取得・再生成される**実装のため、消えても次のログインで復元される。よって**永続化しない**（named volume を持たない）。`public/storage` シンボリックリンクだけは配信のため起動時に張る（リンク先は揮発データ）。これにより storage 周りの volume 共有・権限調整が不要になり構成が簡素化。
+- **B. storage 揮発扱い**：アバター画像は `Storage::disk('public')` に保存されるが、**LINE ログインのたびに再取得・再生成される**実装のため、消えても次のログインで復元される。よって**バックアップ対象には含めない（named volume によるバックアップ・永続化は不要）**。ただし、Nginx は `.webp` 等の画像拡張子を静的ファイルとして直接配信する設定（`docker/nginx/default.prod.conf`）のため PHP には渡らず、**app と web の間で `storage/app/public` の実体を volume で共有する必要がある**（2026-08-02 訂正。詳細は §7-B）。`public/storage` シンボリックリンクは両コンテナに必要（app は起動時に `storage:link`、web はビルド時に手動で作成）。
 - **C. キュー / スケジューラ**：Phase 1 は非同期処理を持たないため **`QUEUE_CONNECTION=sync` のまま、worker / scheduler コンテナは作らない**。将来（購入周期推定機能）追加時の構成は §7-C に設計として明記済み。
 - **D. DB バックアップ（学習目的）**：実データの保険としてではなく**バックアップ／リストアを一度きちんと経験すること**を目的に据える。**ホスト側 cron で日次 `mysqldump` ＋ 3 世代保持、かつリストア手順を検証まで行う**（§7-D）。個人利用ゆえ保険としての要求はないが、取得〜復元の一連を通す価値を優先。
 
@@ -316,8 +316,8 @@ http {
 **2026-07-31 改訂により削除。** Nginx イメージは §2-1 の統合 Dockerfile の `nginx` ステージとして定義する。旧 `docker/nginx/Dockerfile.prod`・`docker/php/Dockerfile.prod` は §2-1 の `docker/Dockerfile.prod` への統合に伴い**削除済み**。
 
 > **なぜ分離をやめたか**: 分離構成では nginx 用 Dockerfile にも `frontend` ステージが必要だが、`npm run build` は `vendor`（Ziggy）を要求するため、nginx 側にも `vendor` ステージを持たせる必要が生じる。すると ARM 上で約 584 秒かかる `apk add` とフロントビルドが二重に走り、コストが許容範囲を超える。§7-A に記録した「切り替え基準」に該当したため統合した。
-> **`storage/app/public`（アバター画像）の配信について（判断 B）**:
-> アバターは LINE ログイン毎に再生成される揮発データのため、永続化 volume は持たない。`public/storage` シンボリックリンク（`storage:link` で生成）は app コンテナ内に張られ、app が保存したアバターを **PHP 経由**で配信すれば足りる。Nginx が静的に直接配信する必要がある場合のみ storage の共有が要るが、Phase 1 では PHP 経由配信で問題ない。実装後にアバターが表示されるかを検証（§4 チェックリスト）。
+> **`storage/app/public`（アバター画像）の配信について（判断 B・2026-08-02 訂正）**:
+> 当初「Nginx が静的に直接配信する必要がある場合のみ storage の共有が要るが、Phase 1 では PHP 経由配信で問題ない」としていたが、これは誤りだった。`docker/nginx/default.prod.conf` の静的ファイル用 `location` ブロックは `.webp` 等の画像拡張子を **Nginx が直接ファイルシステムから配信**する設定であり、PHP には一切渡らない。したがって web（Nginx）コンテナ側にも `storage/app/public` の実体と `public/storage` シンボリックリンクが必要。対応: `docker/Dockerfile.prod` の `nginx` ステージに `ln -sfn` でシンボリックリンクを追加し、`docker-compose.prod.yml` に `storage_public` volume を新設して app/web 間で実体を共有する（詳細は §7-B）。実装後にアバターが表示されるかを検証（§4 チェックリスト）。
 
 ---
 
@@ -447,8 +447,8 @@ volumes:
 > - `web` の `ports` は `127.0.0.1:8080:80`。**ホストのローカルにのみ**バインドし、外部 NIC には晒さない。cloudflared が `localhost:8080` を叩く。
 > - 開発用 compose の `networks: external: true` と異なり、本番は自前で bridge ネットワークを作る（`external` にしない）。
 > - **`build_assets` volume は廃止**（判断 A）。`public/build` は app / web の各イメージに焼き込み済みなので volume 共有は不要。
-> - **`storage_public` volume も持たない**（判断 B）。アバター画像は LINE ログイン毎に再生成される揮発データのため、消えても次のログインで復元される。`storage:link` だけは entrypoint で張る。
-> - 永続化する volume は `mysql_data_prod`（DB 実体）と `redis_data_prod`（セッション・キャッシュ）のみ。**コンテナは使い捨て、これら 2 つの volume だけがデータを保持する**。デプロイでコンテナを作り直しても両 volume は残るため、DB データは無傷。
+> - **`storage_public` volume を新設**（判断 B・2026-08-02 訂正）。app/web 間で `storage/app/public`（アバター画像の実体）を共有するための volume で、**永続化・バックアップが目的ではない**（アバターは LINE ログイン毎に再生成される揮発データのため）。app は読み書き、web は読み取り専用（`:ro`）でマウントする。
+> - 永続化・バックアップ対象の volume は引き続き `mysql_data_prod`（DB 実体）と `redis_data_prod`（セッション・キャッシュ）のみ。`storage_public` はコンテナ間共有専用でバックアップ対象に含めない。デプロイでコンテナを作り直しても `mysql_data_prod`/`redis_data_prod` は残るため、DB データは無傷。
 
 ---
 
@@ -810,18 +810,27 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 
 **この経験からの学び**: 「実測してから判断する」方針は機能した。机上で統合を決めていたら妥当な選択にはなったが、_なぜ_ 統合が必要か（Ziggy の vendor 依存）を理解しないまま進むことになった。逆に分離のまま進めていたら、ビルド時間が二倍以上に膨らむ構成に気づかなかった可能性がある。
 
-### 7-B. storage：ユーザーデータは揮発扱い、永続化しない
+### 7-B. storage：ユーザーデータは揮発扱い、ただし配信のため app/web 間で共有は必要
 
 **問題（当初想定）**: コード焼き込み方式では、デプロイのたびにイメージが作り直され、`storage/app` に保存したファイルが消える。実装調査で `SocialiteLoginController` がアバター画像を `Storage::disk('public')`（＝`storage/app/public/users/{id}/*.webp`）に保存していることを確認した。
 
-**確定（再調査で方針変更）**: このアバターは **LINE ログインのたびに再取得・再生成される**（ログイン処理内で既存を削除して作り直す）。つまり消えても次のログインで自動的に復元される揮発データであり、**永続化は不要**。
+**確定（再調査で方針変更）**: このアバターは **LINE ログインのたびに再取得・再生成される**（ログイン処理内で既存を削除して作り直す）。つまり消えても次のログインで自動的に復元される揮発データであり、**バックアップ・永続化は不要**（この結論自体は変わらない）。
 
-- `storage` 配下は一切 named volume で永続化しない。app / web に storage volume をマウントしない。
-- `storage/framework`（キャッシュ・コンパイル済みビュー）と `storage/logs` も同様に永続化しない。コンテナ再生成で消えて健全。
-- `php artisan storage:link --force` は entrypoint で起動時に張る（§2-10）。リンク自体は配信のため必要だが、リンク先は揮発データ。
-- アバターの配信は PHP 経由で足りる（Nginx が静的直配信する必要はない）。実装後に「LINE ログイン→アバター表示」を検証（§4）。
+**不具合発生と訂正（2026-08-02）**: 上記の結論から「storage 周りの volume 共有は一切不要」と拡大解釈し、`public/storage` シンボリックリンクを app コンテナのみに張り、**PHP経由で配信すれば足りる**としていたが、これは誤りだった。
 
-**この変更の効果**: storage volume の共有・読み取り専用マウント・権限補正がすべて不要になり、compose と entrypoint が簡素化された。永続化対象は `mysql_data_prod` と `redis_data_prod` の 2 つだけ。
+- **症状**: 本番環境で LINE ログイン後、アバター画像が `GET /storage/users/{id}/*.webp` で 404 になる。
+- **原因**: `docker/nginx/default.prod.conf` の静的ファイル用 `location ~* \.(css|gif|ico|jpeg|jpg|js|png|svg|webp|woff2)$` ブロックが `.webp` を含む画像拡張子を**Nginx が直接ファイルシステムから配信**する設定になっており、PHP（app コンテナ）には一切リクエストが渡らない。app コンテナには `storage:link` によるシンボリックリンクと実体があるが、web（Nginx）コンテナには `public/storage` シンボリックリンクも `storage/app/public` の実体も存在しないため、Nginx がパスを解決できず 404 になる。
+- **訂正した設計**:
+  - `docker/Dockerfile.prod` の `nginx` ステージに `RUN ln -sfn /var/www/html/storage/app/public /var/www/html/public/storage` を追加し、web コンテナにもシンボリックリンクを作成する。
+  - `docker-compose.prod.yml` に `storage_public` という名前の volume を新設し、`app`（読み書き）・`web`（読み取り専用 `:ro`）の両方で `storage/app/public` にマウントして実体を共有する。
+  - **この volume の位置づけ**: 目的は永続化ではなく **app/web 間のファイル共有**。アバールが揮発データであるという性質・バックアップ対象外という結論は変わらない。
+
+- `storage/framework`（キャッシュ・コンパイル済みビュー）と `storage/logs` は引き続き永続化しない（`storage_public` の共有範囲は `storage/app/public` のみ）。コンテナ再生成で消えて健全。
+- `php artisan storage:link --force` は app コンテナで entrypoint が起動時に張る（§2-10）。web コンテナはビルド時にシンボリックリンクを作成済みのため、追加の起動時処理は不要。
+
+**この変更の効果**: アバター画像が Nginx 経由で正しく配信されるようになる。`storage_public` volume はコンテナ間共有専用でバックアップ対象には含めない。バックアップ・永続化対象は引き続き `mysql_data_prod` と `redis_data_prod` の 2 つ。
+
+**この経験からの学び**: 「Nginx が静的直接配信する場合のみ共有が必要」という条件を認識していながら、実際の `default.prod.conf` の `location` ブロック設定（画像拡張子は静的配信）を確認せずに「Phase 1 では PHP 経由配信で問題ない」と判断してしまった。設計判断の前提条件（この場合は Nginx の実際のルーティング設定）は、思い込みではなく該当する設定ファイルを直接確認してから判定すべきだった。
 
 ### 7-C. キュー / スケジューラ：Phase 1 は sync、将来構成は確定済み
 
