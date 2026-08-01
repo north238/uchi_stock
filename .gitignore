@@ -1,4 +1,6 @@
 .env
+*.bak
+backups/
 whisper/__pycache__/
 *.pyc
 .DS_Store

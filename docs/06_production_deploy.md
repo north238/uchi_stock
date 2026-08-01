@@ -41,31 +41,34 @@ Raspberry Pi（ARM64）上で、UchiStock を **本番構成の Docker** で常�
 
 すべて**新規作成**。既存ファイルは編集しない。
 
-| #   | パス                                    | 目的                                                                   |
-| --- | --------------------------------------- | ---------------------------------------------------------------------- |
-| 1   | `docker/php/Dockerfile.prod`            | 本番用 PHP-FPM。xdebug なし、`--no-dev`、Vite ビルド焼き込み           |
-| 2   | `docker/php/php.prod.ini`               | 本番用 PHP 設定。`display_errors=off`・opcache 本番最適化・xdebug なし |
-| 3   | `docker/nginx/Dockerfile.prod`          | 本番用 Nginx。本番 conf を参照                                         |
-| 4   | `docker/nginx/default.prod.conf`        | 本番用サーバー設定（`default.conf` を流用）                            |
-| 5   | `docker/nginx/nginx.prod.conf`          | 本番用グローバル設定。**CSP を本番ドメイン向けに修正**                 |
-| 6   | `docker-compose.prod.yml`               | 本番用 compose。ポート非公開・bind mount なし                          |
-| 7   | `htdocs/.env.production.example`        | 本番 `.env` の雛形                                                     |
-| 8   | `deploy.sh`                             | 更新デプロイを 1 コマンド化                                            |
-| 9   | `scripts/backup-db.sh`                  | DB 日次バックアップ＋世代管理（ホスト cron から実行）                  |
-| 10  | `docker/php/entrypoint.prod.sh`         | 起動時に `storage:link`・キャッシュ最適化を実行するエントリポイント    |
+| #   | パス                               | 目的                                                                                            |
+| --- | ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 1   | `docker/Dockerfile.prod`           | **統合**。`vendor`／`frontend` ビルドステージを共有し、`php-fpm`・`nginx` の 2 ターゲットを定義 |
+| 2   | `docker/php/php.prod.ini`          | 本番用 PHP 設定。`display_errors=off`・opcache 本番最適化・xdebug なし                          |
+| 3   | ~~`docker/nginx/Dockerfile.prod`~~ | **廃止**（#1 に統合。削除済み）                                                                 |
+| 4   | `docker/nginx/default.prod.conf`   | 本番用サーバー設定（`default.conf` を流用）                                                     |
+| 5   | `docker/nginx/nginx.prod.conf`     | 本番用グローバル設定。**CSP を本番ドメイン向けに修正**                                          |
+| 6   | `docker-compose.prod.yml`          | 本番用 compose。ポート非公開・bind mount なし                                                   |
+| 7   | `htdocs/.env.production.example`   | 本番 `.env` の雛形                                                                              |
+| 8   | `deploy.sh`                        | 更新デプロイを 1 コマンド化                                                                     |
+| 9   | `scripts/backup-db.sh`             | DB 日次バックアップ＋世代管理（ホスト cron から実行）                                           |
+| 10  | `docker/php/entrypoint.prod.sh`    | 起動時に `storage:link`・キャッシュ最適化を実行するエントリポイント                             |
 
-> ホスト側 cloudflared の systemd ユニットはリポジトリには含めない（§2-9 に設定内容を参考として記載。実ファイルはラズパイ上の `/etc/systemd/system/` に直接作成する）。
+> `cloudflared/uchistock.service.example`（トークン方式の systemd ユニット雛形）はこの一覧から除外している。§2-9 の通り不採用となり、実ファイルは作成しない（参考コードのみ <details> 内に残す）。
 
 ---
 
 ## 2. 各ファイルの実装
 
-### 2-1. `docker/php/Dockerfile.prod`
+### 2-1. `docker/Dockerfile.prod`（統合・app と web を 1 ファイルで定義）
 
-既存 `docker/php/Dockerfile` からの差分方針:
+> **2026-07-31 改訂**：当初は php 用・nginx 用に Dockerfile を分けていたが、実測により **`npm run build` が `vendor` を必要とする**（Ziggy が composer パッケージのため）ことが判明。分離したままでは nginx 側にも vendor ステージが必要になり、`apk add`（ARM 上で約 584 秒）とフロントビルドが二重に走る。よって**単一 Dockerfile に統合**し、`vendor` / `frontend` ステージを両イメージで共有する（判断 A の切り替え・§7-A 参照）。
+
+方針:
 
 - **xdebug を削除**（`pecl install` と `docker-php-ext-enable` から除外）
-- **マルチステージ化**：ビルドステージで `composer install --no-dev` と `npm ci && npm run build` を実行し、最終ステージには `vendor/` とビルド済み `public/build` のみを持ち込む（`node_modules` は最終イメージに残さない）
+- **マルチステージ**：`vendor`（composer 依存）と `frontend`（Vite ビルド）を**各 1 回だけ**実行し、`php-fpm` / `nginx` の両最終ステージがその成果物を `COPY --from` で取得する
+- compose 側から `target:` で作り分ける（§2-6）
 - ラズパイ（ARM64）で動くよう、ベースイメージは `php:8.2-fpm-alpine`（マルチアーキ対応）を継続
 
 ```dockerfile
@@ -82,12 +85,13 @@ COPY ./htdocs/composer.json ./htdocs/composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # ---- Build stage: フロントエンド（Vite）----
+# 【必須】vendor を入れること。Ziggy（tightenco/ziggy）は composer パッケージで、
+# tsc が ../../vendor/tightenco/ziggy を型解決に使うため、無いと TS2307 でビルド失敗する。
 FROM node:18-alpine AS frontend
 WORKDIR /app
 COPY ./htdocs/package.json ./htdocs/package-lock.json ./
 RUN npm ci
 COPY ./htdocs ./
-# vendor を先に入れておく（ビルドで参照される場合に備える）
 COPY --from=vendor /app/vendor ./vendor
 RUN npm run build
 
@@ -136,11 +140,28 @@ RUN chown -R www-data:www-data /var/www/html \
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.prod.sh"]
 CMD ["php-fpm", "-F"]
+
+# ---- Final stage: 本番 Nginx ----
+FROM nginx:stable-alpine AS nginx
+
+WORKDIR /var/www/html
+
+COPY ./docker/nginx/default.prod.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/nginx/nginx.prod.conf   /etc/nginx/nginx.conf
+
+# 静的配信対象：public 本体 ＋ 上の frontend ステージのビルド成果物
+COPY ./htdocs/public /var/www/html/public
+COPY --from=frontend /app/public/build /var/www/html/public/build
+
+RUN adduser -s /bin/sh -D -G www-data www-data 2>/dev/null || true \
+    && chown -R www-data:www-data /var/www/html
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
-> **注意**: `npm run build` がビルドに `vendor`（Ziggy 等）を必要とするかはプロジェクト依存。上記は念のため vendor を frontend ステージへコピーしている。ビルドが vendor 不要なら該当行は削除してよい。
+> **判断 A の要**: `vendor` と `frontend` の 2 ステージは**ビルド全体で 1 回ずつしか走らない**。`php-fpm` と `nginx` の両最終ステージが同じ `frontend` ステージから `public/build` を取得するため、アセットの不整合が構造的に発生せず、volume 共有も不要。
 >
-> **判断 A の要**: 上の `frontend` ステージ（`public/build` を生成）は、後述の Nginx イメージ（§2-5）からも同じ成果物を参照する。両イメージが同一のビルド成果を焼き込むため、volume 共有なしでアセットの不整合が起きない。
+> **実測（ARM64・Raspberry Pi）**: 初回フルビルド約 1171 秒。内訳の大半は PHP 拡張のコンパイル（`apk add --virtual .build-deps` 約 882 秒、vendor ステージの `apk add` 約 584 秒）。フロント部分は `npm ci` 約 96 秒＋`npm run build` 約 78 秒。**分離構成のままだとこれらが二重に走るため統合した**。
 
 ---
 
@@ -290,44 +311,13 @@ http {
 
 ---
 
-### 2-5. `docker/nginx/Dockerfile.prod`
+### 2-5. ~~`docker/nginx/Dockerfile.prod`~~ → **廃止（§2-1 に統合）**
 
-**判断 A を反映**：volume 共有はやめ、php イメージと同じ `frontend` ビルドステージから `public/build` を焼き込む。これにより Nginx も PHP も同一のビルド成果物を持ち、不整合が構造的に発生しない。
+**2026-07-31 改訂により削除。** Nginx イメージは §2-1 の統合 Dockerfile の `nginx` ステージとして定義する。旧 `docker/nginx/Dockerfile.prod`・`docker/php/Dockerfile.prod` は §2-1 の `docker/Dockerfile.prod` への統合に伴い**削除済み**。
 
-```dockerfile
-# ---- 共通フロントビルド（php Dockerfile.prod の frontend ステージと同一内容）----
-FROM node:18-alpine AS frontend
-WORKDIR /app
-COPY ./htdocs/package.json ./htdocs/package-lock.json ./
-RUN npm ci
-COPY ./htdocs ./
-RUN npm run build
-
-# ---- Nginx 本体 ----
-FROM nginx:stable-alpine
-
-WORKDIR /var/www/html
-
-COPY ./docker/nginx/default.prod.conf /etc/nginx/conf.d/default.conf
-COPY ./docker/nginx/nginx.prod.conf   /etc/nginx/nginx.conf
-
-# 静的配信対象：public 本体 ＋ ビルド済みアセットを焼き込み
-COPY ./htdocs/public /var/www/html/public
-COPY --from=frontend /app/public/build /var/www/html/public/build
-
-RUN adduser -s /bin/sh -D -G www-data www-data 2>/dev/null || true \
-    && chown -R www-data:www-data /var/www/html
-
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-> **判断 A の設計意図**:
->
-> - 当初案の「app→web を volume で共有」は、空 volume にのみイメージ内容がコピーされる Docker の初期化挙動に依存し、**2 回目以降のデプロイでアセットが古いまま残るリスク**があった。`deploy.sh` で volume を削除する回避策も、削除漏れや競合で壊れやすい。
-> - 代わりに **app と web が各自のイメージ内に `public/build` を焼き込む**。ビルドステージは同一定義なので成果物は一致する。デプロイ（再ビルド）のたびに両者が最新の同一アセットを持つ。
-> - コスト：`npm run build` が 2 回走る（app 用・web 用）。ラズパイでは無視できない時間になり得るため、§5 のクロスビルド案（開発機で ARM64 イメージを buildx）と併せて検討。**ビルド時間が問題なら判断 A を維持したまま、後述の「単一ビルダーステージ共有」最適化（§7-A 補足）に切り替えられる。**
->   **`storage/app/public`（アバター画像）の配信について（判断 B）**:
->   アバターは LINE ログイン毎に再生成される揮発データのため、永続化 volume は持たない。`public/storage` シンボリックリンク（`storage:link` で生成）は app コンテナ内に張られ、app が保存したアバターを **PHP 経由**で配信すれば足りる。Nginx が静的に直接配信する必要がある場合のみ storage の共有が要るが、Phase 1 では PHP 経由配信で問題ない。実装後にアバターが表示されるかを検証（§4 チェックリスト）。
+> **なぜ分離をやめたか**: 分離構成では nginx 用 Dockerfile にも `frontend` ステージが必要だが、`npm run build` は `vendor`（Ziggy）を要求するため、nginx 側にも `vendor` ステージを持たせる必要が生じる。すると ARM 上で約 584 秒かかる `apk add` とフロントビルドが二重に走り、コストが許容範囲を超える。§7-A に記録した「切り替え基準」に該当したため統合した。
+> **`storage/app/public`（アバター画像）の配信について（判断 B）**:
+> アバターは LINE ログイン毎に再生成される揮発データのため、永続化 volume は持たない。`public/storage` シンボリックリンク（`storage:link` で生成）は app コンテナ内に張られ、app が保存したアバターを **PHP 経由**で配信すれば足りる。Nginx が静的に直接配信する必要がある場合のみ storage の共有が要るが、Phase 1 では PHP 経由配信で問題ない。実装後にアバターが表示されるかを検証（§4 チェックリスト）。
 
 ---
 
@@ -376,7 +366,12 @@ services:
     container_name: uchistock-app-prod
     build:
       context: .
-      dockerfile: ./docker/php/Dockerfile.prod
+      dockerfile: ./docker/Dockerfile.prod
+      target: php-fpm # 統合 Dockerfile の php-fpm ステージ
+    # 本番イメージには .env を焼き込まない（.dockerignore で除外）。
+    # ラズパイ上の htdocs/.env を起動時に環境変数として注入する。
+    env_file:
+      - ./htdocs/.env
     environment:
       - DB_HOST=db
       - REDIS_HOST=redis
@@ -393,7 +388,8 @@ services:
     container_name: uchistock-web-prod
     build:
       context: .
-      dockerfile: ./docker/nginx/Dockerfile.prod
+      dockerfile: ./docker/Dockerfile.prod
+      target: nginx # 統合 Dockerfile の nginx ステージ
     # cloudflared（ホスト）からのみ到達。ローカルホストにのみバインド。
     ports:
       - '127.0.0.1:8080:80'
@@ -411,6 +407,29 @@ volumes:
   mysql_data_prod:
   redis_data_prod:
 ```
+
+> ### ⚠ 最重要：すべての compose コマンドに `--env-file ./htdocs/.env` を付けること
+>
+> `db` サービスの `${DB_DATABASE}` 等は **compose ファイル自身の変数展開**であり、`env_file:`（コンテナへの環境変数注入）とは別物。Compose が変数展開に使う `.env` は**プロジェクトルート**のものなので、`htdocs/.env` は自動では読まれない。
+>
+> ```bash
+> docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml <command>
+> ```
+>
+> **付け忘れると起きること**（実際に発生）:
+>
+> - ルートに `.env`（開発用）があると**黙ってそれが使われ**、開発用の DB 名／パスワードで MySQL が初期化される
+> - ルートに `.env` が無い場合は `The "DB_DATABASE" variable is not set` の警告が出て、MySQL は `MYSQL_ROOT_PASSWORD` 空で起動失敗する
+>
+> **MySQL の初期化は volume 作成時の 1 回だけ**。誤った値で初期化してしまったら、volume を作り直す以外に修正できない:
+>
+> ```bash
+> docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml down
+> docker volume rm uchi_stock_mysql_data_prod   # 名前は docker volume ls で確認
+> docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml up -d
+> ```
+>
+> **推奨**: ラズパイ上ではプロジェクトルートの `.env` を退避する（`mv .env .env.dev.bak`）。付け忘れた際に「静かに開発用設定で動く」のではなく「警告が出て失敗する」ようになり、事故に気づける。`deploy.sh` / `scripts/backup-db.sh` 内の compose 呼び出しにも `--env-file` を入れること。
 
 > **ポイント**:
 >
@@ -504,11 +523,16 @@ echo "==> 完了"
 
 ---
 
-### 2-9. ホスト側 systemd 設定（参考。リポジトリには含めない）
+### 2-9. cloudflared 設定 → **不採用。`07_cloudflare_tunnel.md` を参照**
+
+> **2026-07-30 追記**: 以下のトークン方式は**採用しなかった**。ラズパイに既存トンネル `pi-tunnel` がローカル管理方式（`/etc/cloudflared/config.yml`）で稼働していたため、そこに ingress ルールを追記する方式で実施し、疎通確認まで完了済み。**実際の手順は `07_cloudflare_tunnel.md` にまとめてあるが、トンネル設定・ホスト固有情報を含むためリポジトリにはコミットせず、リポジトリ外（本人の手元）で個別管理している。** 以下は参考として残す。
+
+<details>
+<summary>不採用となったトークン方式（参考）</summary>
+
+#### `cloudflared/uchistock.service.example`（ホスト側 systemd）
 
 cloudflared は**コンテナではなくホストで** systemd 常駐。トークンは発行済み。
-
-> このユニット定義はリポジトリに実ファイルとして置かない（トークンを含む運用のため、コミット対象にする意味が薄い）。以下の内容をそのままラズパイ上の `/etc/systemd/system/cloudflared-uchistock.service` として作成する。
 
 ```ini
 # /etc/systemd/system/cloudflared-uchistock.service に配置
@@ -542,7 +566,9 @@ sudo systemctl enable --now cloudflared-uchistock
 sudo systemctl status cloudflared-uchistock
 ```
 
-> **接続の全体像**:
+</details>
+
+> **接続の全体像**（方式によらず共通）:
 > `インターネット → Cloudflare → (Tunnel) → cloudflared(ホスト) → localhost:8080 → web コンテナ(Nginx:80) → app コンテナ(PHP-FPM:9000)`
 > DB・Redis はこの経路のどこからも直接露出しない。
 
@@ -587,7 +613,7 @@ exec "$@"
 ```bash
 #!/bin/bash
 # UchiStock DB バックアップ（ホスト cron から日次実行）
-# crontab 例: 0 3 * * *  /path/to/uchistock/scripts/backup-db.sh >> /var/log/uchistock-backup.log 2>&1
+# crontab 例: 0 3 * * *  /path/to/uchistock/scripts/backup-db.sh >> /home/pi/uchistock-backup.log 2>&1
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -623,7 +649,7 @@ echo "==> 完了: $(ls -1 "$BACKUP_DIR"/uchistock_*.sql.gz | wc -l) 世代保持
 chmod +x scripts/backup-db.sh
 crontab -e
 # 毎日 03:00 に実行
-# 0 3 * * *  /home/pi/uchistock/scripts/backup-db.sh >> /var/log/uchistock-backup.log 2>&1
+# 0 3 * * *  /home/pi/uchistock/scripts/backup-db.sh >> /home/pi/uchistock-backup.log 2>&1
 ```
 
 #### リストア検証（この工程まで実施して初めて「バックアップができた」とみなす）
@@ -679,8 +705,19 @@ docker compose -f docker-compose.prod.yml run --rm app php artisan key:generate 
 # 3. 起動
 docker compose -f docker-compose.prod.yml up -d
 
-# 4. 初回マイグレーション（seed が必要なら --seed）
+# 4. 初回マイグレーション
 docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+
+# 4-1. マスタデータ投入（初回のみ・`--seed`は使わない）
+#   `migrate --seed` は DatabaseSeeder 全体（UserSeeder/ItemSeeder の開発用テストデータ含む）を
+#   本番に投入してしまうため使用しない。マスタ系シーダーのみ個別に実行する。
+#   RolesTableSeeder / ColorsTableSeeder はどちらも id を明示した insert で冪等ではないため、
+#   再実行すると主キー重複で失敗する。deploy.sh には含めず、初回のみ手動実行とする。
+#   ColorsTableSeeder を投入しないと、ジャンル新規作成時に colors への外部キー制約違反で失敗する。
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T app \
+  php artisan db:seed --class=RolesTableSeeder --force
+docker compose --env-file ./htdocs/.env -f docker-compose.prod.yml exec -T app \
+  php artisan db:seed --class=ColorsTableSeeder --force
 
 # 5. キャッシュ最適化
 docker compose -f docker-compose.prod.yml exec -T app php artisan config:cache
@@ -705,6 +742,7 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 - [ ] LINE ログインが本番ドメインで成功する（コールバック URL 登録済み）
 - [ ] アイテム一覧・ステータス変更・「買った」ワンタップが動作
 - [ ] ラズパイ再起動後、`docker compose` と cloudflared が自動復帰する
+- [ ] `app/Http/Middleware/TrustProxies.php` の `$proxies` が `'*'` になっている（Cloudflare Tunnel構成で必須。§5-5参照）
 
 ---
 
@@ -712,10 +750,14 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 
 > 当初「あとで考える」だった 4 論点（アセット共有・storage 永続化・キュー・バックアップ）は §7 で確定済み。ここに残るのは、実装後に実測しないと最終値が決まらない項目のみ。
 
-1. **`npm run build` が vendor を必要とするか**（Ziggy 等）。不要なら php Dockerfile.prod の frontend ステージの vendor コピー行を削除。nginx Dockerfile.prod の frontend ステージは vendor を持たないので、必要なら合わせて追加。
-2. **ARM64 でのビルド時間**。ラズパイ上ビルドが重い場合は、開発機で `docker buildx` により ARM64 イメージをクロスビルドして持ち込む。§7-A 補足の「単一ビルダー共有」最適化も検討。
+1. ~~**`npm run build` が vendor を必要とするか**~~ → **確定（2026-07-31）：必要**。Ziggy は composer パッケージ（`tightenco/ziggy`）で、`tsc` が `../../vendor/tightenco/ziggy` を型解決に使う。無いと `TS2307: Cannot find module` でビルド失敗。frontend ステージへの vendor コピーは**必須**。
+2. ~~**ARM64 でのビルド時間**~~ → **実測（2026-07-31）：初回フルビルド約 1171 秒**。内訳は PHP 拡張コンパイルが支配的（`apk add --virtual .build-deps` 約 882 秒、vendor ステージ 約 584 秒）、フロントは `npm ci` 約 96 秒＋`npm run build` 約 78 秒。この結果を受けて **Dockerfile を統合**（§7-A）。以降の再ビルドは拡張コンパイルがレイヤーキャッシュに乗るため大幅に短縮される見込み（要実測）。なお開発機で `docker buildx` によるクロスビルドに切り替える案は引き続き有効（Phase 2 検討）。
 3. **CSP のドメイン**。`'self'` ベースで足りるか、ブラウザのコンソールで実検証して調整。
 4. **`opcache.validate_timestamps = 0`** の副作用：デプロイ後は必ず再ビルド＋recreate（`deploy.sh` が満たす）。
+5. **TrustProxies の設定**（Cloudflare Tunnel 構成で必須）。`app/Http/Middleware/TrustProxies.php` の `$proxies` が未設定（null）だと `X-Forwarded-Proto: https` が無視され、Laravel が自身を HTTP と誤認する。結果として `asset()`／`route()` が `http://` を生成し Mixed Content、リダイレクトが http に落ちる、`session.cookie_secure=On` のため Cookie が送られずセッション／CSRF が壊れる、といった原因の分かりにくい不具合が出る。
+   - **対処**: `protected $proxies = '*';`
+   - **`'127.0.0.1'` では効かない**：PHP-FPM から見た接続元は cloudflared ではなく **Nginx コンテナ**であり、クライアント IP は Docker ブリッジのゲートウェイ（`172.x.x.1` 等）になるため。
+   - `'*'` が妥当な理由：`web` は `127.0.0.1:8080` にのみバインドされ外部から直接叩けないため、ヘッダーを偽装できる第三者の経路が存在しない。
 
 ---
 
@@ -739,18 +781,19 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 
 **トレードオフと補足**: `npm run build` が app 用・web 用で 2 回走る。ラズパイでは無視できない時間になり得る。
 
-**現時点の決定（2026-07-28）**: **別々ステージ方式のまま進める**。理由は、ラズパイでの `npm run build` の所要時間が未実測で、統合の必要性を判断する材料がないため。まず実測し、問題が出たら対応する（「推測より計測」）。この方式は 1 ファイルで完結し可読性が高く、マルチステージビルドの学習にも適している。
+**当初の決定（2026-07-28）**: 別々ステージ方式のまま進める。ラズパイでの `npm run build` の所要時間が未実測で、統合の必要性を判断する材料がなかったため。まず実測し、問題が出たら対応する（「推測より計測」）。
 
-**統合（単一ビルダー共有）への切り替え基準**: 次のいずれかが起きたら統合を検討する。
+**実測と再判断（2026-07-31）: 統合へ切り替え済み**
 
-- デプロイ 1 回の総ビルド時間が許容を超える（体感の目安：毎回のデプロイが億劫になる長さ。実測して判断）。
-- フロントのビルド定義（Node バージョン・ビルドコマンド等）を変更する頻度が上がり、php 側・nginx 側 2 箇所の重複メンテがミスを生むようになった。
+実際にラズパイでビルドして、切り替え基準に該当する事象が発生した。
 
-**切り替え時にやること（将来の自分への手順メモ）**:
+- **判明した事実**: `npm run build` は `vendor` を必要とする。Ziggy は composer パッケージ（`tightenco/ziggy`）で、`tsc` が `../../vendor/tightenco/ziggy` を型解決に使うため。app 側は frontend ステージに vendor をコピーしていたので通ったが、nginx 側は vendor を持たず `TS2307: Cannot find module` で失敗した。
+- **分離を維持した場合のコスト**: nginx 側にも `vendor` ステージが必要になる。vendor ステージの `apk add` は ARM 上で約 584 秒かかり、これとフロントビルド（約 174 秒）が二重に走る。当初想定していた「フロントビルド 3 分の重複」より遥かに重い。
+- **判断**: 切り替え基準の「2 箇所の重複メンテがミスを生む」に該当。**統合方式（§2-1）へ移行**した。
 
-- 1 つの「builder」ステージで `vendor` と `public/build` を作る。app イメージはそこから両方を、web イメージは `public/build` を、それぞれ `COPY --from=builder` で取得する統合 Dockerfile にする。ビルドは 1 回で済む。
-- 統合方式は別々方式の上位互換（ビルドが速く重複がない）で、機能的な劣化はない。唯一のコストは可読性がやや下がること。
-- 切り替えは Dockerfile の書き換えのみで、compose や他ファイルへの影響はない（アセットの焼き込み先は変わらないため）。
+**統合後の構成**: 単一の `docker/Dockerfile.prod` に `vendor` → `frontend` → （`php-fpm` / `nginx`）の 4 ステージを定義。ビルドステージは各 1 回のみ実行され、両最終ステージが `COPY --from` で成果物を取得する。compose 側は `target:` でイメージを作り分ける。
+
+**この経験からの学び**: 「実測してから判断する」方針は機能した。机上で統合を決めていたら妥当な選択にはなったが、_なぜ_ 統合が必要か（Ziggy の vendor 依存）を理解しないまま進むことになった。逆に分離のまま進めていたら、ビルド時間が二倍以上に膨らむ構成に気づかなかった可能性がある。
 
 ### 7-B. storage：ユーザーデータは揮発扱い、永続化しない
 
@@ -775,7 +818,7 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 # docker-compose.prod.yml に追加する worker（キュー実行）
 worker:
   container_name: uchistock-worker-prod
-  build: { context: ., dockerfile: ./docker/php/Dockerfile.prod }
+  build: { context: ., dockerfile: ./docker/Dockerfile.prod, target: php-fpm }
   command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
   environment: [DB_HOST=db, REDIS_HOST=redis, REDIS_PORT=6379]
   depends_on: [db, redis]
@@ -785,7 +828,7 @@ worker:
 # scheduler（cron 相当。「そろそろ無いかも」判定バッチ等）
 scheduler:
   container_name: uchistock-scheduler-prod
-  build: { context: ., dockerfile: ./docker/php/Dockerfile.prod }
+  build: { context: ., dockerfile: ./docker/Dockerfile.prod, target: php-fpm }
   command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
   environment: [DB_HOST=db, REDIS_HOST=redis, REDIS_PORT=6379]
   depends_on: [db, redis]
@@ -812,26 +855,17 @@ scheduler:
 
 ---
 
-## 6. この指示書のスコープ外（今はやらない）
-
-- FrankenPHP / Octane への移行（Nginx 存置で十分）
-- CI/CD パイプライン化（Phase 1 は手動 `deploy.sh` で十分）
-- 複数プロジェクト同居のためのリバースプロキシ集約（ラズパイを共用サーバー化する場合の Phase 2 テーマ）
-- 監視・アラート・ログ集約
-
----
-
 ## 実装順序（Claude Code 向け推奨）
 
 1. §2-2 `php.prod.ini` → §2-4 `nginx.prod.conf` → §2-3 `default.prod.conf`（設定ファイル 3 点を先に）
-2. §2-10 `entrypoint.prod.sh`（php イメージが参照するので Dockerfile より前に用意）
-3. §2-1 `Dockerfile.prod`（php）→ §2-5 `Dockerfile.prod`（nginx）
-4. §2-6 `docker-compose.prod.yml`
+2. §2-10 `entrypoint.prod.sh`（Dockerfile が参照するので先に用意）
+3. §2-1 `docker/Dockerfile.prod`（**統合**。旧 `docker/php/Dockerfile.prod`・`docker/nginx/Dockerfile.prod` は削除）
+4. §2-6 `docker-compose.prod.yml`（`target:` 指定・`env_file:` 追加）
 5. §2-7 `.env.production.example`
-6. §2-8 `deploy.sh` ＋ §2-11 `scripts/backup-db.sh`（実行権限 `chmod +x` を両方に付与）
-7. ローカル（開発機）で `docker compose -f docker-compose.prod.yml build` が通ることまで確認
-8. §5 の実測項目（vendor 要否・ビルド時間・CSP）を潰す
-9. §2-9 の内容を参考に、ラズパイ上で cloudflared の systemd ユニットを直接作成（リポジトリには含めない）
+6. §2-8 `deploy.sh` ＋ §2-11 `scripts/backup-db.sh`（**compose 呼び出しに `--env-file ./htdocs/.env` を入れる**・`chmod +x` を両方に付与）
+7. §5-5 TrustProxies の修正（`$proxies = '*'`）
+8. cloudflared 設定 → **`07_cloudflare_tunnel.md`（リポジトリ外で個別管理・非コミット）を参照**（既存 `pi-tunnel` の `config.yml` に ingress 追記する方式で実施済み。§2-9 のトークン方式は不採用）
+9. §5 の残項目（CSP）を実機で潰す
 
 > すべて新規ファイル。既存の `docker-compose.yml`・`docker/**/Dockerfile`・`php.ini`・`nginx.conf`・`default.conf` は**編集しないこと**。
 >

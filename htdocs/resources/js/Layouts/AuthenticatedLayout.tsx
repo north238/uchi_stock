@@ -51,7 +51,7 @@ export default function Authenticated({
             <div className="flex">
               <div className="shrink-0 flex items-center">
                 <Link href="/">
-                  <ApplicationLogo className="block h-9 w-auto fill-current text-ink" />
+                  <ApplicationLogo className="block h-9 w-auto text-ink" />
                 </Link>
               </div>
               <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
