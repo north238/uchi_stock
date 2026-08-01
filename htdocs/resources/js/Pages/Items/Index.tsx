@@ -35,7 +35,7 @@ export default function Index({ auth }: PageProps) {
 
       <PageContainer className="pb-24">
         <div className="mb-4 flex items-center justify-between">
-          <PageHeading>ストック一覧</PageHeading>
+          <PageHeading>一覧</PageHeading>
 
           <Dropdown>
             <Dropdown.Trigger>

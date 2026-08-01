@@ -1,7 +1,6 @@
 import { useEffect, useState, PropsWithChildren } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
-import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { User } from "@/types";
@@ -53,15 +52,10 @@ export default function Authenticated({
                   <ApplicationLogo className="block h-9 w-auto text-ink" />
                 </Link>
               </div>
-              <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink href={route("items.index")} active={route().current("items.index")}>
-                  在庫管理
-                </NavLink>
-              </div>
             </div>
 
             <div className="hidden sm:flex sm:items-center sm:ms-6">
-              <div>
+              <div className="shrink-0">
                 <img
                   src={
                     user.avatar_path ? `/storage/${user.avatar_path}` : "/img/default-avatar.svg"
@@ -70,35 +64,33 @@ export default function Authenticated({
                   className="w-10 h-10 rounded-full object-cover"
                 />
               </div>
-              <div className="ms-2 relative">
+              <div className="ms-2 relative min-w-0">
                 <Dropdown>
                   <Dropdown.Trigger>
-                    <span className="inline-flex rounded-md">
-                      <button
-                        type="button"
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-muted bg-surface hover:text-ink focus:outline-none transition ease-in-out duration-150"
-                      >
-                        <div className="flex flex-col items-start gap-2 max-w-40">
-                          <span className="block max-w-40 truncate">
-                            {user.group ? user.group?.name : "グループ未所属"}
-                          </span>
-                          <span className="block max-w-40 truncate">{user.name}</span>
-                        </div>
+                    <button
+                      type="button"
+                      className="flex w-full min-w-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-muted bg-surface hover:text-ink focus:outline-none transition ease-in-out duration-150"
+                    >
+                      <div className="flex min-w-0 flex-col items-start gap-2 max-w-40">
+                        <span className="block w-full truncate">
+                          {user.group ? user.group?.name : "グループ未所属"}
+                        </span>
+                        <span className="block w-full truncate">{user.name}</span>
+                      </div>
 
-                        <svg
-                          className="ms-2 -me-0.5 h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </span>
+                      <svg
+                        className="ms-2 -me-0.5 h-4 w-4 shrink-0"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
                   </Dropdown.Trigger>
 
                   <Dropdown.Content>
@@ -148,7 +140,7 @@ export default function Authenticated({
           <div className="max-w-page mx-auto">
             <div className="pt-2 pb-3 space-y-1">
               <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
-                在庫管理
+                一覧
               </ResponsiveNavLink>
             </div>
 

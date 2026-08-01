@@ -284,7 +284,9 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 - 背景 `bg-gray-100 dark:bg-gray-900` → `bg-paper`。
 - ナビ／ヘッダー `bg-white dark:bg-gray-800` → `bg-surface`、境界 `border-line`。
 - アクティブ `NavLink` の下線・強調を `accent` に（現状 indigo/blue）。
+  - **2026-08-02 追記**: デスクトップ用の「在庫管理」`NavLink`はロゴ（`/`）と遷移先が重複する単一機能アプリのため削除し、`Components/NavLink.tsx`も削除済み。モバイルのハンバーガーメニュー（`ResponsiveNavLink`）には引き続き「在庫管理」の項目を残す。
 - ドロップダウン起点ボタン・アバターもトークン化。グループ未所属の強制モーダルは §6.6 の Modal 規定に従う（ボタンは §6.2 準拠）。
+  - **2026-08-02 追記（ナビの崩れ対策）**: ユーザー名・グループ名が長い場合、Flexboxの既定挙動（`min-width: auto`）により`truncate`が効かずアバターが圧縮される不具合があった。アバターのラッパーに`shrink-0`、ドロップダウンのトリガー`button`とその子孫チェーンに`min-w-0`／各`truncate`要素に`w-full`、チェブロンアイコンに`shrink-0`を付与し、横幅が不足した際は常にグループ名/ユーザー名側だけが省略記号で縮む構成に統一した。
 - **スクロール構造（Phase 12 で確定・禁止事項）**: ルート要素は `min-h-screen`（ドキュメントスクロール）とする。`h-screen` ＋ `main` の内部スクロール（`overflow-y-auto`）は、内部スクロールが機能しない条件下で画面下部に到達できなくなる不具合を起こすため**禁止**。ナビは `sticky top-0 z-30` で固定し、ナビ内側の最大幅は `max-w-page`（§2.2）。
 
 **`header` prop は廃止済み（Phase 12）**。全画面は §6.10 の `PageContainer` + `PageHeading` でページ骨格を組む。
@@ -354,6 +356,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 
 - **`Components/PageContainer.tsx`**: `mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-8`。本文の外側コンテナは常にこれを使う。個別の余白調整は `className` で追記する（例: Items一覧の `pb-24`）。
 - **`Components/PageHeading.tsx`**: `<h1 className="text-xl font-bold text-ink">`。ページタイトルは常にこれを使う。
+  - **`PageHeading`（画面内の見出し）と`Head title`（ブラウザタブのタイトル）は別物として扱う（2026-08-02 確定）**。このアプリは`resources/views/app.blade.php`の`<title inertia>`をInertiaの`Head`が丸ごと上書きする作りで、アプリ名のサフィックスが付与されない。そのため`Head title`は他タブとの識別のため機能名を含めた文言（例:「ストック一覧」）を維持し、`PageHeading`は画面内でロゴ・ナビが見えている文脈を踏まえて簡潔な文言（例:「一覧」）にしてよい。単一機能アプリのItems系画面（`Items/Index.tsx`＝一覧、`Create.tsx`＝登録、`Edit.tsx`＝編集）で採用。モバイルメニューの`ResponsiveNavLink`（`AuthenticatedLayout.tsx`）も遷移先画面の`PageHeading`と表記を揃える。
 - パネル（カード）要素のパディングは **`p-4 sm:p-8` のみ**とする。`p-*` と `px-*`/`py-*` を同一要素に併記しない（Tailwindの生成順で後勝ちになり、意図しないクラスが無効化される事故のもと）。
 - **パネルの角丸は `rounded-[20px]` をブレークポイント問わず常時適用する**（2026-08-02 確定）。`PageContainer` は全ブレークポイントで `px-4` 以上の余白を確保しており、パネルが画面端に接すること（フルブリード）はないため、`sm:rounded-[20px]` のようにモバイルのみ直角にする理由がない。過去の実装で `sm:` を付けたまま踏襲された箇所があったため、以後は付けない。
 - 1000px 級の1カラムは採らない（`docs/02` §7「3秒で判断」に反するため）。本文幅は576px（`max-w-page`）に統一。カードの2カラム化（`lg`以上）は将来の選択肢として保留。

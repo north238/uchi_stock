@@ -12,6 +12,7 @@ interface Item {
   name: string;
   status: ItemStatusValue;
   quantity: number | null;
+  memo: string | null;
   genre_id: number | null;
   place_id: number | null;
 }
@@ -23,7 +24,7 @@ export default function Edit({ auth }: PageProps) {
     name: item?.name ?? "",
     status: item?.status ?? ("in_stock" as ItemStatusValue),
     quantity: item?.quantity ?? null,
-    memo: "",
+    memo: item?.memo ?? "",
     genre_id: item?.genre_id ?? null,
     place_id: item?.place_id ?? null,
   });
@@ -47,7 +48,7 @@ export default function Edit({ auth }: PageProps) {
           <MdArrowBack className="h-4 w-4" />
           戻る
         </Link>
-        <PageHeading>ストック編集</PageHeading>
+        <PageHeading>編集</PageHeading>
         <div className="mt-4">
           <Form
             data={data}

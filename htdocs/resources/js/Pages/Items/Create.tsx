@@ -39,7 +39,7 @@ export default function Create({ auth }: PageProps) {
           <MdArrowBack className="h-4 w-4" />
           戻る
         </Link>
-        <PageHeading>ストック登録</PageHeading>
+        <PageHeading>登録</PageHeading>
         <div className="mt-4">
           <Form
             data={data}
