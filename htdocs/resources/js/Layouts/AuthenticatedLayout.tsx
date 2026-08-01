@@ -140,7 +140,7 @@ export default function Authenticated({
           <div className="max-w-page mx-auto">
             <div className="pt-2 pb-3 space-y-1">
               <ResponsiveNavLink href={route("items.index")} active={route().current("items.index")}>
-                在庫管理
+                一覧
               </ResponsiveNavLink>
             </div>
 

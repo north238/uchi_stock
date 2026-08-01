@@ -356,6 +356,7 @@ Tailwind へ `danger` / `danger-ink` / `danger-soft` を §2.2 と同じ要領�
 
 - **`Components/PageContainer.tsx`**: `mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-8`。本文の外側コンテナは常にこれを使う。個別の余白調整は `className` で追記する（例: Items一覧の `pb-24`）。
 - **`Components/PageHeading.tsx`**: `<h1 className="text-xl font-bold text-ink">`。ページタイトルは常にこれを使う。
+  - **`PageHeading`（画面内の見出し）と`Head title`（ブラウザタブのタイトル）は別物として扱う（2026-08-02 確定）**。このアプリは`resources/views/app.blade.php`の`<title inertia>`をInertiaの`Head`が丸ごと上書きする作りで、アプリ名のサフィックスが付与されない。そのため`Head title`は他タブとの識別のため機能名を含めた文言（例:「ストック一覧」）を維持し、`PageHeading`は画面内でロゴ・ナビが見えている文脈を踏まえて簡潔な文言（例:「一覧」）にしてよい。単一機能アプリのItems系画面（`Items/Index.tsx`＝一覧、`Create.tsx`＝登録、`Edit.tsx`＝編集）で採用。モバイルメニューの`ResponsiveNavLink`（`AuthenticatedLayout.tsx`）も遷移先画面の`PageHeading`と表記を揃える。
 - パネル（カード）要素のパディングは **`p-4 sm:p-8` のみ**とする。`p-*` と `px-*`/`py-*` を同一要素に併記しない（Tailwindの生成順で後勝ちになり、意図しないクラスが無効化される事故のもと）。
 - **パネルの角丸は `rounded-[20px]` をブレークポイント問わず常時適用する**（2026-08-02 確定）。`PageContainer` は全ブレークポイントで `px-4` 以上の余白を確保しており、パネルが画面端に接すること（フルブリード）はないため、`sm:rounded-[20px]` のようにモバイルのみ直角にする理由がない。過去の実装で `sm:` を付けたまま踏襲された箇所があったため、以後は付けない。
 - 1000px 級の1カラムは採らない（`docs/02` §7「3秒で判断」に反するため）。本文幅は576px（`max-w-page`）に統一。カードの2カラム化（`lg`以上）は将来の選択肢として保留。

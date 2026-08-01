@@ -47,7 +47,7 @@ export default function Edit({ auth }: PageProps) {
           <MdArrowBack className="h-4 w-4" />
           戻る
         </Link>
-        <PageHeading>ストック編集</PageHeading>
+        <PageHeading>編集</PageHeading>
         <div className="mt-4">
           <Form
             data={data}
