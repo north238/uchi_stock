@@ -3,7 +3,6 @@ import InputLabel from "@/Components/InputLabel";
 import SelectInput from "@/Components/SelectInput";
 import InputError from "@/Components/InputError";
 import Modal from "@/Components/Modal";
-import AddButton from "@/Components/Buttons/AddButton";
 import SaveButton from "@/Components/Buttons/SaveButton";
 import CancelButton from "@/Components/Buttons/CancelButton";
 import TextInput from "@/Components/TextInput";
@@ -56,24 +55,27 @@ export default function SelectableWithAdd({
 
   return (
     <div>
-      <InputLabel htmlFor={id} value={label} />
-      <div className="flex gap-2 items-center mt-1">
-        <div className="flex-grow">
-          <SelectInput
-            id={id}
-            name={id}
-            options={options}
-            value={value || ""}
-            onChange={onChange}
-            error={!!error}
-            className="block w-full"
-            disabled={disabled}
-          />
-        </div>
-        <div className="flex-shrink-0 w-20">
-          <AddButton onClick={() => setIsOpen(true)} disabled={disabled} />
-        </div>
+      <div className="flex items-center justify-between">
+        <InputLabel htmlFor={id} value={label} />
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          disabled={disabled}
+          className="whitespace-nowrap px-2 py-2 text-sm font-bold text-accent disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          ＋ 追加
+        </button>
       </div>
+      <SelectInput
+        id={id}
+        name={id}
+        options={options}
+        value={value || ""}
+        onChange={onChange}
+        error={!!error}
+        className="mt-1 block w-full"
+        disabled={disabled}
+      />
       <InputError message={error} className="mt-2" />
 
       {/* モーダル要素 */}
