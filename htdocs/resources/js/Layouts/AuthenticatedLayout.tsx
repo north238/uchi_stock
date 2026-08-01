@@ -160,6 +160,13 @@ export default function Authenticated({
 
               <div className="mt-3 space-y-1">
                 <ResponsiveNavLink href={route("profile.edit")}>プロフィール</ResponsiveNavLink>
+                {user.group_id ? (
+                  <ResponsiveNavLink href={route("groups.edit", user.group_id)}>
+                    グループ編集
+                  </ResponsiveNavLink>
+                ) : (
+                  <ResponsiveNavLink href={route("groups.create")}>グループ作成</ResponsiveNavLink>
+                )}
                 <ResponsiveNavLink method="post" href={route("logout")} as="button">
                   ログアウト
                 </ResponsiveNavLink>
