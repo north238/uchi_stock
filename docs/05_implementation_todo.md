@@ -1,7 +1,7 @@
 # UchiStock 実装 TODO / 進捗管理
 
 最終更新: 2026-08-01
-現在地: **Phase 13 着手中**（ジャンルのColor切り離し。完了後 Phase 12〔UI一貫性・不具合修正〕へ）
+現在地: **Phase 13・Phase 12 完了**（実装・自動テストまで完了。ブラウザでの実機/実見た目確認はツール制約により未実施）
 作業ブランチ: `worktree-mvp_phase11`（Phase 0/1 は `feat/mvp_phase1`〔PR #80〕、Phase 2 は `feat/mvp_phase2`〔PR #81〕、Phase 3 は `feat/mvp_phase3`〔PR #82〕、Phase 4 は `feat/mvp_phase4`〔PR #83〕、Phase 5 は `feat/mvp_phase5`〔PR #84〕、Phase 6 は `feat/mvp_phase6`〔PR #85〕、Phase 7 は `feat/mvp_phase7`〔PR #86〕、Phase 8 は `feat/mvp_phase8`〔PR #87, #88〕、Phase 9 は `feat/mvp_phase9`〔PR #89, #90〕として順次`development`へマージ済み）
 対象: MVP フェーズ0（`docs/02` 要件 / `docs/03` 実装計画 / `docs/04` フロント指示書）
 
@@ -30,8 +30,8 @@
 | 9 | 総仕上げ・受け入れ | 03 §5, ステップ5 | ✅ 完了 |
 | 10 | 登録UX改善（遷移・購入履歴自動記録・トースト） | 03 §7.13,§7.14 / 04 §5.6,§5.8,§10.7 | ✅ 完了 |
 | 11 | 音声入力の削除 | 02 §5 / 03 §4,ステップ6 / 04 §8,§5.7,§10.9 / CLAUDE.md §8 | ✅ 完了 |
-| 13 | ジャンルのColor切り離し・登録API改修 | 08 | 🟡 着手中 |
-| 12 | UI一貫性・不具合修正 | 09 / 04（事後反映） | ⬜ 未着手（Phase 13完了待ち） |
+| 13 | ジャンルのColor切り離し・登録API改修 | 08 | ✅ 完了 |
+| 12 | UI一貫性・不具合修正 | 09 / 04（事後反映） | ✅ 完了 |
 
 状態の凡例: ⬜ 未着手 / 🟡 着手中 / ✅ 完了
 
@@ -183,7 +183,15 @@
   - (a) ジャンルごとの色分け表示ニーズが顕在化した場合、`Color`/`colors`をそのまま活用してUIを実装する。
   - (b) 恒久的に不要と判断した場合、`Color`モデル・`colors`テーブル・`ColorsTableSeeder`・`Genre.color_id`カラム・リレーションを削除する（新規migrationでdrop、既存migrationは編集しない）。
 - **注意**: `Genre`関連ファイルは CLAUDE.md §8「変更禁止: ジャンル・保管場所の管理機能」の対象に含まれる。(b)を実施する場合も含め、着手前に必ずユーザーの明示的な合意を取ること。
-- **決着（2026-08-01）**: 選択肢 (b) を採用。開発者本人の明示的な合意を取得済み。詳細は `docs/08_genre_color_removal.md`（Phase 13）を参照。CLAUDE.md §8・`docs/02` §5 の変更禁止事項からジャンルを除外済み（保管場所は引き続き変更禁止）。
+- **決着（2026-08-01）**: 選択肢 (b) を採用。開発者本人の明示的な合意を取得済み。詳細は `docs/08_genre_color_removal.md`（Phase 13）を参照。CLAUDE.md §8・`docs/02` §5 の変更禁止事項からジャンルを除外済み（保管場所は引き続き変更禁止）。Phase 13で実装完了（2026-08-01）。
+
+### ジャンル登録APIにバリデーションがない — 2026-08-01発見（Phase 13スコープ外）
+
+- `Api/GenreController::store()` は `name` の必須・最大長・重複禁止のバリデーションを行っていない（`docs/08` §4-2でスコープ外と明記済み）。ID返却方式のため同名重複があっても自動選択自体は正しく動作するが、空文字列や極端に長い名前の登録を防げない。将来対応する場合は `Api/PlaceController::store()` も同様の状態のため合わせて検討する。
+
+### `genre_id`/`place_id` の型不整合 — 2026-08-01発見（Phase 12スコープ外）
+
+- `Items/Partials/Form.tsx` の `FormItemFields.genre_id`/`place_id` は型上 `number | null` だが、実際には `handleGenreChange`/`handlePlaceChange`（`e.target.value`）や自動選択実装（`String(res.data.id)`）で文字列がセットされている。既存の挙動（`SelectInput`の`value`が`String(id)`前提）に合わせるため意図的に文字列としているが、型定義と実体が乖離している。将来的に型を`string | null`へ修正するか、送信直前に数値変換する対応を検討する。
 
 ---
 
@@ -194,17 +202,17 @@
 - [x] ドキュメント更新: `CLAUDE.md` §8 の変更禁止からジャンルを除外 [08 §1]
 - [x] ドキュメント更新: `docs/02` §5 に同旨を注記 [08 §1]
 - [x] ドキュメント更新: 本ファイルのバックログ「Color関連」に決着を追記、本節を新設 [08 §1]
-- [ ] マイグレーション追加: `genres.color_id` と `colors` テーブルを削除（新規migration、既存は編集しない）[08 §3]
-- [ ] `app/Models/Genre.php`: `color_id`（fillable）・`color()`リレーション・`with('color')`を削除 [08 §4-1]
-- [ ] `app/Models/Color.php` を削除 [08 §4-1]
-- [ ] `database/seeders/ColorsTableSeeder.php` を削除し `DatabaseSeeder.php` から呼び出しを削除 [08 §4-1]
-- [ ] `Api/GenreController::store()`: `color_id`削除・`data`返却・201化・文言修正 [08 §4-2]
-- [ ] `Api/PlaceController::store()`: `data`返却のみ追加（他は変更しない）[08 §4-3]
-- [ ] `resources/js/api/optionsApi.ts`: `addGenre`/`addPlace`に戻り値の型付与 [08 §4-4]
-- [ ] `tests/Feature/GenreApiTest.php` 新規作成（ジャンル・保管場所双方のFeatureテスト）[08 §5]
-- [ ] `php artisan migrate` / `migrate:fresh --seed` 成功、`genres.color_id`/`colors`不在を確認 [08 §8]
-- [ ] `grep -rn "color" htdocs/app htdocs/database htdocs/resources` で残存参照なしを確認 [08 §8]
-- [ ] ブラウザでジャンル・保管場所セレクトが従来通り動作することを確認 [08 §8]
+- [x] マイグレーション追加: `genres.color_id` と `colors` テーブルを削除（新規migration、既存は編集しない）[08 §3]
+- [x] `app/Models/Genre.php`: `color_id`（fillable）・`color()`リレーション・`with('color')`を削除 [08 §4-1]
+- [x] `app/Models/Color.php` を削除 [08 §4-1]
+- [x] `database/seeders/ColorsTableSeeder.php` を削除し `DatabaseSeeder.php` から呼び出しを削除 [08 §4-1]
+- [x] `Api/GenreController::store()`: `color_id`削除・`data`返却・201化・文言修正 [08 §4-2]
+- [x] `Api/PlaceController::store()`: `data`返却のみ追加（他は変更しない）[08 §4-3]
+- [x] `resources/js/api/optionsApi.ts`: `addGenre`/`addPlace`に戻り値の型付与 [08 §4-4]
+- [x] `tests/Feature/GenreApiTest.php` 新規作成（ジャンル・保管場所双方のFeatureテスト）[08 §5]
+- [x] `php artisan migrate` / `migrate:fresh --seed` 成功、`genres.color_id`/`colors`不在を確認 [08 §8]
+- [x] `grep -rn "color" htdocs/app htdocs/database htdocs/resources` で残存参照なしを確認 [08 §8]
+- [ ] ブラウザでジャンル・保管場所セレクトが従来通り動作することを確認 [08 §8]（本セッションのツール制約により未実施。ユーザーによる確認を推奨）
 
 ## Phase 12: UI一貫性・不具合修正 [09]
 
@@ -212,23 +220,33 @@
 
 > **注記（2026-08-01）**: 指示書は `Dashboard.tsx`・`Welcome.tsx` の存在を前提に変更対象としているが、この2ファイルは既に削除済みで現存しない（`resources/js/Pages/`配下は`Auth`/`Group`/`Items`/`Profile`のみ）。該当箇所の作業は対象外として扱う。
 
-- [ ] `AuthenticatedLayout.tsx`: `min-h-screen`化・`overflow-y-auto`削除・`<nav>`を`sticky top-0 z-30`に [09 §1]
-- [ ] `tailwind.config.js`: `maxWidth.page`（36rem）新設、ナビ内側幅を統一 [09 §3-0]
-- [ ] `Components/PageContainer.tsx` / `PageHeading.tsx` 新規作成 [09 §3-1,§3-2]
-- [ ] `header` prop廃止、Items/Group/Profile各画面を`PageContainer`+`PageHeading`へ統一（Dashboard/Welcomeは対象外）[09 §2,§3-3]
-- [ ] `Items/Partials/Form.tsx`: 外側`py-6`削除、パネルの競合クラス整理 [09 §3-4]
-- [ ] `Group/Create.tsx`: パネル内`<h2>`見出し重複解消、`lg:py:8`タイポ修正 [09 §2,§3-4]
-- [ ] `Items/Index.tsx`: `PageContainer`に`pb-24`を追加しFABとの重なりを解消 [09 §4]
-- [ ] モバイルメニューにグループ編集/作成の導線を追加 [09 §5]
-- [ ] `SelectableWithAdd.tsx`: `＋追加`をラベル行へ移動し`w-20`固定幅を撤廃 [09 §6-1]
-- [ ] `Items/Partials/Form.tsx`: 追加直後に該当オプションを自動選択（Phase 13完了後）[09 §6-2]
-- [ ] `docs/04_frontend_design_guide.md` へ事後反映（§2.2, §6.4, 新規§6.10, z-index対応表, §5.7, §5.5, §7）[09 §7]
-- [ ] `npm run tsc` / `npm run lint` / `npm run build` 成功、`php artisan test`回帰なし [09 §10]
-- [ ] 全画面でライト/ダーク・PC/スマホ実機を目視確認 [09 §10]
+- [x] `AuthenticatedLayout.tsx`: `min-h-screen`化・`overflow-y-auto`削除・`<nav>`を`sticky top-0 z-30`に [09 §1]
+- [x] `tailwind.config.js`: `maxWidth.page`（36rem）新設、ナビ内側幅を統一 [09 §3-0]
+- [x] `Components/PageContainer.tsx` / `PageHeading.tsx` 新規作成 [09 §3-1,§3-2]
+- [x] `header` prop廃止、Items/Group/Profile各画面を`PageContainer`+`PageHeading`へ統一（Dashboard/Welcomeは対象外）[09 §2,§3-3]
+- [x] `Items/Partials/Form.tsx`: 外側`py-6`削除、パネルの競合クラス整理 [09 §3-4]
+- [x] `Group/Create.tsx`: パネル内`<h2>`見出し重複解消、`lg:py:8`タイポ修正 [09 §2,§3-4]
+- [x] `Items/Index.tsx`: `PageContainer`に`pb-24`を追加しFABとの重なりを解消 [09 §4]
+- [x] モバイルメニューにグループ編集/作成の導線を追加 [09 §5]
+- [x] `SelectableWithAdd.tsx`: `＋追加`をラベル行へ移動し`w-20`固定幅を撤廃 [09 §6-1]
+- [x] `Items/Partials/Form.tsx`: 追加直後に該当オプションを自動選択（Phase 13完了後）[09 §6-2]
+- [x] `docs/04_frontend_design_guide.md` へ事後反映（§2.2, §6.4, 新規§6.10, z-index対応表, §5.7, §5.5, §7）[09 §7]
+- [x] `npm run tsc` / `npm run lint` / `npm run build` 成功、`php artisan test`回帰なし [09 §10]
+- [ ] 全画面でライト/ダーク・PC/スマホ実機を目視確認 [09 §10]（本セッションはブラウザ操作ツールが利用できず未実施。ユーザーによる確認を推奨）
 
 ---
 
 ## 進捗メモ（新しいものを上に）
+
+- 2026-08-01: Phase 13（ジャンルのColor切り離し・登録API整理）・Phase 12（UI一貫性・不具合修正）を完了。指示順序どおりPhase 13→Phase 12の順で実装。
+
+  **調査で発見した2件のドキュメント上の食い違い**: (1) `docs/08` 180行目が「`docs/07` §6-2を参照」としていたが`docs/07_logo_redesign.md`に§6-2は存在せず、正しくは`docs/09` §6-2への参照ミスだったため修正。(2) `docs/09`が`Dashboard.tsx`/`Welcome.tsx`の存在を前提にしていたが、両ファイルは既に削除済みで現存しないため、該当箇所の作業は対象外として扱った。
+
+  **Phase 13（バックエンド）**: 新規マイグレーション`2026_08_01_000000_drop_colors_and_genre_color_id.php`で`genres.color_id`と`colors`テーブルを削除（既存マイグレーションは無変更）。`Genre`モデルから`color_id`・`color()`リレーション・`with('color')`を削除、`Color`モデルと`ColorsTableSeeder`を削除、`DatabaseSeeder`から呼び出しを除去。`GenreController::store()`は`color_id`のハードコードを削除し、成功時に作成したレコード（`id`/`name`）を`data`として返却（201化、エラー文言修正）。`PlaceController::store()`は`data`返却のみ追加し他は無変更。`resources/js/api/optionsApi.ts`に`AddOptionResponse`型を追加。`tests/Feature/GenreApiTest.php`を新規作成（6ケース、`color_id`列不在の検証含む）。
+
+  **Phase 12（フロント）**: `AuthenticatedLayout.tsx`のスクロール構造を`h-screen`+`main`内部スクロールから`min-h-screen`のドキュメントスクロールに戻し（PCで保存ボタンに到達できない不具合の修正）、`<nav>`を`sticky top-0 z-30`に。`tailwind.config.js`に`maxWidth.page`（36rem）を新設しナビ幅を統一。`Components/PageContainer.tsx`・`PageHeading.tsx`を新規作成し、`header` prop方式を廃止して`AuthenticatedLayout`・`Items/Index,Create,Edit`・`Group/Create,Edit`・`Profile/Edit`を統一（`Form.tsx`の外側`py-6`重複解消・パネルの競合クラス整理、`Group/Create.tsx`の見出し重複と`lg:py:8`タイポも修正）。`Items/Index.tsx`に`pb-24`を追加しFABとの重なりを解消。モバイルメニューにグループ編集/作成の導線を追加（デスクトップ用Dropdownと同じ分岐）。`SelectableWithAdd.tsx`の「＋追加」を`w-20`固定幅からラベル行のテキストボタンへ変更しスマホでの折り返しを解消。Phase 13完了を受けて`Form.tsx`の`handleAddGenre`/`handleAddPlace`に追加直後の自動選択を実装。`docs/04_frontend_design_guide.md`に`max-w-page`トークン・ページ骨格（§6.10新設）・スクロール構造の禁止事項・z-index対応表・FAB余白・＋追加配置と自動選択の方針を事後反映。
+
+  **検証**: `php artisan test`は全49件パス（回帰なし。作業中に一時`config:clear`が必要な環境要因のstaleキャッシュで28件失敗する事象があったが、これは今回の変更が原因ではなくキャッシュクリアで解消することを確認）。`php artisan migrate`/`migrate:fresh --seed`成功。`grep -rn "color" htdocs/app htdocs/database htdocs/resources`で残存参照なし（マイグレーションファイル自体を除く）。`npm run tsc`はエラーなし、`npm run lint`は既存の9件（`ssr.tsx`等）のみで新規の指摘なし、`npm run build`成功。**ブラウザでの実機・実見た目確認は本セッションでブラウザ操作ツールが利用できなかったため未実施**。ユーザーによる目視確認（Phase 12 §1の保存ボタン到達・全画面のライト/ダーク表示・スマホ実機でのスクロール/FAB重なり/モバイルメニュー、Phase 13のジャンル・保管場所セレクトの動作）を推奨。
 
 - 2026-07-26: Phase 11（音声入力の削除）実装完了。**削除したファイル**: `htdocs/app/Http/Controllers/VoiceController.php`、`htdocs/resources/js/Components/VoiceInput.tsx`、`htdocs/resources/js/hooks/useVoiceRecorder.ts`、`htdocs/resources/js/utils/audioUtils.ts`。**バックエンド**: `routes/api.php` から `POST /voice/transcribe`（`api.voice.transcribe`）ルートと `VoiceController` の import を削除、`routes/web.php` の未使用 import も削除。`config/services.php` から `whisper` 設定ブロックを削除。`ItemController::create`/`edit` で行っていた `route('api.voice.transcribe')` の生成・`apiUrl` プロパティの Inertia への受け渡しを削除。`.env.example`/`.env.testing` から `WHISPER_URL` を削除。**フロント**: `Pages/Items/Partials/Form.tsx` から `VoiceInput` の呼び出し・`voiceProcessing` state・`apiUrl` prop を除去（各入力の `disabled` 条件も `processing` のみに簡素化）。`Pages/Items/Create.tsx`/`Edit.tsx` から `apiUrl` の受け取り・`Form` への受け渡しを削除。`README.md` の「主要機能」「技術スタック」からも音声入力・Whisper API の記載を削除。**検証**: `grep -rniE "voice|whisper"` でコード側（`docs/`・`CLAUDE.md` 以外）に参照が残っていないことを確認。このworktreeは `composer install`/`npm install`/`vite build` 未実施の状態だったため一式実行した上で `php artisan test` を実行し、7 failed / 28 passed（既知のAuth系・環境起因の失敗のみ、Phase 10までと同一で回帰なし）を確認。`npm run tsc` は既知の `ssr.tsx` エラーのみ、`npm run lint` は削除により警告数が減少（VoiceInput.tsx分の警告が消滅）し新規の指摘なしを確認。Phase 11 完了により MVP フェーズ0 の実装 TODO は全フェーズ完了。
 - 2026-07-26: Phase 10の実機検証を実施（前回セッションではDockerコンテナ名衝突により未実施だった分）。本体`uchistock-*`スタックを停止し、このworktreeで`docker-compose up -d`（コンテナ名はデフォルトの`uchistock-*`のまま、ポートも本体と同一。同時起動しない運用に変更したため名前・ポートは変更不要）→ `migrate --seed`実行→検証。**結果**: (1) `php artisan test`: 28 passed / 7 failed（既知のAuth系・環境起因の失敗で全フェーズ通じて同一、回帰なし。Phase9時点の26 passedからPhase10で追加した`ItemStoreTest`2件が加わり28 passedへ）。(2) `npm run tsc`: エラーは`ssr.tsx`のみ（`b9ab2d4`時点からの既存エラーでPhase10とは無関係）。(3) `npm run lint`: 1 error/11 warningsだが全て`UpdateProfileInformationForm.tsx`（Phase8由来）・`VoiceInput.tsx`・`ssr.tsx`等の既存箇所でPhase10の変更ファイルには新規の指摘なし。(4) `curl`でnginx→php-fpm→mysqlの疎通確認（`/login`が200）。**ブラウザ確認（ユーザー実施、2026-07-26）**: 登録後の`items.index`遷移・トースト表示・購入履歴自動作成を含め目視確認完了。Phase 10の実機検証がすべて完了。
