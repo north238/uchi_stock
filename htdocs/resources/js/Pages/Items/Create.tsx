@@ -29,10 +29,8 @@ export default function Create({ auth }: PageProps) {
   };
 
   return (
-    <Authenticated
-      user={auth.user}
-    >
-      <Head title="アイテム登録" />
+    <Authenticated user={auth.user}>
+      <Head title="ストック登録" />
       <PageContainer>
         <Link
           href={route("items.index")}
@@ -41,7 +39,7 @@ export default function Create({ auth }: PageProps) {
           <MdArrowBack className="h-4 w-4" />
           戻る
         </Link>
-        <PageHeading>アイテム登録</PageHeading>
+        <PageHeading>ストック登録</PageHeading>
         <div className="mt-4">
           <Form
             data={data}

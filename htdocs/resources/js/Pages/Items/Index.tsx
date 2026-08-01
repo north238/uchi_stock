@@ -31,11 +31,11 @@ export default function Index({ auth }: PageProps) {
 
   return (
     <Authenticated user={auth.user}>
-      <Head title="アイテム一覧" />
+      <Head title="ストック一覧" />
 
       <PageContainer className="pb-24">
         <div className="mb-4 flex items-center justify-between">
-          <PageHeading>在庫一覧</PageHeading>
+          <PageHeading>ストック一覧</PageHeading>
 
           <Dropdown>
             <Dropdown.Trigger>
@@ -48,7 +48,11 @@ export default function Index({ auth }: PageProps) {
               </button>
             </Dropdown.Trigger>
             <Dropdown.Content align="right" width="48">
-              <Dropdown.Link href={route("items.index", { sort: "status" })} preserveScroll preserveState>
+              <Dropdown.Link
+                href={route("items.index", { sort: "status" })}
+                preserveScroll
+                preserveState
+              >
                 状態順
               </Dropdown.Link>
               <Dropdown.Link
@@ -64,12 +68,12 @@ export default function Index({ auth }: PageProps) {
 
         {items.length === 0 ? (
           <div className="rounded-[20px] bg-surface p-6 text-center shadow-card">
-            <p className="text-muted">登録されたアイテムはありません。</p>
+            <p className="text-muted">登録されたストックはありません。</p>
             <Link
               href={route("items.create")}
               className="mt-4 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-ink"
             >
-              アイテムを登録する
+              ストックを登録する
             </Link>
           </div>
         ) : (

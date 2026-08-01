@@ -37,10 +37,8 @@ export default function Edit({ auth }: PageProps) {
   };
 
   return (
-    <Authenticated
-      user={auth.user}
-    >
-      <Head title="アイテム編集" />
+    <Authenticated user={auth.user}>
+      <Head title="ストック編集" />
       <PageContainer>
         <Link
           href={route("items.index")}
@@ -49,7 +47,7 @@ export default function Edit({ auth }: PageProps) {
           <MdArrowBack className="h-4 w-4" />
           戻る
         </Link>
-        <PageHeading>アイテム編集</PageHeading>
+        <PageHeading>ストック編集</PageHeading>
         <div className="mt-4">
           <Form
             data={data}
