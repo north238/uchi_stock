@@ -13,7 +13,7 @@
 - スマホの「ホーム画面に追加」したアイコンから起動した場合のみ、LINE ログインが失敗する
 - 本番ログ(`storage/logs/laravel.log`)には以下が記録される:
 
-  ```
+  ```text
   production.ERROR: システムエラー {"message":"","file":"/var/www/html/vendor/socialiteproviders/line/Provider.php","line":118}
   ```
 
@@ -30,13 +30,13 @@
 
 ### 1.3 調査で無罪確定済みの項目(再調査不要)
 
-| 項目 | 確認結果 |
-|---|---|
-| `APP_URL` / `LINE_REDIRECT_URI` | `https://uchistock.bridgin-app.com` で一致 |
-| `SESSION_DOMAIN` | null(自動スコープ)で正常 |
-| `SESSION_SAME_SITE` | `lax` で正常 |
-| TrustProxies | `$proxies = '*'` 設定済み |
-| Redis 接続 | `ping()` 成功、セッションキーの書き込みも確認済み |
+| 項目                            | 確認結果                                          |
+| ------------------------------- | ------------------------------------------------- |
+| `APP_URL` / `LINE_REDIRECT_URI` | `https://uchistock.bridgin-app.com` で一致        |
+| `SESSION_DOMAIN`                | null(自動スコープ)で正常                          |
+| `SESSION_SAME_SITE`             | `lax` で正常                                      |
+| TrustProxies                    | `$proxies = '*'` 設定済み                         |
+| Redis 接続                      | `ping()` 成功、セッションキーの書き込みも確認済み |
 
 ### 1.4 採用しない対策と理由
 
@@ -142,3 +142,51 @@ docker compose -f docker-compose.prod.yml exec redis redis-cli monitor
 ## 5. 家族展開時の注意(Phase 2 向けメモ)
 
 - 家族がすでにホーム画面へアイコンを追加していた場合、4.1 と同様に**アイコンの削除→再追加の案内が必要**(Phase 1 の現時点では Fumiya の端末のみのため影響は限定的)
+
+ドキュメント貼り付け用に、案Aを自己完結でまとめます。
+
+---
+
+## 6. `disable_auto_login`によるstandalone復活(未検証・保留中)
+
+### 目的
+
+manifestを`"display": "standalone"`に戻し、全画面表示とタブ増殖なしを実現する。
+
+### 原理
+
+standaloneでLINEログインが壊れる直接の引き金は、認可中にLINEアプリへ切り替わり、コールバックがホーム画面アプリの外(デフォルトブラウザ)で開くこと。LINE Loginの`disable_auto_login=true`パラメータでアプリ切り替え自体を抑止し、フロー全体をWeb内で完結させれば、コンテキスト分離が発生せずstate検証が通る——という仮説。
+
+### 実装(1行)
+
+`SocialiteLoginController`の認可URL組み立て部に、既存の`bot_prompt`と同じパターンで追加:
+
+```php
+$urlWithParam = $url
+    . (strpos($url, '?') === false ? '?' : '&') . 'bot_prompt=aggressive'
+    . '&disable_auto_login=true';
+```
+
+あわせて`public/favicon/site.webmanifest`の`display`を`browser`→`standalone`に戻す。
+
+### トレードオフ
+
+- ログイン時にLINEアプリの自動認証が使えず、**LINEのメールアドレス＋パスワードの手入力**が必要になる。リメンバークッキー(動作確認済み)により実質初回とログアウト後のみ
+- 現状運用(ブックマーク)のログアウト後復帰は認可ワンタップで済むため、**復帰の手間は現状より重くなる**。交換条件は「日次のタブ増殖解消 ⇔ 稀なログイン時の手入力」
+
+### リスク(未検証事項)
+
+**iOSがstandaloneアプリから外部ドメイン(LINE認可画面)への遷移をアプリ内WebViewに留めるかは未確認。** アプリ内ブラウザシート(別ストレージ)で開かれた場合、同じコンテキスト分離が再発し案Aは不成立。文献で断定できないため実機検証が必須。
+
+### 検証手順
+
+1. 上記1行＋manifest変更をデプロイ
+2. ホーム画面の既存アイコンを削除し、**「Webアプリとして追加」にチェックを入れて**再追加
+3. 新アイコン(全画面起動)からLINEログインを実行
+4. 成功 → 案A採用で確定。`docs/07`とCLAUDE.mdの「`display: browser`維持」制約を「standalone + `disable_auto_login`必須」に改訂
+5. 失敗(`InvalidStateException`再発) → 案Aを恒久的に棄却し、現状のブックマーク運用で確定。本節に棄却日と理由を追記
+
+### 前提知識(2026-08-03時点の確定事項)
+
+- iOS 17.4以降、ホーム画面追加時の「Webアプリとして追加」チェックでユーザーがstandalone/ブックマークを選択でき、**manifestの`display`はデフォルト値を決めるだけ**でユーザー選択を強制できない
+- したがって案A採用時も、チェックを外して追加した端末ではブックマークとして動く(それ自体は無害)
