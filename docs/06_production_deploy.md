@@ -757,6 +757,7 @@ docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
 - [ ] アイテム一覧・ステータス変更・「買った」ワンタップが動作
 - [ ] ラズパイ再起動後、`docker compose` と cloudflared が自動復帰する
 - [ ] `app/Http/Middleware/TrustProxies.php` の `$proxies` が `'*'` になっている（Cloudflare Tunnel構成で必須。§5-5参照）
+- [ ] 本番ハードニング時は TrustProxies 設定（`$proxies = '*'`, 設定済み）を前提に `SESSION_SECURE_COOKIE=true` を有効化する（本チェックリストでは有効化しない、追記のみ。詳細は `docs/10_line_login_standalone_fix.md`）
 
 ---
 

@@ -33,9 +33,10 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             Log::error('システムエラー', [
-                'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
+                'exception' => get_class($e),
+                'message'   => $e->getMessage(),
+                'file'      => $e->getFile(),
+                'line'      => $e->getLine(),
             ]);
 
             // カスタムログ記録後、Laravelの標準ログ処理はスキップ
