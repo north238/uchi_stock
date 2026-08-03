@@ -1,5 +1,7 @@
 # UchiStock - 家庭在庫管理アプリ
 
+[![CI](https://github.com/north238/uchi_stock/actions/workflows/ci.yml/badge.svg)](https://github.com/north238/uchi_stock/actions/workflows/ci.yml)
+
 ## 概要
 
 UchiStockは、家庭の在庫管理を効率化するためのWebアプリケーションです。
@@ -180,6 +182,8 @@ open http://localhost:8080
 php artisan test
 
 ```
+
+`development` / `main` へのPR作成時は、GitHub Actions（`.github/workflows/ci.yml`）でPHPUnitテストとフロントエンドの型チェック・Lint・ビルド確認が自動実行されます。
 
 ## JSファイル（記述チェック・フォーマット）
 
